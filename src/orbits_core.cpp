@@ -12,6 +12,9 @@ int main()
     for (double elem:position){
         std::cout << elem << "\n";
     }
+    double orbital_radius=sqrt(pow(position.at(0),2) + pow(position.at(1),2) + pow(position.at(2),2));
+
+    std::cout << "orbital radius: " << orbital_radius << "\n";
     std::cout << "Velocity: \n";
 
     for (double elem:velocity){

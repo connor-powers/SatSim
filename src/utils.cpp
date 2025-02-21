@@ -12,7 +12,7 @@ std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> i
     
 
 
-    const double distance=std::sqrt(input_r_vec.at(0)*input_r_vec.at(0) + input_r_vec.at(1)*input_r_vec.at(1) + input_r_vec.at(2)*input_r_vec.at(2));
+    const double distance=sqrt(input_r_vec.at(0)*input_r_vec.at(0) + input_r_vec.at(1)*input_r_vec.at(1) + input_r_vec.at(2)*input_r_vec.at(2));
     const double overall_factor= -G*mass_Earth/pow(distance,3);
 
 
@@ -59,6 +59,6 @@ std::pair<std::array<double,3>,std::array<double,3>> propagate_orbit_RK4(std::fu
 
 
 
-    
+
     return position_and_vel_at_next_timestep;
 }

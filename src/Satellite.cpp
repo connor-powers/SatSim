@@ -83,7 +83,6 @@ std::pair<std::array<double,3>,std::array<double,3>> Satellite::calculate_positi
         //these should be the same distance
     }
     double initial_speed=sqrt(G*mass_Earth*(2/distance - 1/input_semimajor_axis));
-    std::cout << "initial speed here in the calculation: " << initial_speed << "\n";
     //But what's the orbital velocity direction?
 
     //http://mae-nas.eng.usu.edu/MAE_5540_Web/propulsion_systems/section2/section2.3.pdf
