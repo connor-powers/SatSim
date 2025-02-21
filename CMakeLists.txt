@@ -6,7 +6,14 @@ include_directories(/usr/local/eigen-3.4.0) #change this based on where your Eig
 project(orbital_sim)
 include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
-FetchContent_MakeAvailable(json)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
+)
+FetchContent_MakeAvailable(json googletest)
 
 add_executable(run src/orbits_core.cpp src/utils.cpp src/Satellite.cpp)
+add_executable(circular_orbit_tests tests/circular_orbit_tests.cpp src/Satellite.cpp)
+
 target_link_libraries(run PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(circular_orbit_tests PRIVATE nlohmann_json::nlohmann_json gtest_main)
