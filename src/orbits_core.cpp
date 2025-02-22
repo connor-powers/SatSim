@@ -3,7 +3,6 @@
 
 int main()
 {
-    std::cout << "test\n";
     Satellite test_sat("../input.json");
     std::array<double,3> position=test_sat.get_position();
     std::array<double,3> velocity=test_sat.get_velocity();
