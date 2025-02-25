@@ -1,4 +1,5 @@
 #include <iostream>
+#include <functional>
 
 std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> input_r_vec);
 
