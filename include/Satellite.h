@@ -18,6 +18,8 @@ class Satellite
         double a_;
         double true_anomaly_;
         double orbital_period_;
+        double m_;
+        double t_;
 
         std::array<double,3> instantaneous_position_;
         std::array<double,3> instantaneous_velocity_;
@@ -29,7 +31,6 @@ class Satellite
         std::pair<double,double> calculate_eccentric_anomaly(const double input_eccentricity, const double input_true_anomaly,const double input_semimajor_axis);
         double calculate_orbital_period(double input_semimajor_axis);
         std::array<double,3> transform_orbital_plane_coords_to_3D_ECI_cartesian(double input_x, double input_y,double input_RAAN,double input_i,double input_arg_of_periapsis);
-
     public:
         Satellite(std::string input_file_name){
             //baselining JSON input file format specifying initial orbital parameters of satellite
@@ -58,6 +59,10 @@ class Satellite
             true_anomaly_=input_data["True Anomaly"];
             //convert to radians
             true_anomaly_*=(M_PI/180);
+
+            m_=input_data["Mass"];
+            t_=0; //for now, assuming satellites are initialized at time t=0;
+
             orbital_period_=calculate_orbital_period(a_);
 
             std::pair<std::array<double,3>,std::array<double,3>> initial_position_and_vel=calculate_position_and_velocity_from_orbit_params(a_,eccentricity_,true_anomaly_,raan_,inclination_,arg_of_periapsis_,orbital_period_);
@@ -83,5 +88,17 @@ class Satellite
         double get_radius(){
             return instantaneous_orbital_radius_;
         }
+        double get_total_energy(){
+            double orbital_radius=get_radius();
+            double gravitational_potential_energy=-G*mass_Earth*m_/orbital_radius;
+
+            double orbital_speed=get_speed();
+            double kinetic_energy=(1/2)*m_*(orbital_speed*orbital_speed);
+
+            return (gravitational_potential_energy+kinetic_energy);
+        }
+
+        void evolve_RK4(double input_timestep, int input_num_timesteps);
+
 
 };

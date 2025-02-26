@@ -25,15 +25,17 @@ int main()
     double speed=sqrt(pow(velocity.at(0),2) + pow(velocity.at(1),2) + pow(velocity.at(2),2));
     std::cout << speed << "\n";
 
-    std::pair<std::array<double,3>,std::array<double,3>> evolved_position_and_velocity=RK4_step_orbital_position_and_velocity(position,velocity,10);
-    std::array<double,3> evolved_position=evolved_position_and_velocity.first;
-    std::array<double,3> evolved_velocity=evolved_position_and_velocity.second;
+    double test_timestep=1; //s
+    int num_timesteps=1;
+    test_sat.evolve_RK4(test_timestep,num_timesteps);
+
+    std::array<double,3> evolved_position=test_sat.get_position();
+    std::array<double,3> evolved_velocity=test_sat.get_velocity();
 
     double evolved_orbital_radius=sqrt(pow(evolved_position.at(0),2) + pow(evolved_position.at(1),2) + pow(evolved_position.at(2),2));
     std::cout << "Evolved orbital radius: " << evolved_orbital_radius << "\n";
     double evolved_speed=sqrt(pow(evolved_velocity.at(0),2) + pow(evolved_velocity.at(1),2) + pow(evolved_velocity.at(2),2));
     std::cout << "Evolved orbital speed: " << evolved_speed << "\n";
-
 
 
     return 0;
