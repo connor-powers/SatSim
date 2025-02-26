@@ -24,8 +24,6 @@ class Satellite
         std::array<double,3> instantaneous_position_;
         std::array<double,3> instantaneous_velocity_;
 
-        double instantaneous_orbital_radius_;
-        double instantaneous_orbital_speed_;
 
         std::pair<std::array<double,3>,std::array<double,3>> calculate_position_and_velocity_from_orbit_params(const double input_semimajor_axis,const double input_eccentricity,const double input_true_anomaly,const double input_RAAN,const double input_i,const double input_arg_of_periapsis,const double input_orbital_period);
         std::pair<double,double> calculate_eccentric_anomaly(const double input_eccentricity, const double input_true_anomaly,const double input_semimajor_axis);
@@ -71,9 +69,6 @@ class Satellite
             instantaneous_position_=initial_cartesian_ECI_position;
             instantaneous_velocity_=initial_cartesian_ECI_velocity;
 
-            instantaneous_orbital_radius_=sqrt(pow(instantaneous_position_.at(0),2)+pow(instantaneous_position_.at(1),2)+pow(instantaneous_position_.at(2),2));
-            instantaneous_orbital_speed_=sqrt(pow(instantaneous_velocity_.at(0),2)+pow(instantaneous_velocity_.at(1),2)+pow(instantaneous_velocity_.at(2),2));
-
         }
 
         std::array<double,3> get_position(){
@@ -83,10 +78,10 @@ class Satellite
             return instantaneous_velocity_;
         }
         double get_speed(){
-            return instantaneous_orbital_speed_;
+            return sqrt(pow(instantaneous_velocity_.at(0),2)+pow(instantaneous_velocity_.at(1),2)+pow(instantaneous_velocity_.at(2),2));
         }
         double get_radius(){
-            return instantaneous_orbital_radius_;
+            return sqrt(pow(instantaneous_position_.at(0),2)+pow(instantaneous_position_.at(1),2)+pow(instantaneous_position_.at(2),2));
         }
         double get_total_energy(){
             double orbital_radius=get_radius();

@@ -22,7 +22,7 @@ int main()
     }
 
     std::cout << "Speed:\n";
-    double speed=sqrt(pow(velocity.at(0),2) + pow(velocity.at(1),2) + pow(velocity.at(2),2));
+    double speed=test_sat.get_speed();
     std::cout << speed << "\n";
 
     double test_timestep=1; //s
@@ -34,7 +34,7 @@ int main()
 
     double evolved_orbital_radius=sqrt(pow(evolved_position.at(0),2) + pow(evolved_position.at(1),2) + pow(evolved_position.at(2),2));
     std::cout << "Evolved orbital radius: " << evolved_orbital_radius << "\n";
-    double evolved_speed=sqrt(pow(evolved_velocity.at(0),2) + pow(evolved_velocity.at(1),2) + pow(evolved_velocity.at(2),2));
+    double evolved_speed=test_sat.get_speed();
     std::cout << "Evolved orbital speed: " << evolved_speed << "\n";
 
 
