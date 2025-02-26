@@ -4,5 +4,6 @@
     "Argument of Periapsis": 1,
     "Eccentricity": 0,
     "Semimajor Axis": 10000,
-    "True Anomaly": 0
+    "True Anomaly": 0,
+    "Mass": 100
 }

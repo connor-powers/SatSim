@@ -4,6 +4,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include "Satellite.h"
+#include "utils.h"
 using Eigen::Matrix3d;
 
 
@@ -101,4 +102,29 @@ std::pair<std::array<double,3>,std::array<double,3>> Satellite::calculate_positi
     output_array.first=ECI_cartesian_coords;
     output_array.second=ECI_cartesian_velocities;
     return output_array;
+}
+
+
+void Satellite::evolve_RK4(double input_step_size, int num_timesteps){
+    //format input position and velocity arrays into single array for RK4 step
+    std::array<double,6> combined_initial_position_and_velocity_array={};
+    std::pair<std::array<double,3>,std::array<double,3>> output_position_velocity_pair={};
+
+    for (size_t ind=0;ind<3;ind++){
+        combined_initial_position_and_velocity_array.at(ind) = instantaneous_position_.at(ind);
+    }
+    for (size_t ind=3;ind<6;ind++){
+        combined_initial_position_and_velocity_array.at(ind) = instantaneous_velocity_.at(ind-3);
+    }
+
+    std::array<double,6> output_combined_initial_position_and_velocity_array= RK4_step<6>(combined_initial_position_and_velocity_array,input_step_size,RK4_deriv_function_orbit_position_and_velocity);
+    
+    
+    for (size_t ind=0;ind<3;ind++){
+        instantaneous_position_.at(ind) = output_combined_initial_position_and_velocity_array.at(ind);
+        instantaneous_velocity_.at(ind) = output_combined_initial_position_and_velocity_array.at(ind+3);
+    }
+    t_+=(input_step_size*num_timesteps);
+
+    return;
 }
