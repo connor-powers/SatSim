@@ -105,7 +105,7 @@ std::pair<std::array<double,3>,std::array<double,3>> Satellite::calculate_positi
 }
 
 
-void Satellite::evolve_RK4(double input_step_size, int num_timesteps){
+void Satellite::evolve_RK4(double input_step_size){
     //format input position and velocity arrays into single array for RK4 step
     std::array<double,6> combined_initial_position_and_velocity_array={};
     std::pair<std::array<double,3>,std::array<double,3>> output_position_velocity_pair={};
@@ -124,7 +124,7 @@ void Satellite::evolve_RK4(double input_step_size, int num_timesteps){
         instantaneous_position_.at(ind) = output_combined_initial_position_and_velocity_array.at(ind);
         instantaneous_velocity_.at(ind) = output_combined_initial_position_and_velocity_array.at(ind+3);
     }
-    t_+=(input_step_size*num_timesteps);
+    t_+=input_step_size;
 
     return;
 }
