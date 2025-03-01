@@ -29,7 +29,6 @@ TEST(CircularOrbitTests,TotalEnergyTimestep1){
     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
     double initial_energy=test_satellite.get_total_energy();
     double test_timestep=1; //s
-    int num_timesteps=1;
     test_satellite.evolve_RK4(test_timestep);
     double evolved_energy=test_satellite.get_total_energy();
     EXPECT_TRUE(abs(initial_energy-evolved_energy)<pow(10,-10)) << "Total energy not preserved within tolerance. Difference: " << initial_energy-evolved_energy << "\n";
@@ -40,7 +39,6 @@ TEST(CircularOrbitTests,EvolvedOrbitalRadius1){
     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
     double calculated_initial_radius=test_satellite.get_radius();
     double test_timestep=1; //s
-    int num_timesteps=1;
     test_satellite.evolve_RK4(test_timestep);
     double calculated_evolved_radius=test_satellite.get_radius();
 
@@ -52,7 +50,6 @@ TEST(CircularOrbitTests,EvolvedOrbitalSpeed1){
     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
     double calculated_initial_speed=test_satellite.get_speed();
     double test_timestep=1; //s
-    int num_timesteps=1;
     test_satellite.evolve_RK4(test_timestep);
     double calculated_evolved_speed=test_satellite.get_speed();
 
