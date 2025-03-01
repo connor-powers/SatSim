@@ -10,7 +10,7 @@ TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed1){
     double calculated_initial_speed=test_satellite.get_speed();
     double test_timestep=1; //s
     int num_timesteps=1;
-    test_satellite.evolve_RK4(test_timestep,num_timesteps);
+    test_satellite.evolve_RK4(test_timestep);
     double calculated_evolved_speed=test_satellite.get_speed();
 
     EXPECT_TRUE(calculated_initial_speed>calculated_evolved_speed) << "Perigee speed not larger than calculated evolved speed. Difference: " << calculated_initial_speed-calculated_evolved_speed << "\n";
@@ -22,7 +22,7 @@ TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed2){
     double calculated_initial_speed=test_satellite.get_speed();
     double test_timestep=1; //s
     int num_timesteps=1;
-    test_satellite.evolve_RK4(test_timestep,num_timesteps);
+    test_satellite.evolve_RK4(test_timestep);
     double calculated_evolved_speed=test_satellite.get_speed();
 
     EXPECT_TRUE(calculated_initial_speed<calculated_evolved_speed) << "Apogee speed not smaller than calculated evolved speed. Difference: " << calculated_initial_speed-calculated_evolved_speed << "\n";

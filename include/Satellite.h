@@ -7,22 +7,24 @@ using json=nlohmann::json;
 //Define constants
 const double G=6.674*pow(10,-11); //https://en.wikipedia.org/wiki/Gravitational_constant
 const double mass_Earth=5.9722*pow(10,24); //https://en.wikipedia.org/wiki/Earth_mass
+const double radius_Earth=6378137; //https://en.wikipedia.org/wiki/Earth_radius
 
 class Satellite
 {
     private:
-        double inclination_;
-        double raan_;
-        double arg_of_periapsis_;
-        double eccentricity_;
-        double a_;
-        double true_anomaly_;
-        double orbital_period_;
-        double m_;
-        double t_;
+        double inclination_={0};
+        double raan_={0};
+        double arg_of_periapsis_={0};
+        double eccentricity_={0};
+        double a_={0};
+        double true_anomaly_={0};
+        double orbital_period_={0};
+        double m_={0};
+        double t_={0};
+        std::string name_="";
 
-        std::array<double,3> instantaneous_position_;
-        std::array<double,3> instantaneous_velocity_;
+        std::array<double,3> instantaneous_position_={0,0,0};
+        std::array<double,3> instantaneous_velocity_={0,0,0};
 
 
         std::pair<std::array<double,3>,std::array<double,3>> calculate_position_and_velocity_from_orbit_params(const double input_semimajor_axis,const double input_eccentricity,const double input_true_anomaly,const double input_RAAN,const double input_i,const double input_arg_of_periapsis,const double input_orbital_period);
@@ -59,6 +61,7 @@ class Satellite
             true_anomaly_*=(M_PI/180);
 
             m_=input_data["Mass"];
+            name_=input_data["Name"];
             t_=0; //for now, assuming satellites are initialized at time t=0;
 
             orbital_period_=calculate_orbital_period(a_);
@@ -93,7 +96,13 @@ class Satellite
             return (gravitational_potential_energy+kinetic_energy);
         }
 
-        void evolve_RK4(double input_timestep, int input_num_timesteps);
+        double get_instantaneous_time(){
+            return t_;
+        }
+        std::string get_name(){
+            return name_;
+        }
+        void evolve_RK4(double input_timestep);
 
 
 };

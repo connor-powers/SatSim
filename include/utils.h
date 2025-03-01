@@ -41,3 +41,6 @@ template <int T> std::array<double, T> RK4_step(std::array<double, T> y_n, doubl
     
     return y_nplus1;
 }
+
+
+void sim_and_draw_orbit_gnuplot(Satellite input_satellite,double input_timestep, double input_total_sim_time);
