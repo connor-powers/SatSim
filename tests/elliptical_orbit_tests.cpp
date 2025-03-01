@@ -9,7 +9,6 @@ TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed1){
     Satellite test_satellite("../tests/elliptical_orbit_test_1.json");
     double calculated_initial_speed=test_satellite.get_speed();
     double test_timestep=1; //s
-    int num_timesteps=1;
     test_satellite.evolve_RK4(test_timestep);
     double calculated_evolved_speed=test_satellite.get_speed();
 
@@ -21,7 +20,6 @@ TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed2){
     Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
     double calculated_initial_speed=test_satellite.get_speed();
     double test_timestep=1; //s
-    int num_timesteps=1;
     test_satellite.evolve_RK4(test_timestep);
     double calculated_evolved_speed=test_satellite.get_speed();
 
