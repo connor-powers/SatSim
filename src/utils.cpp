@@ -47,8 +47,12 @@ std::array<double,6> RK4_deriv_function_orbit_position_and_velocity(std::array<d
 
 
 
-void sim_and_draw_orbit_gnuplot(Satellite input_satellite,double input_timestep, double input_total_sim_time){
-    std::string satellite_name=input_satellite.get_name();
+void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time){
+    if (input_satellite_vector.size()<1){
+        std::cout << "No input Satellite objects\n";
+        return;
+    }
+
     //first, open "pipe" to gnuplot
     FILE *gnuplot_pipe = popen("gnuplot -persist", "w");
     //if it exists
@@ -59,11 +63,13 @@ void sim_and_draw_orbit_gnuplot(Satellite input_satellite,double input_timestep,
         fprintf(gnuplot_pipe,"set xlabel 'x'\n");
         fprintf(gnuplot_pipe,"set ylabel 'y'\n");
         fprintf(gnuplot_pipe,"set zlabel 'z'\n");
-        fprintf(gnuplot_pipe,"set title '%s orbit up to time %.2f'\n",satellite_name.c_str(),input_total_sim_time);
-        fprintf(gnuplot_pipe,"set view 45,45\n");
+        fprintf(gnuplot_pipe,"set title 'Simulated orbits up to time %.2f s'\n",input_total_sim_time);
+        fprintf(gnuplot_pipe,"set view 70,1\n");        
+        fprintf(gnuplot_pipe,"unset colorbox\n");    
+        fprintf(gnuplot_pipe,"set style fill transparent solid 1.0\n");    
 
-
-
+        fprintf(gnuplot_pipe,"set key\n");   
+        fprintf(gnuplot_pipe,"set hidden3d front\n");   
 
 
         //plotting
@@ -75,31 +81,73 @@ void sim_and_draw_orbit_gnuplot(Satellite input_satellite,double input_timestep,
         fprintf(gnuplot_pipe,"set vrange [0:2*pi]\n");
 
 
-
-
-        fprintf(gnuplot_pipe,"splot R_Earth*cos(u)*cos(v),R_Earth*cos(u)*sin(v),R_Earth*sin(u) lw 1 lc rgb 'blue' notitle,'-' lw 1 lc rgb 'violet' notitle\n");
-        //now the orbit data, inline
-        std::array<double,3> initial_position=input_satellite.get_position();
-        fprintf(gnuplot_pipe,"%f %f %f\n",initial_position.at(0),initial_position.at(1),initial_position.at(2));
-
-
-
-        std::array<double,3> evolved_position={};
-
-        int num_timesteps=std::ceil(input_total_sim_time/input_timestep);
-
-        for (int timestep=0;timestep<num_timesteps;timestep++){
-            input_satellite.evolve_RK4(input_timestep);
-            evolved_position=input_satellite.get_position();
-            fprintf(gnuplot_pipe,"%f %f %f\n",evolved_position.at(0),evolved_position.at(1),evolved_position.at(2));
+        //first satellite
+        Satellite current_satellite=input_satellite_vector.at(0);
+        if (input_satellite_vector.size()==1){
+            if (current_satellite.plotting_color_.size()>0){
+                fprintf(gnuplot_pipe,"splot '-' with lines lw 1 lc rgb '%s' title '%s' \\\n",current_satellite.plotting_color_.c_str(),current_satellite.get_name().c_str());
+            }
+            else {
+                fprintf(gnuplot_pipe,"splot '-' with lines lw 1 title '%s' \\\n",current_satellite.get_name().c_str());
+            }
+            
         }
-        fprintf(gnuplot_pipe,"e\n");
 
+        else {
+            if (current_satellite.plotting_color_.size()>0){
+                fprintf(gnuplot_pipe,"splot '-' with lines lw 1 lc rgb '%s' title '%s'\\\n",current_satellite.plotting_color_.c_str(),current_satellite.get_name().c_str());
+            }
+            else {
+                fprintf(gnuplot_pipe,"splot '-' with lines lw 1 title '%s'\\\n",current_satellite.get_name().c_str());
+            }
+        }
 
+        for (size_t satellite_index=1;satellite_index<input_satellite_vector.size();satellite_index++){
+            current_satellite=input_satellite_vector.at(satellite_index);
+            if (satellite_index<input_satellite_vector.size()-1){
+                if (current_satellite.plotting_color_.size()>0){
+                    fprintf(gnuplot_pipe,",'-' with lines lw 1 lc rgb '%s' title '%s' \\\n",current_satellite.plotting_color_.c_str(),current_satellite.get_name().c_str());
+                }
+                else {
+                    fprintf(gnuplot_pipe,",'-' with lines lw 1 title '%s' \\\n",current_satellite.get_name().c_str());
+                }
+                
+            }
+
+            else {
+                if (current_satellite.plotting_color_.size()>0){
+                    fprintf(gnuplot_pipe,",'-' with lines lw 1 lc rgb '%s' title '%s'\\\n",current_satellite.plotting_color_.c_str(),current_satellite.get_name().c_str());
+                }
+                else {
+                    fprintf(gnuplot_pipe,",'-' with lines lw 1 title '%s'\\\n",current_satellite.get_name().c_str());
+                }
+            }
+        }
+        fprintf(gnuplot_pipe,",R_Earth*cos(u)*cos(v),R_Earth*cos(u)*sin(v),R_Earth*sin(u) notitle with pm3d fillcolor rgbcolor 'navy'\n");
+
+        //now the orbit data, inline, one satellite at a time
+        for (size_t satellite_index=0;satellite_index<input_satellite_vector.size();satellite_index++){
+            Satellite current_satellite=input_satellite_vector.at(satellite_index);
+            std::array<double,3> initial_position=current_satellite.get_position();
+            fprintf(gnuplot_pipe,"%f %f %f\n",initial_position.at(0),initial_position.at(1),initial_position.at(2));
     
+    
+            std::array<double,3> evolved_position={};
+    
+            int num_timesteps=std::ceil(input_total_sim_time/input_timestep);
+    
+            for (int timestep=0;timestep<num_timesteps;timestep++){
+                current_satellite.evolve_RK4(input_timestep);
+                evolved_position=current_satellite.get_position();
+                fprintf(gnuplot_pipe,"%f %f %f\n",evolved_position.at(0),evolved_position.at(1),evolved_position.at(2));
+            }
+            fprintf(gnuplot_pipe,"e\n");
+
+        }
+        fprintf(gnuplot_pipe,"pause mouse keypress\n");
+
         fprintf(gnuplot_pipe,"exit \n");
         pclose(gnuplot_pipe);
-
 
 
     }

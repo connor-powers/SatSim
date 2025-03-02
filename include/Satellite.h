@@ -32,6 +32,7 @@ class Satellite
         double calculate_orbital_period(double input_semimajor_axis);
         std::array<double,3> transform_orbital_plane_coords_to_3D_ECI_cartesian(double input_x, double input_y,double input_RAAN,double input_i,double input_arg_of_periapsis);
     public:
+        std::string plotting_color_="";
         Satellite(std::string input_file_name){
             //baselining JSON input file format specifying initial orbital parameters of satellite
             //semimajor axis is read in units of km
@@ -39,29 +40,35 @@ class Satellite
             std::ifstream input_filestream(input_file_name);
             json input_data=json::parse(input_filestream);
 
-            inclination_=input_data["Inclination"];
+            inclination_=input_data.at("Inclination");
             //convert to radians
             inclination_*=(M_PI/180);
 
-            raan_=input_data["RAAN"];
+            raan_=input_data.at("RAAN");
             //convert to radians
             raan_*=(M_PI/180);
 
-            arg_of_periapsis_=input_data["Argument of Periapsis"];
+            arg_of_periapsis_=input_data.at("Argument of Periapsis");
             //convert to radians
             arg_of_periapsis_*=(M_PI/180);
 
-            eccentricity_=input_data["Eccentricity"];
+            eccentricity_=input_data.at("Eccentricity");
 
-            a_=input_data["Semimajor Axis"];
+            a_=input_data.at("Semimajor Axis");
             a_*=1000; //converting from km to m
 
-            true_anomaly_=input_data["True Anomaly"];
+            true_anomaly_=input_data.at("True Anomaly");
             //convert to radians
             true_anomaly_*=(M_PI/180);
 
-            m_=input_data["Mass"];
-            name_=input_data["Name"];
+            m_=input_data.at("Mass");
+            name_=input_data.at("Name");
+
+            //making plotting color an optional parameter
+            if (input_data.find("Plotting Color")!=input_data.end()){
+                plotting_color_=input_data.at("Plotting Color");
+            }
+            
             t_=0; //for now, assuming satellites are initialized at time t=0;
 
             orbital_period_=calculate_orbital_period(a_);
