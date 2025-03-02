@@ -75,6 +75,11 @@
         "random": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "codecvt": "cpp",
+        "numbers": "cpp",
+        "regex": "cpp",
+        "semaphore": "cpp",
+        "typeindex": "cpp"
     }
 }

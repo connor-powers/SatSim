@@ -1,0 +1,10 @@
+{
+    "Inclination": 0,
+    "RAAN": 1,
+    "Argument of Periapsis": 1,
+    "Eccentricity": 0.0,
+    "Semimajor Axis": 11000,
+    "True Anomaly": 90,
+    "Mass": 100,
+    "Name" : "Test Satellite Name 2"
+}

@@ -79,8 +79,8 @@ std::pair<std::array<double,3>,std::array<double,3>> Satellite::calculate_positi
 
     //https://en.wikipedia.org/wiki/Orbital_speed
     double distance=sqrt(pow(ECI_cartesian_coords.at(0),2)+pow(ECI_cartesian_coords.at(1),2)+pow(ECI_cartesian_coords.at(2),2));
-    if (abs(distance-computed_distance_from_Earth)>=pow(10,-14)){
-        std::cout << "distance was " << distance << ", previously computed distance from Earth was " << computed_distance_from_Earth << "\n";
+    if (abs(distance-computed_distance_from_Earth)>=pow(10,-8)){
+        std::cout << "distance diff was " << abs(distance-computed_distance_from_Earth) << "\n";
         //these should be the same distance
     }
     double initial_speed=sqrt(G*mass_Earth*(2/distance - 1/input_semimajor_axis));
