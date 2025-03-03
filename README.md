@@ -2,7 +2,7 @@
 C++ orbital simulation project, currently using RK4 for time dynamics.
 
 # Example workflow:
-1) Adjust orbital parameters of desired satellite input file(s). One input JSON per satellite, all fields mandatory except "Plotting Color". Angles are entered in degrees.
+1) Adjust orbital parameters of desired satellite input file(s). One input JSON per satellite, all fields mandatory except "Plotting Color" (this must be a named color in Gnuplot). Angles are entered in degrees.
 
 2) Adjust simulation timestep and total simulation time in orbits_core.cpp
 
@@ -20,7 +20,7 @@ Note: You can click and drag the resulting 3D plot to adjust camera angle as des
 Visualization/plotting is done via Gnuplot. The copyright and permission notice of Gnuplot is shown below:
 
 Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
- 
+
 Permission to use, copy, and distribute this software and its
 documentation for any purpose with or without fee is hereby granted,
 provided that the above copyright notice appear in all copies and
