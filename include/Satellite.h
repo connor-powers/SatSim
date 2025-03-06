@@ -9,6 +9,26 @@ const double G=6.674*pow(10,-11); //https://en.wikipedia.org/wiki/Gravitational_
 const double mass_Earth=5.9722*pow(10,24); //https://en.wikipedia.org/wiki/Earth_mass
 const double radius_Earth=6378137; //https://en.wikipedia.org/wiki/Earth_radius
 
+class ThrustProfileLVLH
+{
+    public:
+        double t_start_={0};
+        double t_end_={0};
+        std::array<double,3> LVLH_force_vec_={0,0,0};
+        ThrustProfileLVLH(double t_start, double t_end, std::array<double,3> LVLH_force_vec){
+            t_start_=t_start;
+            t_end_=t_end;
+            LVLH_force_vec_=LVLH_force_vec;
+        }
+        ThrustProfileLVLH(double t_start, double t_end, std::array<double,3> LVLH_normalized_force_direction_vec,double input_force_magnitude){
+            t_start_=t_start;
+            t_end_=t_end;
+            for (size_t ind=0;ind<3;ind++){
+                LVLH_force_vec_.at(ind)=input_force_magnitude*LVLH_normalized_force_direction_vec.at(ind);
+            }
+        }
+};
+
 class Satellite
 {
     private:
@@ -19,8 +39,15 @@ class Satellite
         double a_={0};
         double true_anomaly_={0};
         double orbital_period_={0};
-        double m_={0};
+        double m_={1}; //default value to prevent infinities in acceleration calculations from a=F/m
         double t_={0};
+
+
+        //Now body-frame attributes
+        double pitch_angle_={0};
+        double roll_angle_={0};
+        double yaw_angle_={0};
+
         std::string name_="";
 
         std::array<double,3> perifocal_position_={0,0,0};
@@ -28,6 +55,12 @@ class Satellite
 
         std::array<double,3> ECI_position_={0,0,0};
         std::array<double,3> ECI_velocity_={0,0,0};
+
+        std::vector<ThrustProfileLVLH> thrust_profile_list_={};
+
+        std::vector<std::array<double,3>> list_of_LVLH_forces_at_this_time_={};
+        std::vector<std::array<double,3>> list_of_ECI_forces_at_this_time_={};
+
 
         std::pair<double,double> calculate_eccentric_anomaly(const double input_eccentricity, const double input_true_anomaly,const double input_semimajor_axis);
         double calculate_orbital_period(double input_semimajor_axis);
@@ -126,5 +159,9 @@ class Satellite
         std::array<double,3> convert_perifocal_to_ECI(std::array<double,3> input_perifocal_vec);
         std::array<double,3> convert_ECI_to_perifocal(std::array<double,3> input_ECI_vec);
 
+        std::array<double,3> convert_LVLH_to_ECI(std::array<double,3> input_LVLH_vec);
+
+        void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_normalized_thrust_direction,double input_LVLH_thrust_magnitude,double input_thrust_start_time, double input_thrust_end_time);
+        void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_thrust_vector,double input_thrust_start_time, double input_thrust_end_time);
 
 };

@@ -168,7 +168,34 @@ void Satellite::evolve_RK4(double input_step_size){
         combined_initial_position_and_velocity_array.at(ind) = ECI_velocity_.at(ind-3);
     }
 
-    std::array<double,6> output_combined_initial_position_and_velocity_array= RK4_step<6>(combined_initial_position_and_velocity_array,input_step_size,RK4_deriv_function_orbit_position_and_velocity);
+    //populate list of thrust forces at half a timestep past, for RK4 calculations
+    std::vector<std::array<double,3>> list_of_LVLH_forces_at_half_timestep_past={};
+    std::vector<std::array<double,3>> list_of_ECI_forces_at_half_timestep_past={};
+
+    for (ThrustProfileLVLH thrust_profile : thrust_profile_list_){
+
+        if (((t_+(input_step_size/2))>=thrust_profile.t_start_)&&((t_+(input_step_size/2))<=thrust_profile.t_end_)){
+            list_of_LVLH_forces_at_half_timestep_past.push_back(thrust_profile.LVLH_force_vec_);
+            std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI(thrust_profile.LVLH_force_vec_);
+            list_of_ECI_forces_at_half_timestep_past.push_back(ECI_thrust_vector);
+        }
+    }
+
+    //populate list of thrust forces at a timestep past, for RK4 calculations
+    std::vector<std::array<double,3>> list_of_LVLH_forces_at_one_timestep_past={};
+    std::vector<std::array<double,3>> list_of_ECI_forces_at_one_timestep_past={};
+
+    for (ThrustProfileLVLH thrust_profile : thrust_profile_list_){
+
+        if (((t_+input_step_size)>=thrust_profile.t_start_)&&((t_+input_step_size)<=thrust_profile.t_end_)){
+            list_of_LVLH_forces_at_one_timestep_past.push_back(thrust_profile.LVLH_force_vec_);
+            std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI(thrust_profile.LVLH_force_vec_);
+            list_of_ECI_forces_at_one_timestep_past.push_back(ECI_thrust_vector);
+        }
+    }
+
+
+    std::array<double,6> output_combined_initial_position_and_velocity_array= RK4_step<6>(combined_initial_position_and_velocity_array,input_step_size,RK4_deriv_function_orbit_position_and_velocity,m_,list_of_ECI_forces_at_this_time_,list_of_ECI_forces_at_half_timestep_past,list_of_ECI_forces_at_one_timestep_past);
     
     
     for (size_t ind=0;ind<3;ind++){
@@ -180,5 +207,62 @@ void Satellite::evolve_RK4(double input_step_size){
     }
     t_+=input_step_size;
 
+    list_of_LVLH_forces_at_this_time_=list_of_LVLH_forces_at_one_timestep_past;
+    list_of_ECI_forces_at_this_time_=list_of_ECI_forces_at_one_timestep_past;
+
     return;
+}
+
+
+std::array<double,3> Satellite::convert_LVLH_to_ECI(std::array<double,3> input_LVLH_vec){
+    Vector3d input_LVLH_vec_eigen;
+    input_LVLH_vec_eigen << input_LVLH_vec.at(0),input_LVLH_vec.at(1),input_LVLH_vec.at(2);
+    //ref: https://ntrs.nasa.gov/api/citations/20205003902/downloads/Introduction%20to%20Orbital%20Mechanics%20and%20Spacecraft%20Attitudes%20for%20Thermal%20Engineers%20CHARTS%20PDF.pdf
+    Matrix3d ref_mat;
+    ref_mat << 0,0,-1,
+               1,0,0,
+               0,-1,0;
+    
+    Matrix3d omega_mat=z_rot_matrix(raan_);
+    Matrix3d inclination_mat=y_rot_matrix(inclination_);
+    Matrix3d arg_periapsis_mat=z_rot_matrix(arg_of_periapsis_);
+    Matrix3d true_anomaly_mat=z_rot_matrix(true_anomaly_);
+
+    Matrix3d pitch_angle_mat=y_rot_matrix(pitch_angle_);
+    Matrix3d yaw_angle_mat=z_rot_matrix(yaw_angle_);
+    Matrix3d roll_angle_mat=x_rot_matrix(roll_angle_);
+
+
+    Vector3d ECI_vec_eigen=omega_mat*inclination_mat*arg_periapsis_mat*true_anomaly_mat*ref_mat*pitch_angle_mat*yaw_angle_mat*roll_angle_mat*input_LVLH_vec_eigen;
+
+    std::array<double,3> ECI_vec_output={ECI_vec_eigen(0),ECI_vec_eigen(1),ECI_vec_eigen(2)};
+    return ECI_vec_output;
+}
+
+
+void Satellite::add_LVLH_thrust_profile(std::array<double,3> input_LVLH_thrust_vector,double input_thrust_start_time, double input_thrust_end_time){
+    ThrustProfileLVLH new_thrust_profile(input_thrust_start_time, input_thrust_end_time, input_LVLH_thrust_vector);
+    thrust_profile_list_.push_back(new_thrust_profile);
+    if (input_thrust_start_time==0){
+        list_of_LVLH_forces_at_this_time_.push_back(input_LVLH_thrust_vector);
+        std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI(input_LVLH_thrust_vector);
+        list_of_ECI_forces_at_this_time_.push_back(ECI_thrust_vector);
+    }
+}
+
+void Satellite::add_LVLH_thrust_profile(std::array<double,3> input_LVLH_normalized_thrust_direction,double input_LVLH_thrust_magnitude,double input_thrust_start_time, double input_thrust_end_time){
+    ThrustProfileLVLH new_thrust_profile(input_thrust_start_time, input_thrust_end_time, input_LVLH_normalized_thrust_direction,input_LVLH_thrust_magnitude);
+    thrust_profile_list_.push_back(new_thrust_profile);
+
+    std::array<double,3> LVLH_thrust_vec={0,0,0};
+
+    for (size_t ind=0;ind<3;ind++){
+        LVLH_thrust_vec.at(ind)=input_LVLH_thrust_magnitude*input_LVLH_normalized_thrust_direction.at(ind);
+    }
+
+    if (input_thrust_start_time==0){
+        list_of_LVLH_forces_at_this_time_.push_back(LVLH_thrust_vec);
+        std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI(LVLH_thrust_vec);
+        list_of_ECI_forces_at_this_time_.push_back(ECI_thrust_vector);
+    }
 }

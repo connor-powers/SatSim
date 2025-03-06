@@ -1,12 +1,12 @@
 {
-    "Inclination": 45,
+    "Inclination": 0,
     "RAAN": 1,
     "Argument of Periapsis": 1,
     "Eccentricity": 0.1,
     "Semimajor Axis": 10000,
     "True Anomaly": 0,
     "Mass": 100,
-    "Name" : "Test Satellite Name 1",
+    "Name" : "Satellite 1",
     "Plotting Color" : "dark-goldenrod"
 
 }
