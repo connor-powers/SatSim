@@ -1,20 +1,33 @@
 # Satellite_Orbit_Sim
-C++ orbital simulation project, currently using RK4 for time dynamics.
+Simulation of satellites in Earth's orbit, written in C++. 
 
-# Example workflow:
-1) Adjust orbital parameters of desired satellite input file(s). One input JSON per satellite, all fields mandatory except "Plotting Color" (this must be a named color in Gnuplot). Angles are entered in degrees.
+Features so far:
 
-2) Adjust simulation timestep and total simulation time in orbits_core.cpp
+- RK4 method for time evolution
 
-3) Run the "run" executable in build to simulate and visualize the satellite orbit(s)
+- Construct and plot multiple satellite objects simultaneously
+
+- Support for adding body-frame (LVLH) thrust profiles to satellites
+
+   - Currently supports constant-thrust profiles over a specified time period
+
+- 3D visualization of simulated satellite orbits
+
+
+# Build Instructions
+Note: this tool requires gnuplot to be installed.
+
+1. Create empty "build" directory inside Satellite_Orbit_Sim directory
+2. Run "cmake .."
+3. Run "cmake --build ."
+
+# Example workflow
+1. Make an input json files each satellite you'd like to simulate. Currently, each satellite is defined by its 6 initial orbital parameters (semimajor axis, inclination, RAAN, argument of periapsis, eccentricity, and true anomaly), as well as its name and mass. Plotting color (the display color of its orbit) is an optional parameter, but must be one of the named colors ("colornames") in gnuplot. (see existing examples, e.g., input.json). All angles are entered as degrees.
+2. Modify simulation_setup.cpp as your simulation requires, creating Satellite objects for each simulated satellite, adding thrust profiles to satellites, etc. Make sure all satellites you want to simulate are contained in the vector passed into the sim_and_draw_orbit_gnuplot call.
+3. Re-run "cmake --build ." to build the updated executables
+4. Run the "run" executable in the build directory to simulate and visualize the satellite orbit(s)
 
 Note: You can click and drag the resulting 3D plot to adjust camera angle as desired.
-
-
-
-
-
-
 
 # Misc
 Visualization/plotting is done via Gnuplot. The copyright and permission notice of Gnuplot is shown below:
