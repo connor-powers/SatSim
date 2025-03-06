@@ -21,7 +21,7 @@ FetchContent_MakeAvailable(json googletest Eigen)
 
 
 
-add_executable(run src/orbits_core.cpp src/utils.cpp src/Satellite.cpp)
+add_executable(run src/simulation_setup.cpp src/utils.cpp src/Satellite.cpp)
 add_executable(circular_orbit_tests tests/circular_orbit_tests.cpp src/Satellite.cpp src/utils.cpp)
 add_executable(elliptical_orbit_tests tests/elliptical_orbit_tests.cpp src/Satellite.cpp src/utils.cpp)
 
