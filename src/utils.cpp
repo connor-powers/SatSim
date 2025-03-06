@@ -90,7 +90,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
         fprintf(gnuplot_pipe,"set ylabel 'y'\n");
         fprintf(gnuplot_pipe,"set zlabel 'z'\n");
         fprintf(gnuplot_pipe,"set title 'Simulated orbits up to time %.2f s'\n",input_total_sim_time);
-        // fprintf(gnuplot_pipe,"set view 70,1\n");        
+        // fprintf(gnuplot_pipe,"set view 70,1,1,1\n");        
         fprintf(gnuplot_pipe,"set view equal xyz\n");        
 
         fprintf(gnuplot_pipe,"unset colorbox\n");    

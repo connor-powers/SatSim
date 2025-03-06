@@ -11,6 +11,7 @@ const double radius_Earth=6378137; //https://en.wikipedia.org/wiki/Earth_radius
 
 class ThrustProfileLVLH
 {
+    //Note: for now, thrust forces are assumed to act through center of mass of satellite.
     public:
         double t_start_={0};
         double t_end_={0};

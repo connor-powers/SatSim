@@ -6,7 +6,6 @@
     "Semimajor Axis": 10000,
     "True Anomaly": 0,
     "Mass": 100,
-    "Name" : "Satellite 2",
-    "Plotting Color" : "forest-green"
+    "Name" : "Satellite 2"
 
 }
