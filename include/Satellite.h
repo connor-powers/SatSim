@@ -9,28 +9,61 @@ const double G=6.674*pow(10,-11); //https://en.wikipedia.org/wiki/Gravitational_
 const double mass_Earth=5.9722*pow(10,24); //https://en.wikipedia.org/wiki/Earth_mass
 const double radius_Earth=6378137; //https://en.wikipedia.org/wiki/Earth_radius
 
+class ThrustProfileLVLH
+{
+    public:
+        double t_start_={0};
+        double t_end_={0};
+        std::array<double,3> LVLH_force_vec_={0,0,0};
+        ThrustProfileLVLH(double t_start, double t_end, std::array<double,3> LVLH_force_vec){
+            t_start_=t_start;
+            t_end_=t_end;
+            LVLH_force_vec_=LVLH_force_vec;
+        }
+        ThrustProfileLVLH(double t_start, double t_end, std::array<double,3> LVLH_normalized_force_direction_vec,double input_force_magnitude){
+            t_start_=t_start;
+            t_end_=t_end;
+            for (size_t ind=0;ind<3;ind++){
+                LVLH_force_vec_.at(ind)=input_force_magnitude*LVLH_normalized_force_direction_vec.at(ind);
+            }
+        }
+};
+
 class Satellite
 {
     private:
         double inclination_={0};
-        double raan_={0};
+        double raan_={0}; //Assuming RAAN can be used interchangeably with longitude of ascending node for the Earth-orbiting satellites simulated here
         double arg_of_periapsis_={0};
         double eccentricity_={0};
         double a_={0};
         double true_anomaly_={0};
         double orbital_period_={0};
-        double m_={0};
+        double m_={1}; //default value to prevent infinities in acceleration calculations from a=F/m
         double t_={0};
+
+
+        //Now body-frame attributes
+        double pitch_angle_={0};
+        double roll_angle_={0};
+        double yaw_angle_={0};
+
         std::string name_="";
 
-        std::array<double,3> instantaneous_position_={0,0,0};
-        std::array<double,3> instantaneous_velocity_={0,0,0};
+        std::array<double,3> perifocal_position_={0,0,0};
+        std::array<double,3> perifocal_velocity_={0,0,0};
+
+        std::array<double,3> ECI_position_={0,0,0};
+        std::array<double,3> ECI_velocity_={0,0,0};
+
+        std::vector<ThrustProfileLVLH> thrust_profile_list_={};
+
+        std::vector<std::array<double,3>> list_of_LVLH_forces_at_this_time_={};
+        std::vector<std::array<double,3>> list_of_ECI_forces_at_this_time_={};
 
 
-        std::pair<std::array<double,3>,std::array<double,3>> calculate_position_and_velocity_from_orbit_params(const double input_semimajor_axis,const double input_eccentricity,const double input_true_anomaly,const double input_RAAN,const double input_i,const double input_arg_of_periapsis,const double input_orbital_period);
         std::pair<double,double> calculate_eccentric_anomaly(const double input_eccentricity, const double input_true_anomaly,const double input_semimajor_axis);
         double calculate_orbital_period(double input_semimajor_axis);
-        std::array<double,3> transform_orbital_plane_coords_to_3D_ECI_cartesian(double input_x, double input_y,double input_RAAN,double input_i,double input_arg_of_periapsis);
     public:
         std::string plotting_color_="";
         Satellite(std::string input_file_name){
@@ -73,25 +106,29 @@ class Satellite
 
             orbital_period_=calculate_orbital_period(a_);
 
-            std::pair<std::array<double,3>,std::array<double,3>> initial_position_and_vel=calculate_position_and_velocity_from_orbit_params(a_,eccentricity_,true_anomaly_,raan_,inclination_,arg_of_periapsis_,orbital_period_);
-            std::array<double,3> initial_cartesian_ECI_position=initial_position_and_vel.first;
-            std::array<double,3> initial_cartesian_ECI_velocity=initial_position_and_vel.second;
-            instantaneous_position_=initial_cartesian_ECI_position;
-            instantaneous_velocity_=initial_cartesian_ECI_velocity;
+            //updated workflow
+            perifocal_position_=calculate_perifocal_position();
+            perifocal_velocity_=calculate_perifocal_velocity();
+
+            ECI_position_=convert_perifocal_to_ECI(perifocal_position_);
+            ECI_velocity_=convert_perifocal_to_ECI(perifocal_velocity_);
+
 
         }
 
-        std::array<double,3> get_position(){
-            return instantaneous_position_;
+        std::array<double,3> get_ECI_position(){
+            return ECI_position_;
         }
-        std::array<double,3> get_velocity(){
-            return instantaneous_velocity_;
+        std::array<double,3> get_ECI_velocity(){
+            return ECI_velocity_;
         }
         double get_speed(){
-            return sqrt(pow(instantaneous_velocity_.at(0),2)+pow(instantaneous_velocity_.at(1),2)+pow(instantaneous_velocity_.at(2),2));
+            //shouldn't matter which frame I use, might as well use perifocal coords since it's fewer operations (no W-direction component so can omit that term, whereas there's x,y,z components in ECI)
+            return sqrt(pow(perifocal_velocity_.at(0),2)+pow(perifocal_velocity_.at(1),2));
         }
         double get_radius(){
-            return sqrt(pow(instantaneous_position_.at(0),2)+pow(instantaneous_position_.at(1),2)+pow(instantaneous_position_.at(2),2));
+            //shouldn't matter which frame I use, might as well use perifocal coords since it's fewer operations (no W-direction component so can omit that term, whereas there's x,y,z components in ECI)
+            return sqrt(pow(perifocal_position_.at(0),2)+pow(perifocal_position_.at(1),2));
         }
         double get_total_energy(){
             double orbital_radius=get_radius();
@@ -111,5 +148,20 @@ class Satellite
         }
         void evolve_RK4(double input_timestep);
 
+        std::array<double,3> body_frame_to_ECI(std::array<double,3> input_vector);
+
+        std::array<double,3> ECI_to_body_frame(std::array<double,3> input_vector);
+
+        std::array<double,3> calculate_perifocal_position();
+
+        std::array<double,3> calculate_perifocal_velocity();
+
+        std::array<double,3> convert_perifocal_to_ECI(std::array<double,3> input_perifocal_vec);
+        std::array<double,3> convert_ECI_to_perifocal(std::array<double,3> input_ECI_vec);
+
+        std::array<double,3> convert_LVLH_to_ECI(std::array<double,3> input_LVLH_vec);
+
+        void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_normalized_thrust_direction,double input_LVLH_thrust_magnitude,double input_thrust_start_time, double input_thrust_end_time);
+        void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_thrust_vector,double input_thrust_start_time, double input_thrust_end_time);
 
 };
