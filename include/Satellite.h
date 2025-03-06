@@ -13,7 +13,7 @@ class Satellite
 {
     private:
         double inclination_={0};
-        double raan_={0};
+        double raan_={0}; //Assuming RAAN can be used interchangeably with longitude of ascending node for the Earth-orbiting satellites simulated here
         double arg_of_periapsis_={0};
         double eccentricity_={0};
         double a_={0};
@@ -23,14 +23,14 @@ class Satellite
         double t_={0};
         std::string name_="";
 
-        std::array<double,3> instantaneous_position_={0,0,0};
-        std::array<double,3> instantaneous_velocity_={0,0,0};
+        std::array<double,3> perifocal_position_={0,0,0};
+        std::array<double,3> perifocal_velocity_={0,0,0};
 
+        std::array<double,3> ECI_position_={0,0,0};
+        std::array<double,3> ECI_velocity_={0,0,0};
 
-        std::pair<std::array<double,3>,std::array<double,3>> calculate_position_and_velocity_from_orbit_params(const double input_semimajor_axis,const double input_eccentricity,const double input_true_anomaly,const double input_RAAN,const double input_i,const double input_arg_of_periapsis,const double input_orbital_period);
         std::pair<double,double> calculate_eccentric_anomaly(const double input_eccentricity, const double input_true_anomaly,const double input_semimajor_axis);
         double calculate_orbital_period(double input_semimajor_axis);
-        std::array<double,3> transform_orbital_plane_coords_to_3D_ECI_cartesian(double input_x, double input_y,double input_RAAN,double input_i,double input_arg_of_periapsis);
     public:
         std::string plotting_color_="";
         Satellite(std::string input_file_name){
@@ -73,25 +73,29 @@ class Satellite
 
             orbital_period_=calculate_orbital_period(a_);
 
-            std::pair<std::array<double,3>,std::array<double,3>> initial_position_and_vel=calculate_position_and_velocity_from_orbit_params(a_,eccentricity_,true_anomaly_,raan_,inclination_,arg_of_periapsis_,orbital_period_);
-            std::array<double,3> initial_cartesian_ECI_position=initial_position_and_vel.first;
-            std::array<double,3> initial_cartesian_ECI_velocity=initial_position_and_vel.second;
-            instantaneous_position_=initial_cartesian_ECI_position;
-            instantaneous_velocity_=initial_cartesian_ECI_velocity;
+            //updated workflow
+            perifocal_position_=calculate_perifocal_position();
+            perifocal_velocity_=calculate_perifocal_velocity();
+
+            ECI_position_=convert_perifocal_to_ECI(perifocal_position_);
+            ECI_velocity_=convert_perifocal_to_ECI(perifocal_velocity_);
+
 
         }
 
-        std::array<double,3> get_position(){
-            return instantaneous_position_;
+        std::array<double,3> get_ECI_position(){
+            return ECI_position_;
         }
-        std::array<double,3> get_velocity(){
-            return instantaneous_velocity_;
+        std::array<double,3> get_ECI_velocity(){
+            return ECI_velocity_;
         }
         double get_speed(){
-            return sqrt(pow(instantaneous_velocity_.at(0),2)+pow(instantaneous_velocity_.at(1),2)+pow(instantaneous_velocity_.at(2),2));
+            //shouldn't matter which frame I use, might as well use perifocal coords since it's fewer operations (no W-direction component so can omit that term, whereas there's x,y,z components in ECI)
+            return sqrt(pow(perifocal_velocity_.at(0),2)+pow(perifocal_velocity_.at(1),2));
         }
         double get_radius(){
-            return sqrt(pow(instantaneous_position_.at(0),2)+pow(instantaneous_position_.at(1),2)+pow(instantaneous_position_.at(2),2));
+            //shouldn't matter which frame I use, might as well use perifocal coords since it's fewer operations (no W-direction component so can omit that term, whereas there's x,y,z components in ECI)
+            return sqrt(pow(perifocal_position_.at(0),2)+pow(perifocal_position_.at(1),2));
         }
         double get_total_energy(){
             double orbital_radius=get_radius();
@@ -110,6 +114,17 @@ class Satellite
             return name_;
         }
         void evolve_RK4(double input_timestep);
+
+        std::array<double,3> body_frame_to_ECI(std::array<double,3> input_vector);
+
+        std::array<double,3> ECI_to_body_frame(std::array<double,3> input_vector);
+
+        std::array<double,3> calculate_perifocal_position();
+
+        std::array<double,3> calculate_perifocal_velocity();
+
+        std::array<double,3> convert_perifocal_to_ECI(std::array<double,3> input_perifocal_vec);
+        std::array<double,3> convert_ECI_to_perifocal(std::array<double,3> input_ECI_vec);
 
 
 };

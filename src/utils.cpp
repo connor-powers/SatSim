@@ -130,7 +130,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
         //now the orbit data, inline, one satellite at a time
         for (size_t satellite_index=0;satellite_index<input_satellite_vector.size();satellite_index++){
             Satellite current_satellite=input_satellite_vector.at(satellite_index);
-            std::array<double,3> initial_position=current_satellite.get_position();
+            std::array<double,3> initial_position=current_satellite.get_ECI_position();
             fprintf(gnuplot_pipe,"%f %f %f\n",initial_position.at(0),initial_position.at(1),initial_position.at(2));
     
     
@@ -140,7 +140,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
     
             for (int timestep=0;timestep<num_timesteps;timestep++){
                 current_satellite.evolve_RK4(input_timestep);
-                evolved_position=current_satellite.get_position();
+                evolved_position=current_satellite.get_ECI_position();
                 fprintf(gnuplot_pipe,"%f %f %f\n",evolved_position.at(0),evolved_position.at(1),evolved_position.at(2));
             }
             fprintf(gnuplot_pipe,"e\n");
