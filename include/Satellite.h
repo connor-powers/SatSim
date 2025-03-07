@@ -95,6 +95,21 @@ class Satellite
             //convert to radians
             true_anomaly_*=(M_PI/180);
 
+
+            pitch_angle_=input_data.at("Pitch Angle");
+            //convert to radians
+            pitch_angle_*=(M_PI/180);
+
+            roll_angle_=input_data.at("Roll Angle");
+            //convert to radians
+            roll_angle_*=(M_PI/180);
+
+
+            yaw_angle_=input_data.at("Yaw Angle");
+            //convert to radians
+            yaw_angle_*=(M_PI/180);
+
+
             m_=input_data.at("Mass");
             name_=input_data.at("Name");
 

@@ -5,6 +5,9 @@
     "Eccentricity": 0.1,
     "Semimajor Axis": 10000,
     "True Anomaly": 0,
+    "Roll Angle": 10,
+    "Pitch Angle": 25,
+    "Yaw Angle": 189,
     "Mass": 100,
     "Name" : "Satellite 2"
 
