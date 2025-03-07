@@ -5,6 +5,9 @@
     "Eccentricity": 0,
     "Semimajor Axis": 9000,
     "True Anomaly": 0,
+    "Roll Angle": 0,
+    "Pitch Angle": 0,
+    "Yaw Angle": 0,
     "Mass": 1,
     "Name": "Circ_Test_1"
 }

@@ -12,6 +12,11 @@ int main()
     double t_thrust_end=6000;
     test_sat_1.add_LVLH_thrust_profile(LVLH_thrust_direction,thrust_magnitude,t_thrust_start,t_thrust_end);
 
+    std::array<double,3> LVLH_thrust_vec_2={0.51,20,-5};
+    double t_thrust_2_start=5500;
+    double t_thrust_2_end=6500;
+    test_sat_1.add_LVLH_thrust_profile(LVLH_thrust_vec_2,t_thrust_2_start,t_thrust_2_end);
+    
 
     Satellite test_sat_2("../input_2.json");
 
