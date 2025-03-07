@@ -1,5 +1,5 @@
 # Satellite_Orbit_Sim
-Simulation of satellites in Earth's orbit, written in C++. 
+Simulation of customizable satellites in Earth's orbit. 
 
 Features so far:
 
