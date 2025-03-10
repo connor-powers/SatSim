@@ -5,9 +5,6 @@
     "Eccentricity": 0.2,
     "Semimajor Axis": 15000,
     "True Anomaly": 90,
-    "Roll Angle": 0,
-    "Pitch Angle": 10,
-    "Yaw Angle": 300,
     "Mass": 100,
     "Name" : "Satellite 3",
     "Plotting Color": "dark-magenta"

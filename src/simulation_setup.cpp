@@ -6,7 +6,7 @@ int main()
 {
     Satellite test_sat_1("../input.json");
 
-    std::array<double,3> LVLH_thrust_direction={-1,0,0};
+    std::array<double,3> LVLH_thrust_direction={1,0,0};
     double thrust_magnitude=100; //N
     double t_thrust_start=5000;
     double t_thrust_end=6000;

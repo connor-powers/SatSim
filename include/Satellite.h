@@ -41,13 +41,18 @@ class Satellite
         double true_anomaly_={0};
         double orbital_period_={0};
         double m_={1}; //default value to prevent infinities in acceleration calculations from a=F/m
+        // double I_={1}; //moment of inertia, taken to be same for all 3 principal axes, set to default value for same reasons as mass
         double t_={0};
 
 
         //Now body-frame attributes
-        double pitch_angle_={0};
-        double roll_angle_={0};
-        double yaw_angle_={0};
+        // double pitch_angle_={0};
+        // double roll_angle_={0};
+        // double yaw_angle_={0};
+
+        // double theta_={0};
+        // double phi_={0};
+        // double psi_={0};
 
         std::string name_="";
 
@@ -61,7 +66,7 @@ class Satellite
 
         std::vector<std::array<double,3>> list_of_LVLH_forces_at_this_time_={};
         std::vector<std::array<double,3>> list_of_ECI_forces_at_this_time_={};
-
+        // std::vector<std::array<double,3>> list_of_body_frame_torques_at_this_time_={};
 
         std::pair<double,double> calculate_eccentric_anomaly(const double input_eccentricity, const double input_true_anomaly,const double input_semimajor_axis);
         double calculate_orbital_period(double input_semimajor_axis);
@@ -96,18 +101,18 @@ class Satellite
             true_anomaly_*=(M_PI/180);
 
 
-            pitch_angle_=input_data.at("Pitch Angle");
-            //convert to radians
-            pitch_angle_*=(M_PI/180);
+            // pitch_angle_=input_data.at("Pitch Angle");
+            // //convert to radians
+            // pitch_angle_*=(M_PI/180);
 
-            roll_angle_=input_data.at("Roll Angle");
-            //convert to radians
-            roll_angle_*=(M_PI/180);
+            // roll_angle_=input_data.at("Roll Angle");
+            // //convert to radians
+            // roll_angle_*=(M_PI/180);
 
 
-            yaw_angle_=input_data.at("Yaw Angle");
-            //convert to radians
-            yaw_angle_*=(M_PI/180);
+            // yaw_angle_=input_data.at("Yaw Angle");
+            // //convert to radians
+            // yaw_angle_*=(M_PI/180);
 
 
             m_=input_data.at("Mass");
@@ -175,9 +180,20 @@ class Satellite
         std::array<double,3> convert_perifocal_to_ECI(std::array<double,3> input_perifocal_vec);
         std::array<double,3> convert_ECI_to_perifocal(std::array<double,3> input_ECI_vec);
 
-        std::array<double,3> convert_LVLH_to_ECI(std::array<double,3> input_LVLH_vec);
+        // std::array<double,3> convert_LVLH_to_ECI(std::array<double,3> input_LVLH_vec);
 
         void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_normalized_thrust_direction,double input_LVLH_thrust_magnitude,double input_thrust_start_time, double input_thrust_end_time);
         void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_thrust_vector,double input_thrust_start_time, double input_thrust_end_time);
+        
+
+        std::array<double,3> convert_LVLH_to_ECI_manual(std::array<double,3> input_LVLH_vec);
+        std::array<double,3> convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_vec);
+
+        // std::array<double,3> convert_body_frame_to_LVLH(std::array<double,3> input_body_frame_vec);
+
+        // std::array<double,3> convert_body_frame_to_LVLH(std::array<double,3> input_body_frame_vec);
+
+        // std::array<double,3> convert_body_frame_to_ECI(std::array<double,3> input_body_frame_vec);
+
 
 };
