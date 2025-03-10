@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 #include "Satellite.h"
 #include "utils.h"
 using Eigen::Matrix3d;
@@ -176,7 +177,7 @@ void Satellite::evolve_RK4(double input_step_size){
 
         if (((t_+(input_step_size/2))>=thrust_profile.t_start_)&&((t_+(input_step_size/2))<=thrust_profile.t_end_)){
             list_of_LVLH_forces_at_half_timestep_past.push_back(thrust_profile.LVLH_force_vec_);
-            std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI(thrust_profile.LVLH_force_vec_);
+            std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI_manual(thrust_profile.LVLH_force_vec_);
             list_of_ECI_forces_at_half_timestep_past.push_back(ECI_thrust_vector);
         }
     }
@@ -189,18 +190,19 @@ void Satellite::evolve_RK4(double input_step_size){
 
         if (((t_+input_step_size)>=thrust_profile.t_start_)&&((t_+input_step_size)<=thrust_profile.t_end_)){
             list_of_LVLH_forces_at_one_timestep_past.push_back(thrust_profile.LVLH_force_vec_);
-            std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI(thrust_profile.LVLH_force_vec_);
+            std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI_manual(thrust_profile.LVLH_force_vec_);
             list_of_ECI_forces_at_one_timestep_past.push_back(ECI_thrust_vector);
         }
     }
-
-
-    std::array<double,6> output_combined_initial_position_and_velocity_array= RK4_step<6>(combined_initial_position_and_velocity_array,input_step_size,RK4_deriv_function_orbit_position_and_velocity,m_,list_of_ECI_forces_at_this_time_,list_of_ECI_forces_at_half_timestep_past,list_of_ECI_forces_at_one_timestep_past);
     
+
+    std::array<double,6> output_combined_position_and_velocity_array= RK4_step<6>(combined_initial_position_and_velocity_array,input_step_size,RK4_deriv_function_orbit_position_and_velocity,m_,list_of_ECI_forces_at_this_time_,list_of_ECI_forces_at_half_timestep_past,list_of_ECI_forces_at_one_timestep_past);
+    // std::array<double,6> output_combined_angular_array= RK4_step<6>(combined_initial_angular_array,input_step_size,RK4_deriv_function_angular,I_,list_of_body_frame_torques_at_this_time_,list_of_body_frame_torques_at_half_timestep_past,list_of_body_frame_torques_at_one_timestep_past);
+
     
     for (size_t ind=0;ind<3;ind++){
-        ECI_position_.at(ind) = output_combined_initial_position_and_velocity_array.at(ind);
-        ECI_velocity_.at(ind) = output_combined_initial_position_and_velocity_array.at(ind+3);
+        ECI_position_.at(ind) = output_combined_position_and_velocity_array.at(ind);
+        ECI_velocity_.at(ind) = output_combined_position_and_velocity_array.at(ind+3);
         //also update the perifocal versions
         perifocal_position_=convert_ECI_to_perifocal(ECI_position_);
         perifocal_velocity_=convert_ECI_to_perifocal(ECI_velocity_);
@@ -214,30 +216,30 @@ void Satellite::evolve_RK4(double input_step_size){
 }
 
 
-std::array<double,3> Satellite::convert_LVLH_to_ECI(std::array<double,3> input_LVLH_vec){
-    Vector3d input_LVLH_vec_eigen;
-    input_LVLH_vec_eigen << input_LVLH_vec.at(0),input_LVLH_vec.at(1),input_LVLH_vec.at(2);
-    //ref: https://ntrs.nasa.gov/api/citations/20205003902/downloads/Introduction%20to%20Orbital%20Mechanics%20and%20Spacecraft%20Attitudes%20for%20Thermal%20Engineers%20CHARTS%20PDF.pdf
-    Matrix3d ref_mat;
-    ref_mat << 0,0,-1,
-               1,0,0,
-               0,-1,0;
+// std::array<double,3> Satellite::convert_LVLH_to_ECI(std::array<double,3> input_LVLH_vec){
+//     Vector3d input_LVLH_vec_eigen;
+//     input_LVLH_vec_eigen << input_LVLH_vec.at(0),input_LVLH_vec.at(1),input_LVLH_vec.at(2);
+//     //ref: https://ntrs.nasa.gov/api/citations/20205003902/downloads/Introduction%20to%20Orbital%20Mechanics%20and%20Spacecraft%20Attitudes%20for%20Thermal%20Engineers%20CHARTS%20PDF.pdf
+//     Matrix3d ref_mat;
+//     ref_mat << 0,0,-1,
+//                1,0,0,
+//                0,-1,0;
     
-    Matrix3d omega_mat=z_rot_matrix(raan_);
-    Matrix3d inclination_mat=y_rot_matrix(inclination_);
-    Matrix3d arg_periapsis_mat=z_rot_matrix(arg_of_periapsis_);
-    Matrix3d true_anomaly_mat=z_rot_matrix(true_anomaly_);
+//     Matrix3d omega_mat=z_rot_matrix(raan_);
+//     Matrix3d inclination_mat=y_rot_matrix(inclination_);
+//     Matrix3d arg_periapsis_mat=z_rot_matrix(arg_of_periapsis_);
+//     Matrix3d true_anomaly_mat=z_rot_matrix(true_anomaly_);
 
-    Matrix3d pitch_angle_mat=y_rot_matrix(pitch_angle_);
-    Matrix3d yaw_angle_mat=z_rot_matrix(yaw_angle_);
-    Matrix3d roll_angle_mat=x_rot_matrix(roll_angle_);
+//     Matrix3d pitch_angle_mat=y_rot_matrix(pitch_angle_);
+//     Matrix3d yaw_angle_mat=z_rot_matrix(yaw_angle_);
+//     Matrix3d roll_angle_mat=x_rot_matrix(roll_angle_);
 
 
-    Vector3d ECI_vec_eigen=omega_mat*inclination_mat*arg_periapsis_mat*true_anomaly_mat*ref_mat*pitch_angle_mat*yaw_angle_mat*roll_angle_mat*input_LVLH_vec_eigen;
+//     Vector3d ECI_vec_eigen=omega_mat*inclination_mat*arg_periapsis_mat*true_anomaly_mat*ref_mat*pitch_angle_mat*yaw_angle_mat*roll_angle_mat*input_LVLH_vec_eigen;
 
-    std::array<double,3> ECI_vec_output={ECI_vec_eigen(0),ECI_vec_eigen(1),ECI_vec_eigen(2)};
-    return ECI_vec_output;
-}
+//     std::array<double,3> ECI_vec_output={ECI_vec_eigen(0),ECI_vec_eigen(1),ECI_vec_eigen(2)};
+//     return ECI_vec_output;
+// }
 
 
 void Satellite::add_LVLH_thrust_profile(std::array<double,3> input_LVLH_thrust_vector,double input_thrust_start_time, double input_thrust_end_time){
@@ -245,7 +247,7 @@ void Satellite::add_LVLH_thrust_profile(std::array<double,3> input_LVLH_thrust_v
     thrust_profile_list_.push_back(new_thrust_profile);
     if (input_thrust_start_time==0){
         list_of_LVLH_forces_at_this_time_.push_back(input_LVLH_thrust_vector);
-        std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI(input_LVLH_thrust_vector);
+        std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI_manual(input_LVLH_thrust_vector);
         list_of_ECI_forces_at_this_time_.push_back(ECI_thrust_vector);
     }
 }
@@ -262,7 +264,109 @@ void Satellite::add_LVLH_thrust_profile(std::array<double,3> input_LVLH_normaliz
 
     if (input_thrust_start_time==0){
         list_of_LVLH_forces_at_this_time_.push_back(LVLH_thrust_vec);
-        std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI(LVLH_thrust_vec);
+        std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI_manual(LVLH_thrust_vec);
         list_of_ECI_forces_at_this_time_.push_back(ECI_thrust_vector);
     }
 }
+
+
+
+
+
+
+
+
+
+//"manual" version, via dot products and cross products with position and velocity vectors
+std::array<double,3> Satellite::convert_LVLH_to_ECI_manual(std::array<double,3> input_LVLH_vec){
+    //LVLH x-axis is defined as in the direction of motion
+    //LVLH z-axis is defined as pointing back towards Earth, so along the reversed direction of the position vector from the center of the Earth
+    //y-axis determined from a cross product
+
+    Vector3d ECI_unit_vec_x={1,0,0};
+    Vector3d ECI_unit_vec_y={0,1,0};
+    Vector3d ECI_unit_vec_z={0,0,1};
+
+    std::array<double,3> current_ECI_position_array=get_ECI_position();
+    Vector3d current_ECI_position_unit_vec;
+    current_ECI_position_unit_vec << current_ECI_position_array.at(0),current_ECI_position_array.at(1),current_ECI_position_array.at(2);
+    current_ECI_position_unit_vec.normalize(); //to make it actually a unit vector
+
+    std::array<double,3> current_ECI_velocity_array=get_ECI_velocity();
+    Vector3d current_ECI_velocity_unit_vec;
+    current_ECI_velocity_unit_vec << current_ECI_velocity_array.at(0),current_ECI_velocity_array.at(1),current_ECI_velocity_array.at(2);
+    current_ECI_velocity_unit_vec.normalize();
+
+    Vector3d LVLH_x_unit_vec=current_ECI_velocity_unit_vec;
+    Vector3d LVLH_z_unit_vec=(-1)*current_ECI_position_unit_vec;
+
+    Vector3d LVLH_y_unit_vec=LVLH_z_unit_vec.cross(LVLH_x_unit_vec);
+    //Should already be normalized, just in case though
+    LVLH_y_unit_vec.normalize();
+
+    
+
+    double v_x_ECI= input_LVLH_vec.at(0)*ECI_unit_vec_x.dot(LVLH_x_unit_vec) + input_LVLH_vec.at(1)*ECI_unit_vec_x.dot(LVLH_y_unit_vec) + input_LVLH_vec.at(2)*ECI_unit_vec_x.dot(LVLH_z_unit_vec);
+
+    double v_y_ECI= input_LVLH_vec.at(0)*ECI_unit_vec_y.dot(LVLH_x_unit_vec) + input_LVLH_vec.at(1)*ECI_unit_vec_y.dot(LVLH_y_unit_vec) + input_LVLH_vec.at(2)*ECI_unit_vec_y.dot(LVLH_z_unit_vec);
+
+    double v_z_ECI= input_LVLH_vec.at(0)*ECI_unit_vec_z.dot(LVLH_x_unit_vec) + input_LVLH_vec.at(1)*ECI_unit_vec_z.dot(LVLH_y_unit_vec) + input_LVLH_vec.at(2)*ECI_unit_vec_z.dot(LVLH_z_unit_vec);
+
+
+    std::array<double,3> output_ECI_arr={v_x_ECI,v_y_ECI,v_z_ECI};
+    return output_ECI_arr;
+}
+
+std::array<double,3> Satellite::convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_vec){
+    //LVLH x-axis is defined as in the direction of motion
+    //LVLH z-axis is defined as pointing back towards Earth, so along the reversed direction of the position vector from the center of the Earth
+    //y-axis determined from a cross product
+
+    Vector3d ECI_unit_vec_x={1,0,0};
+    Vector3d ECI_unit_vec_y={0,1,0};
+    Vector3d ECI_unit_vec_z={0,0,1};
+
+    std::array<double,3> current_ECI_position_array=get_ECI_position();
+    Vector3d current_ECI_position_unit_vec;
+    current_ECI_position_unit_vec << current_ECI_position_array.at(0),current_ECI_position_array.at(1),current_ECI_position_array.at(2);
+    current_ECI_position_unit_vec.normalize(); //to make it actually a unit vector
+
+    std::array<double,3> current_ECI_velocity_array=get_ECI_velocity();
+    Vector3d current_ECI_velocity_unit_vec;
+    current_ECI_velocity_unit_vec << current_ECI_velocity_array.at(0),current_ECI_velocity_array.at(1),current_ECI_velocity_array.at(2);
+    current_ECI_velocity_unit_vec.normalize();
+
+    Vector3d LVLH_x_unit_vec=current_ECI_velocity_unit_vec;
+    Vector3d LVLH_z_unit_vec=(-1)*current_ECI_position_unit_vec;
+
+    Vector3d LVLH_y_unit_vec=LVLH_z_unit_vec.cross(LVLH_x_unit_vec);
+    //Should already be normalized, just in case though
+    LVLH_y_unit_vec.normalize();
+
+
+    
+
+    double v_x_LVLH= input_ECI_vec.at(0)*LVLH_x_unit_vec.dot(ECI_unit_vec_x) + input_ECI_vec.at(1)*LVLH_x_unit_vec.dot(ECI_unit_vec_y) + input_ECI_vec.at(2)*LVLH_x_unit_vec.dot(ECI_unit_vec_z);
+
+    double v_y_LVLH= input_ECI_vec.at(0)*LVLH_y_unit_vec.dot(ECI_unit_vec_x) + input_ECI_vec.at(1)*LVLH_y_unit_vec.dot(ECI_unit_vec_y) + input_ECI_vec.at(2)*LVLH_y_unit_vec.dot(ECI_unit_vec_z);
+
+    double v_z_LVLH= input_ECI_vec.at(0)*LVLH_z_unit_vec.dot(ECI_unit_vec_x) + input_ECI_vec.at(1)*LVLH_z_unit_vec.dot(ECI_unit_vec_y) + input_ECI_vec.at(2)*LVLH_z_unit_vec.dot(ECI_unit_vec_z);
+
+
+    std::array<double,3> output_LVLH_arr={v_x_LVLH,v_y_LVLH,v_z_LVLH};
+    return output_LVLH_arr;
+}
+
+// std::array<double,3> Satellite::convert_body_frame_to_LVLH(std::array<double,3> input_body_frame_vec){
+//     //taking LVLH to be the "unrotated" body frame
+
+//     std::array<double,3> LVLH_vec=convert_rotated_body_frame_to_unrotated_body_frame(input_body_frame_vec, theta_, phi_, psi_);
+//     return LVLH_vec;
+// }
+
+// std::array<double,3> Satellite::convert_body_frame_to_ECI(std::array<double,3> input_body_frame_vec){
+//     //Current strategy: first convert rotated body frame to unrotated body frame, which I'm taking to be the LVLH frame
+//     //Then convert the unrotated LVLH frame into ECI
+//     std::array<double,3> LVLH_vec=convert_body_frame_to_LVLH(input_body_frame_vec);
+//     std::array<double,3> ECI_vec=convert_LVLH_to_ECI_manual(LVLH_vec);
+// }
