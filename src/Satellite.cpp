@@ -212,6 +212,9 @@ void Satellite::evolve_RK4(double input_step_size){
     list_of_LVLH_forces_at_this_time_=list_of_LVLH_forces_at_one_timestep_past;
     list_of_ECI_forces_at_this_time_=list_of_ECI_forces_at_one_timestep_past;
 
+    //Update orbital parameters
+    update_orbital_elements_from_position_and_velocity();
+
     return;
 }
 
@@ -370,3 +373,88 @@ std::array<double,3> Satellite::convert_ECI_to_LVLH_manual(std::array<double,3> 
 //     std::array<double,3> LVLH_vec=convert_body_frame_to_LVLH(input_body_frame_vec);
 //     std::array<double,3> ECI_vec=convert_LVLH_to_ECI_manual(LVLH_vec);
 // }
+
+
+void Satellite::update_orbital_elements_from_position_and_velocity(){
+    //Anytime the orbit is changed via external forces, need to update the orbital parameters of the satellite.
+    //Using approach from Fundamentals of Astrodynamics
+    double mu=G*mass_Earth;
+
+    Vector3d position_vector={ECI_position_.at(0),ECI_position_.at(1),ECI_position_.at(2)};
+    Vector3d velocity_vector={ECI_velocity_.at(0),ECI_velocity_.at(1),ECI_velocity_.at(2)};
+    Vector3d h_vector=position_vector.cross(velocity_vector);
+    double h=h_vector.norm();
+    Vector3d n_vector={-h_vector(1),h_vector(0),0};
+    double n=n_vector.norm();
+    double v_magnitude=get_speed();
+    double r_magnitude=get_radius();
+
+    Vector3d e_vec_component_1=(1/mu)*( pow(v_magnitude,2) - (mu/r_magnitude) )*position_vector;
+    Vector3d e_vec_component_2 = (1/mu)*(position_vector.dot(velocity_vector))*velocity_vector;
+    Vector3d e_vec=e_vec_component_1-e_vec_component_2;
+    double calculated_eccentricity=e_vec.norm();
+
+
+    double calculated_p=pow(h,2)/mu;
+
+
+    double calculated_i=acos(h_vector(2)/h);
+
+    double calculated_RAAN=acos(n_vector(0)/n);
+    if (n_vector(1)<0){
+        calculated_RAAN=2*M_PI-calculated_RAAN;
+    }
+
+    //Need to treat the e \approx 0 case (circular orbits) specially
+    //Going to set arg of periapsis to be 0 then calculate true anomaly as the argument of latitude instead
+    double calculated_arg_of_periapsis;
+    double calculated_true_anomaly;
+    if (calculated_eccentricity>pow(10,-15)){
+        calculated_arg_of_periapsis=acos(n_vector.dot(e_vec)/(n*calculated_eccentricity));
+        if (e_vec(2)<0){
+            calculated_arg_of_periapsis=2*M_PI-calculated_arg_of_periapsis;
+        }
+    
+        calculated_true_anomaly=acos(e_vec.dot(position_vector)/(calculated_eccentricity*r_magnitude));
+        if (position_vector.dot(velocity_vector)<0){
+            calculated_true_anomaly=2*M_PI-calculated_true_anomaly;
+        }
+    }
+    else {
+        //Approximately circular orbits
+        //For this case, I'll set the true anomaly to be the argument of latitude (which is valid when arg of periapsis is 0, which is what I'm setting it to)
+        //Refs: https://en.wikipedia.org/wiki/True_anomaly#Circular_orbit , https://en.wikipedia.org/wiki/Argument_of_latitude , https://en.wikipedia.org/wiki/Argument_of_periapsis
+        calculated_arg_of_periapsis=0; //Setting this
+
+        double calculated_arg_of_latitude=acos(n_vector.dot(position_vector)/(n*r_magnitude));
+        if (position_vector(2)<0){
+            calculated_arg_of_latitude=(2*M_PI-calculated_arg_of_latitude);
+        }
+        calculated_true_anomaly=calculated_arg_of_latitude; //For this case
+    }
+
+
+    double calculated_a=calculated_p/(1-pow(calculated_eccentricity,2));
+
+    //Update stored values of these orbital elements
+
+    a_=calculated_a;
+    eccentricity_=calculated_eccentricity;
+    inclination_=calculated_i;
+    raan_=calculated_RAAN;
+    arg_of_periapsis_=calculated_arg_of_periapsis;
+    true_anomaly_=calculated_true_anomaly;
+
+    return;
+}
+
+std::array<double,6> Satellite::get_orbital_elements(){
+    std::array<double,6> orbit_elems_array;
+    orbit_elems_array.at(0)=a_;
+    orbit_elems_array.at(1)=eccentricity_;
+    orbit_elems_array.at(2)=inclination_;
+    orbit_elems_array.at(3)=raan_;
+    orbit_elems_array.at(4)=arg_of_periapsis_;
+    orbit_elems_array.at(5)=true_anomaly_;
+    return orbit_elems_array;
+}
