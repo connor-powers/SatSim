@@ -407,7 +407,6 @@ void Satellite::update_orbital_elements_from_position_and_velocity(){
     }
 
     //Need to treat the e \approx 0 case (circular orbits) specially
-    //Going to set arg of periapsis to be 0 then calculate true anomaly as the argument of latitude instead
     double calculated_arg_of_periapsis;
     double calculated_true_anomaly;
     if (calculated_eccentricity>pow(10,-15)){
