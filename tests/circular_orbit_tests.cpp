@@ -28,11 +28,11 @@ TEST(CircularOrbitTests,TotalEnergyTimestep1){
 
     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
     double initial_energy=test_satellite.get_total_energy();
-    std::cout << "Initial energy: " << initial_energy << "\n";
+    EXPECT_TRUE(initial_energy==-3.35916*pow(10,10)) << "Initial energy : " << initial_energy << "\n";
     double test_timestep=1; //s
     test_satellite.evolve_RK4(test_timestep);
     double evolved_energy=test_satellite.get_total_energy();
-    std::cout << "Evolved energy: " << evolved_energy << "\n";
+    EXPECT_TRUE(evolved_energy=-3.35916*pow(10,10)) << "Evolved energy : " << evolved_energy << "\n";
 
     EXPECT_TRUE(abs(initial_energy-evolved_energy)<pow(10,-10)) << "Total energy not preserved within tolerance. Difference: " << initial_energy-evolved_energy << "\n";
 }
