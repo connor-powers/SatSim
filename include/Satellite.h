@@ -91,7 +91,13 @@ class Satellite
             //convert to radians
             arg_of_periapsis_*=(M_PI/180);
 
+
             eccentricity_=input_data.at("Eccentricity");
+            //If circular orbit, arg of periapsis is undefined, using convention of setting it to 0 in this case
+            if (eccentricity_==0){
+                arg_of_periapsis_=0;
+            }
+
 
             a_=input_data.at("Semimajor Axis");
             a_*=1000; //converting from km to m
@@ -195,5 +201,7 @@ class Satellite
 
         // std::array<double,3> convert_body_frame_to_ECI(std::array<double,3> input_body_frame_vec);
 
+        void update_orbital_elements_from_position_and_velocity();
+        std::array<double,6> get_orbital_elements();
 
 };
