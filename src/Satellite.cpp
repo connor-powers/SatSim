@@ -213,7 +213,7 @@ void Satellite::evolve_RK4(double input_step_size){
     list_of_ECI_forces_at_this_time_=list_of_ECI_forces_at_one_timestep_past;
 
     //Update orbital parameters
-    update_orbital_elements_from_position_and_velocity();
+    // update_orbital_elements_from_position_and_velocity();
 
     return;
 }

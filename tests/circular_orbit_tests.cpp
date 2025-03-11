@@ -122,21 +122,21 @@ TEST(CircularOrbitTests,ConstantEvolvedOrbitalElementsTest){
 
 
 
-// TEST(CircularOrbitTests,Thruster_Eccentricity_Change){
+TEST(CircularOrbitTests,Thruster_Eccentricity_Change){
 
-//     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
-//     std::array<double,3> LVLH_thrust_direction={1,0,0};
-//     double thrust_magnitude=100; //N
-//     double t_thrust_start=1;
-//     double t_thrust_end=100;
+    Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
+    std::array<double,3> LVLH_thrust_direction={1,0,0};
+    double thrust_magnitude=100; //N
+    double t_thrust_start=1;
+    double t_thrust_end=100;
 
-//     test_satellite.add_LVLH_thrust_profile(LVLH_thrust_direction,thrust_magnitude,t_thrust_start,t_thrust_end);
-//     double test_timestep=1; //s
-//     for (int timestep_ind=0;timestep_ind<120;timestep_ind++){
-//         test_satellite.evolve_RK4(test_timestep);
-//     }
-//     std::array<double,6> evolved_orbit_elements=test_satellite.get_orbital_elements();
-//     double resulting_eccentricity=evolved_orbit_elements.at(1);
+    test_satellite.add_LVLH_thrust_profile(LVLH_thrust_direction,thrust_magnitude,t_thrust_start,t_thrust_end);
+    double test_timestep=1; //s
+    for (int timestep_ind=0;timestep_ind<120;timestep_ind++){
+        test_satellite.evolve_RK4(test_timestep);
+    }
+    std::array<double,6> evolved_orbit_elements=test_satellite.get_orbital_elements();
+    double resulting_eccentricity=evolved_orbit_elements.at(1);
 
-//     EXPECT_TRUE(resulting_eccentricity>0) << "Resulting eccentricity was not greater than 0. Calculated value: " << resulting_eccentricity << "\n";
-// }
+    EXPECT_TRUE(resulting_eccentricity>0) << "Resulting eccentricity was not greater than 0. Calculated value: " << resulting_eccentricity << "\n";
+}
