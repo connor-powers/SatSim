@@ -377,6 +377,7 @@ std::array<double,3> Satellite::convert_ECI_to_LVLH_manual(std::array<double,3> 
 
 void Satellite::update_orbital_elements_from_position_and_velocity(){
     //Anytime the orbit is changed via external forces, need to update the orbital parameters of the satellite.
+    //True anomaly should change over time even in absence of external forces
     //Using approach from Fundamentals of Astrodynamics
     double mu=G*mass_Earth;
 

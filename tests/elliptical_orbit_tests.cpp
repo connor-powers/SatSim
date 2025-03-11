@@ -27,7 +27,7 @@ TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed2){
 }
 
 
-TEST(CircularOrbitTests,ConstantEvolvedOrbitalElementsTest){
+TEST(EllipticalOrbitTests,ConstantEvolvedOrbitalElementsTest){
 
     Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
     std::array<double,6> initial_orbit_elements=test_satellite.get_orbital_elements();
@@ -57,7 +57,7 @@ TEST(CircularOrbitTests,ConstantEvolvedOrbitalElementsTest){
     }
 }
 
-TEST(CircularOrbitTests,BasicOrbitalElementsTest){
+TEST(EllipticalOrbitTests,BasicOrbitalElementsTest){
 
     Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
     std::array<double,6> initial_orbit_elements=test_satellite.get_orbital_elements();
