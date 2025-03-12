@@ -3,10 +3,10 @@
 #include "Satellite.h"
 #include "utils.h"
 
-const double non_length_tolerance=pow(10.0,-12);
+const double tolerance=pow(10.0,-12);
 //Setting a different tolerance for semimajor axis than the other orbital parameters since there appears to be a minimum error associated with converting position and velocity to semimajor axis, 
 //best guess is this has to do with the scale of distances being dealt with here
-const double length_tolerance=pow(10.0,-7);
+const double semimajor_axis_tolerance=pow(10.0,-7);
 const double epsilon=pow(10.0,-7);
 
 TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed1){
@@ -60,10 +60,10 @@ TEST(EllipticalOrbitTests,ConstantEvolvedOrbitalElementsTest){
     for (size_t orbital_elem_index=0; orbital_elem_index<5;orbital_elem_index++){
         //True anomaly shouldn't be constant over evolution
         if (orbital_elem_index==0){
-            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index))<length_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index) << "\n";
+            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index))<semimajor_axis_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index) << "\n";
         }
         else {
-            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index))<non_length_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index) << "\n";
+            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index))<tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index) << "\n";
         }
     }
 }
@@ -88,10 +88,10 @@ TEST(EllipticalOrbitTests,BasicOrbitalElementsTest){
 
     for (size_t orbital_elem_index=0; orbital_elem_index<6;orbital_elem_index++){
         if (orbital_elem_index==0){
-            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index))<length_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index) << "\n";
+            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index))<semimajor_axis_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index) << "\n";
         }
         else {
-            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index))<non_length_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index) << "\n";
+            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index))<tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index) << "\n";
         }
     }
 }
