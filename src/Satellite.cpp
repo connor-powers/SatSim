@@ -378,7 +378,7 @@ std::array<double,6> Satellite::get_orbital_elements(){
 
 double Satellite::evolve_RK45(double input_epsilon,double input_step_size){
 
-    //Format input position and velocity arrays into single array for RK45 step
+    //Format input position and velocity arrays into single array for RK4(5) step
     std::array<double,6> combined_initial_position_and_velocity_array={};
     std::pair<std::array<double,3>,std::array<double,3>> output_position_velocity_pair={};
 

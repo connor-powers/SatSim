@@ -69,7 +69,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
 
 template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_step(std::array<double, T> y_n, double input_step_size,std::function<std::array<double,T>(const std::array<double,T>,const double,std::vector<ThrustProfileLVLH>, double)> input_derivative_function,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_t_n,double input_epsilon){
     
-    //Implementing RK45 method for its adaptive step size
+    //Implementing RK4(5) method for its adaptive step size
     //Refs:https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method , https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods#The_Runge%E2%80%93Kutta_method
     double nodes[6]={0.0,1.0/4,3.0/8,12.0/13,1.0,1.0/2}; //c coefficients
     double CH_vec[6]={16.0/135,0.0,6656.0/12825,28561.0/56430,-9.0/50,2.0/55}; 
