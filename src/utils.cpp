@@ -331,7 +331,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
             double timestep_to_use=input_timestep;
             double current_satellite_time=current_satellite.get_instantaneous_time();
             while (current_satellite_time<input_total_sim_time){
-                double new_timestep=current_satellite.evolve_RK45(input_epsilon,input_timestep);
+                double new_timestep=current_satellite.evolve_RK45(input_epsilon,timestep_to_use);
                 timestep_to_use=new_timestep;
                 evolved_position=current_satellite.get_ECI_position();
                 current_satellite_time=current_satellite.get_instantaneous_time();

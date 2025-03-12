@@ -26,7 +26,7 @@ int main()
 
     double timestep=2;
     double total_sim_time=25000;
-    double epsilon=pow(10,-6);
+    double epsilon=pow(10,-11);
     sim_and_draw_orbit_gnuplot(satellite_vector,timestep,total_sim_time,epsilon);
 
     return 0;
