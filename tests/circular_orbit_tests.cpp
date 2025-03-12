@@ -10,7 +10,7 @@
 const double tolerance=pow(10.0,-12);
 //Setting a different tolerance for semimajor axis than the other orbital parameters since there appears to be a minimum error associated with converting position and velocity to semimajor axis, 
 //best guess is this has to do with the scale of distances and/or velocities being dealt with here
-const double semimajor_axis_tolerance=pow(10.0,-7);
+const double length_tolerance=pow(10.0,-7);
 const double epsilon=pow(10.0,-7);
 const double energy_cons_tolerance=pow(10.0,-5);
 
@@ -52,7 +52,7 @@ TEST(CircularOrbitTests,EvolvedOrbitalRadius1){
     double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
     double calculated_evolved_radius=test_satellite.get_radius();
 
-    EXPECT_TRUE(abs(calculated_initial_radius-calculated_evolved_radius)<tolerance) << "Orbital radius not constant within tolerance. Difference: " << calculated_initial_radius-calculated_evolved_radius << "\n";
+    EXPECT_TRUE(abs(calculated_initial_radius-calculated_evolved_radius)<length_tolerance) << "Orbital radius not constant within tolerance. Difference: " << calculated_initial_radius-calculated_evolved_radius << "\n";
 }
 
 TEST(CircularOrbitTests,EvolvedOrbitalSpeed1){
@@ -87,7 +87,7 @@ TEST(CircularOrbitTests,BasicOrbitalElementsTest){
 
     for (size_t orbital_elem_index=0; orbital_elem_index<6;orbital_elem_index++){
         if (orbital_elem_index==0){
-            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index))<semimajor_axis_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index) << "\n";
+            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index))<length_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index) << "\n";
         }
         else {
             EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index))<tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-recalculated_orbit_elements.at(orbital_elem_index) << "\n";
@@ -116,7 +116,7 @@ TEST(CircularOrbitTests,ConstantEvolvedOrbitalElementsTest){
     for (size_t orbital_elem_index=0; orbital_elem_index<5;orbital_elem_index++){
         //True anomaly shouldn't be constant over evolution
         if (orbital_elem_index==0){
-            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index))<semimajor_axis_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index) << "\n";
+            EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index))<length_tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index) << "\n";
         }
         else {
             EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index))<tolerance) << orbital_element_name_array.at(orbital_elem_index) << " was not constant within tolerance. Diff:" <<initial_orbit_elements.at(orbital_elem_index)-evolved_orbit_elements.at(orbital_elem_index) << "\n";
