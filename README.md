@@ -2,7 +2,7 @@
 
 Features so far:
 
-- RK4 method for time evolution
+- RK4(5) method for time evolution
 
 - Construct and plot multiple satellite objects simultaneously
 
