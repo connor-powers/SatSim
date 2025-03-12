@@ -1,3 +1,6 @@
+#ifndef SATELLITE_HEADER
+#define SATELLITE_HEADER
+
 #include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -192,8 +195,6 @@ class Satellite
         void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_thrust_vector,double input_thrust_start_time, double input_thrust_end_time);
         
 
-        std::array<double,3> convert_LVLH_to_ECI_manual(std::array<double,3> input_LVLH_vec);
-        std::array<double,3> convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_vec);
 
         // std::array<double,3> convert_body_frame_to_LVLH(std::array<double,3> input_body_frame_vec);
 
@@ -204,4 +205,12 @@ class Satellite
         void update_orbital_elements_from_position_and_velocity();
         std::array<double,6> get_orbital_elements();
 
+        double evolve_RK45(double input_epsilon,double input_initial_timestep);
+
 };
+
+
+
+
+
+#endif

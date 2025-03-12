@@ -6,6 +6,89 @@
 using Eigen::Matrix3d;
 using Eigen::Vector3d;
 
+
+//"manual" version, via dot products and cross products with position and velocity vectors
+std::array<double,3> convert_LVLH_to_ECI_manual(std::array<double,3> input_LVLH_vec,std::array<double,3> input_position_vec,std::array<double,3> input_velocity_vec){
+    //LVLH x-axis is defined as in the direction of motion
+    //LVLH z-axis is defined as pointing back towards Earth, so along the reversed direction of the position vector from the center of the Earth
+    //y-axis determined from a cross product
+
+    Vector3d ECI_unit_vec_x={1.0,0.0,0.0};
+    Vector3d ECI_unit_vec_y={0.0,1.0,0.0};
+    Vector3d ECI_unit_vec_z={0.0,0.0,1.0};
+
+    std::array<double,3> current_ECI_position_array=input_position_vec;
+    Vector3d current_ECI_position_unit_vec;
+    current_ECI_position_unit_vec << current_ECI_position_array.at(0),current_ECI_position_array.at(1),current_ECI_position_array.at(2);
+    current_ECI_position_unit_vec.normalize(); //to make it actually a unit vector
+
+    std::array<double,3> current_ECI_velocity_array=input_velocity_vec;
+    Vector3d current_ECI_velocity_unit_vec;
+    current_ECI_velocity_unit_vec << current_ECI_velocity_array.at(0),current_ECI_velocity_array.at(1),current_ECI_velocity_array.at(2);
+    current_ECI_velocity_unit_vec.normalize();
+
+    Vector3d LVLH_x_unit_vec=current_ECI_velocity_unit_vec;
+    Vector3d LVLH_z_unit_vec=(-1)*current_ECI_position_unit_vec;
+
+    Vector3d LVLH_y_unit_vec=LVLH_z_unit_vec.cross(LVLH_x_unit_vec);
+    //Should already be normalized, just in case though
+    LVLH_y_unit_vec.normalize();
+
+    
+
+    double v_x_ECI= input_LVLH_vec.at(0)*ECI_unit_vec_x.dot(LVLH_x_unit_vec) + input_LVLH_vec.at(1)*ECI_unit_vec_x.dot(LVLH_y_unit_vec) + input_LVLH_vec.at(2)*ECI_unit_vec_x.dot(LVLH_z_unit_vec);
+
+    double v_y_ECI= input_LVLH_vec.at(0)*ECI_unit_vec_y.dot(LVLH_x_unit_vec) + input_LVLH_vec.at(1)*ECI_unit_vec_y.dot(LVLH_y_unit_vec) + input_LVLH_vec.at(2)*ECI_unit_vec_y.dot(LVLH_z_unit_vec);
+
+    double v_z_ECI= input_LVLH_vec.at(0)*ECI_unit_vec_z.dot(LVLH_x_unit_vec) + input_LVLH_vec.at(1)*ECI_unit_vec_z.dot(LVLH_y_unit_vec) + input_LVLH_vec.at(2)*ECI_unit_vec_z.dot(LVLH_z_unit_vec);
+
+
+    std::array<double,3> output_ECI_arr={v_x_ECI,v_y_ECI,v_z_ECI};
+    return output_ECI_arr;
+}
+
+std::array<double,3> convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_vec,std::array<double,3> input_position_vec,std::array<double,3> input_velocity_vec){
+    //LVLH x-axis is defined as in the direction of motion
+    //LVLH z-axis is defined as pointing back towards Earth, so along the reversed direction of the position vector from the center of the Earth
+    //y-axis determined from a cross product
+
+    Vector3d ECI_unit_vec_x={1.0,0.0,0.0};
+    Vector3d ECI_unit_vec_y={0.0,1.0,0.0};
+    Vector3d ECI_unit_vec_z={0.0,0.0,1.0};
+
+    std::array<double,3> current_ECI_position_array=input_position_vec;
+    Vector3d current_ECI_position_unit_vec;
+    current_ECI_position_unit_vec << current_ECI_position_array.at(0),current_ECI_position_array.at(1),current_ECI_position_array.at(2);
+    current_ECI_position_unit_vec.normalize(); //to make it actually a unit vector
+
+    std::array<double,3> current_ECI_velocity_array=input_velocity_vec;
+    Vector3d current_ECI_velocity_unit_vec;
+    current_ECI_velocity_unit_vec << current_ECI_velocity_array.at(0),current_ECI_velocity_array.at(1),current_ECI_velocity_array.at(2);
+    current_ECI_velocity_unit_vec.normalize();
+
+    Vector3d LVLH_x_unit_vec=current_ECI_velocity_unit_vec;
+    Vector3d LVLH_z_unit_vec=(-1)*current_ECI_position_unit_vec;
+
+    Vector3d LVLH_y_unit_vec=LVLH_z_unit_vec.cross(LVLH_x_unit_vec);
+    //Should already be normalized, just in case though
+    LVLH_y_unit_vec.normalize();
+
+
+    
+
+    double v_x_LVLH= input_ECI_vec.at(0)*LVLH_x_unit_vec.dot(ECI_unit_vec_x) + input_ECI_vec.at(1)*LVLH_x_unit_vec.dot(ECI_unit_vec_y) + input_ECI_vec.at(2)*LVLH_x_unit_vec.dot(ECI_unit_vec_z);
+
+    double v_y_LVLH= input_ECI_vec.at(0)*LVLH_y_unit_vec.dot(ECI_unit_vec_x) + input_ECI_vec.at(1)*LVLH_y_unit_vec.dot(ECI_unit_vec_y) + input_ECI_vec.at(2)*LVLH_y_unit_vec.dot(ECI_unit_vec_z);
+
+    double v_z_LVLH= input_ECI_vec.at(0)*LVLH_z_unit_vec.dot(ECI_unit_vec_x) + input_ECI_vec.at(1)*LVLH_z_unit_vec.dot(ECI_unit_vec_y) + input_ECI_vec.at(2)*LVLH_z_unit_vec.dot(ECI_unit_vec_z);
+
+
+    std::array<double,3> output_LVLH_arr={v_x_LVLH,v_y_LVLH,v_z_LVLH};
+    return output_LVLH_arr;
+}
+
+
+
 //baselining cartesian coordinates in ECI frame
 
 std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> input_r_vec,const double input_spacecraft_mass,std::vector<std::array<double,3>> input_vec_of_force_vectors_in_ECI)
@@ -42,7 +125,50 @@ std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> i
 
 
 
+std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> input_r_vec,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time,const std::array<double,3> input_velocity_vec)
+{
+    //orbital acceleration = -G m_Earth/distance^3 * r_vec (just based on rearranging F=ma with a the acceleration due to gravitational attraction between satellite and Earth https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation)
+    //going to be assuming Earth's position doesn't change for now
+    //also assuming Earth is spherical, can loosen this assumption in the future
+    //note: this is in ECI frame (r_vec and velocity vec should also be in ECI frame)
 
+    std::array<double,3> acceleration_vec_due_to_gravity=input_r_vec; //shouldn't need to explicitly call copy function because input_r_vec is passed by value not ref
+    
+    //F=ma
+    //a=F/m = (F_grav + F_ext)/m = (F_grav/m) + (F_ext/m) = -G*M_Earth/distance^3 + ...
+
+    const double distance=sqrt(input_r_vec.at(0)*input_r_vec.at(0) + input_r_vec.at(1)*input_r_vec.at(1) + input_r_vec.at(2)*input_r_vec.at(2));
+    const double overall_factor= -G*mass_Earth/pow(distance,3);
+
+
+
+    for (size_t ind=0;ind<input_r_vec.size();ind++){
+        acceleration_vec_due_to_gravity.at(ind)*=overall_factor;
+    }
+
+    std::array<double,3> acceleration_vec=acceleration_vec_due_to_gravity;
+
+    //now add effects from externally-applied forces, e.g., thrusters, if any
+
+    std::vector<std::array<double,3>> list_of_LVLH_forces_at_evaluation_time={};
+    std::vector<std::array<double,3>> list_of_ECI_forces_at_evaluation_time={};
+
+    for (ThrustProfileLVLH thrust_profile : input_list_of_thrust_profiles_LVLH){
+
+        if ((input_evaluation_time>=thrust_profile.t_start_)&&(input_evaluation_time<=thrust_profile.t_end_)){
+            list_of_LVLH_forces_at_evaluation_time.push_back(thrust_profile.LVLH_force_vec_);
+            std::array<double,3> ECI_thrust_vector=convert_LVLH_to_ECI_manual(thrust_profile.LVLH_force_vec_,input_r_vec,input_velocity_vec);
+            list_of_ECI_forces_at_evaluation_time.push_back(ECI_thrust_vector);
+        }
+    }
+
+    for (std::array<double,3> external_force_vec_in_ECI : list_of_ECI_forces_at_evaluation_time){
+        acceleration_vec.at(0)+=(external_force_vec_in_ECI.at(0)/input_spacecraft_mass);
+        acceleration_vec.at(1)+=(external_force_vec_in_ECI.at(1)/input_spacecraft_mass);
+        acceleration_vec.at(2)+=(external_force_vec_in_ECI.at(2)/input_spacecraft_mass);
+    }
+    return acceleration_vec;
+}
 
 
 
@@ -62,6 +188,27 @@ std::array<double,6> RK4_deriv_function_orbit_position_and_velocity(std::array<d
     }
     
     std::array<double,3> calculated_orbital_acceleration=calculate_orbital_acceleration(position_array,input_spacecraft_mass,input_vec_of_force_vectors_in_ECI);
+
+    for (size_t ind=3;ind<6;ind++){
+        derivative_of_input_y.at(ind)=calculated_orbital_acceleration.at(ind-3);
+    }
+
+    return derivative_of_input_y;
+}
+
+
+std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time){
+    std::array<double,6> derivative_of_input_y={};
+    std::array<double,3> position_array={};
+    std::array<double,3> velocity_array={};
+
+    for (size_t ind=0;ind<3;ind++){
+        derivative_of_input_y.at(ind)=input_position_and_velocity.at(ind+3);
+        velocity_array.at(ind)=input_position_and_velocity.at(ind+3);
+        position_array.at(ind)=input_position_and_velocity.at(ind);
+    }
+    
+    std::array<double,3> calculated_orbital_acceleration=calculate_orbital_acceleration(position_array,input_spacecraft_mass,input_list_of_thrust_profiles_LVLH,input_evaluation_time,velocity_array);
 
     for (size_t ind=3;ind<6;ind++){
         derivative_of_input_y.at(ind)=calculated_orbital_acceleration.at(ind-3);
@@ -271,3 +418,5 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
 //     }
 //     return body_frame_angular_acceleration;
 // }
+
+
