@@ -239,7 +239,7 @@ std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<
 
 
 
-void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time){
+void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time, double input_epsilon){
     if (input_satellite_vector.size()<1){
         std::cout << "No input Satellite objects\n";
         return;
@@ -328,11 +328,13 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
     
             std::array<double,3> evolved_position={};
     
-            int num_timesteps=std::ceil(input_total_sim_time/input_timestep);
-    
-            for (int timestep=0;timestep<num_timesteps;timestep++){
-                current_satellite.evolve_RK4(input_timestep);
+            double timestep_to_use=input_timestep;
+            double current_satellite_time=current_satellite.get_instantaneous_time();
+            while (current_satellite_time<input_total_sim_time){
+                double new_timestep=current_satellite.evolve_RK45(input_epsilon,timestep_to_use);
+                timestep_to_use=new_timestep;
                 evolved_position=current_satellite.get_ECI_position();
+                current_satellite_time=current_satellite.get_instantaneous_time();
                 fprintf(gnuplot_pipe,"%f %f %f\n",evolved_position.at(0),evolved_position.at(1),evolved_position.at(2));
             }
             fprintf(gnuplot_pipe,"e\n");
