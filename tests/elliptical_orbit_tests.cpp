@@ -5,7 +5,7 @@
 
 const double tolerance=pow(10.0,-12);
 //Setting a different tolerance for semimajor axis than the other orbital parameters since there appears to be a minimum error associated with converting position and velocity to semimajor axis, 
-//best guess is this has to do with the scale of distances being dealt with here
+//best guess is this has to do with the scale of distances and/or velocities being dealt with here
 const double semimajor_axis_tolerance=pow(10.0,-7);
 const double epsilon=pow(10.0,-7);
 
