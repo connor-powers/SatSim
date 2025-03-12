@@ -40,7 +40,7 @@ TEST(CircularOrbitTests,TotalEnergyTimestep1){
     double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
     double evolved_energy=test_satellite.get_total_energy();
 
-    EXPECT_TRUE(abs(initial_energy-evolved_energy)<non_length_tolerance) << "Total energy not preserved within tolerance. Difference: " << initial_energy-evolved_energy << "\n";
+    EXPECT_TRUE(abs(initial_energy-evolved_energy)<pow(10,-5)) << "Total energy not preserved within tolerance. Difference: " << initial_energy-evolved_energy << "\n";
 }
 
 TEST(CircularOrbitTests,EvolvedOrbitalRadius1){
