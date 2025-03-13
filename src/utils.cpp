@@ -5,6 +5,9 @@
 
 using Eigen::Matrix3d;
 using Eigen::Vector3d;
+using Eigen::Vector4d;
+using Eigen::Matrix4d;
+
 
 
 //"manual" version, via dot products and cross products with position and velocity vectors
@@ -422,3 +425,27 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
 // }
 
 
+
+
+std::array<double,4> bodyframe_quaternion_deriv(std::array<double,4> input_bodyframe_quaternion,double input_w_1, double input_w_2, double input_w_3){
+
+    //Assumes quaternions are input as [q_0, q_1, q_2, q_3] and omega is the spacecraft "body rate", represented in the body frame, w.r.t. a chosen reference frame
+    //Ref: https://ntrs.nasa.gov/api/citations/20240009554/downloads/Space%20Attitude%20Development%20Control.pdf
+
+    //Let's do this with Eigen so we can use matrix multiplication easily
+    Vector4d input_body_quaternion;
+    input_body_quaternion << input_bodyframe_quaternion.at(0),input_bodyframe_quaternion.at(1),input_bodyframe_quaternion.at(2),input_bodyframe_quaternion.at(3);
+
+    Matrix4d coeff_mat;
+    coeff_mat << 0,-input_w_1,-input_w_2,-input_w_3,
+                 input_w_1, 0, input_w_3, -input_w_2,
+                 input_w_2, -input_w_3, 0, input_w_1,
+                 input_w_3, input_w_2, -input_w_1, 0;
+
+    Vector4d quaternion_deriv_vec= 0.5*coeff_mat*input_body_quaternion;
+    std::array<double,4> quaternion_deriv_array;
+    for (size_t ind=0;ind<quaternion_deriv_array.size();ind++){
+        quaternion_deriv_array.at(ind)=quaternion_deriv_vec(ind);
+    }
+    return quaternion_deriv_array;
+}   

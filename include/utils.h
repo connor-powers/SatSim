@@ -99,7 +99,7 @@ template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_
 
     //Need to populate k_vec (compute vector k_i for i=0...s-1)
     for (size_t k_ind=0;k_ind<s;k_ind++){
-        double evaluation_time=input_t_n+(nodes[k_ind]*input_step_size);
+        double evaluation_time=input_t_n+(nodes.at(k_ind)*input_step_size);
         std::array<double, T> y_n_evaluated_value=y_n;
         std::array<double, T> k_vec_at_this_s;
         for (size_t s_ind=0; s_ind<k_ind; s_ind++){
@@ -119,7 +119,7 @@ template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_
 
     for (size_t s_ind=0;s_ind<s;s_ind++){
         for (size_t y_ind=0;y_ind<y_n.size();y_ind++){
-            double tmp=CH_vec[s_ind]*k_vec_vec.at(s_ind).at(y_ind);
+            double tmp=CH_vec.at(s_ind)*k_vec_vec.at(s_ind).at(y_ind);
             y_nplusone.at(y_ind)+=tmp;
         }
     }
@@ -129,16 +129,16 @@ template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_
 
         for (size_t y_ind=0;y_ind<std::size(TE_vec);y_ind++){
 
-            TE_vec[y_ind]+=CT_vec[s_ind]*k_vec_vec.at(s_ind).at(y_ind);
+            TE_vec.at(y_ind)+=CT_vec.at(s_ind)*k_vec_vec.at(s_ind).at(y_ind);
 
         }
     }
 
     for (size_t y_ind=0; y_ind<std::size(TE_vec);y_ind++){
-        TE_vec[y_ind]=abs(TE_vec[y_ind]);
+        TE_vec.at(y_ind)=abs(TE_vec.at(y_ind));
     }
     //I'm going to use the max TE found across the whole position+velocity vec as the TE in the calculation of the next stepsize
-    double max_TE=TE_vec[ std::distance( std::begin(TE_vec), std::max_element(std::begin(TE_vec),std::end(TE_vec)) ) ];
+    double max_TE=TE_vec.at( std::distance( std::begin(TE_vec), std::max_element(std::begin(TE_vec),std::end(TE_vec)) ) );
     double epsilon_ratio=input_epsilon/max_TE;
 
     double h_new=0.9*input_step_size*std::pow(epsilon_ratio,1.0/5);
@@ -162,6 +162,8 @@ template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_
 std::array<double,3> convert_LVLH_to_ECI_manual(std::array<double,3> input_LVLH_vec,std::array<double,3> input_position_vec,std::array<double,3> input_velocity_vec);
 std::array<double,3> convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_vec,std::array<double,3> input_position_vec,std::array<double,3> input_velocity_vec);
 std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time);
+
+std::array<double,4> bodyframe_quaternion_deriv(std::array<double,4> input_bodyframe_quaternion,double input_w_1, double input_w_2, double input_w_3);
 
 
 #endif
