@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
-
+#include <stdexcept>
 using json=nlohmann::json;
 
 //Define constants
@@ -85,6 +85,9 @@ class Satellite
             inclination_=input_data.at("Inclination");
             //convert to radians
             inclination_*=(M_PI/180);
+            if (inclination_==0){
+                throw std::invalid_argument("Zero inclination orbits are not currently supported");
+            }
 
             raan_=input_data.at("RAAN");
             //convert to radians
@@ -202,11 +205,12 @@ class Satellite
 
         // std::array<double,3> convert_body_frame_to_ECI(std::array<double,3> input_body_frame_vec);
 
-        void update_orbital_elements_from_position_and_velocity();
+        int update_orbital_elements_from_position_and_velocity();
         std::array<double,6> get_orbital_elements();
 
-        double evolve_RK45(double input_epsilon,double input_initial_timestep);
+        std::pair<double,int> evolve_RK45(double input_epsilon,double input_initial_timestep,bool perturbation=true);
 
+        double get_orbital_element(std::string orbital_element_name);
 };
 
 

@@ -22,12 +22,21 @@ int main()
 
     Satellite test_sat_3("../input_3.json");
     
-    std::vector<Satellite> satellite_vector={test_sat_1,test_sat_2,test_sat_3};
+    std::vector<Satellite> satellite_vector_1={test_sat_1, test_sat_2,test_sat_3};
 
     double timestep=2;
     double total_sim_time=25000;
     double epsilon=pow(10,-11);
-    sim_and_draw_orbit_gnuplot(satellite_vector,timestep,total_sim_time,epsilon);
+    sim_and_draw_orbit_gnuplot(satellite_vector_1,timestep,total_sim_time,epsilon);
 
+    //Now some demonstrations of plotting orbital parameters
+    Satellite test_sat_4("../input_4.json");
+    Satellite test_sat_5("../input_5.json");
+    Satellite test_sat_6("../input_6.json");
+
+
+    std::vector<Satellite> satellite_vector_2={test_sat_4,test_sat_5,test_sat_6};
+    total_sim_time=50000;
+    sim_and_plot_orbital_elem_gnuplot(satellite_vector_2,timestep,total_sim_time,epsilon,"Argument of Periapsis");
     return 0;
 }

@@ -291,18 +291,22 @@ void Satellite::add_LVLH_thrust_profile(std::array<double,3> input_LVLH_normaliz
 // }
 
 
-void Satellite::update_orbital_elements_from_position_and_velocity(){
+int Satellite::update_orbital_elements_from_position_and_velocity(){
     //Anytime the orbit is changed via external forces, need to update the orbital parameters of the satellite.
     //True anomaly should change over time even in absence of external forces
     //Using approach from Fundamentals of Astrodynamics
+    int error_code=0; //0 represents nominal operation
     double mu=G*mass_Earth;
 
     Vector3d position_vector={ECI_position_.at(0),ECI_position_.at(1),ECI_position_.at(2)};
     Vector3d velocity_vector={ECI_velocity_.at(0),ECI_velocity_.at(1),ECI_velocity_.at(2)};
     Vector3d h_vector=position_vector.cross(velocity_vector);
     double h=h_vector.norm();
+
     Vector3d n_vector={-h_vector(1),h_vector(0),0};
     double n=n_vector.norm();
+
+
     double v_magnitude=get_speed();
     double r_magnitude=get_radius();
 
@@ -321,6 +325,10 @@ void Satellite::update_orbital_elements_from_position_and_velocity(){
     if (n_vector(1)<0){
         calculated_RAAN=2*M_PI-calculated_RAAN;
     }
+    if (std::isnan(calculated_RAAN)){
+        std:: cout << "Calculated RAAN was undefined. One possible cause of this is an orbit with zero inclination. Current magnitude of line of nodes: " << n << "\n";
+        error_code=1;
+    }
 
     //Need to treat the e \approx 0 case (circular orbits) specially
     double calculated_arg_of_periapsis;
@@ -330,10 +338,15 @@ void Satellite::update_orbital_elements_from_position_and_velocity(){
         if (e_vec(2)<0){
             calculated_arg_of_periapsis=2*M_PI-calculated_arg_of_periapsis;
         }
-    
+
         calculated_true_anomaly=acos(e_vec.dot(position_vector)/(calculated_eccentricity*r_magnitude));
         if (position_vector.dot(velocity_vector)<0){
             calculated_true_anomaly=2*M_PI-calculated_true_anomaly;
+        }
+
+        if (std::isnan(calculated_arg_of_periapsis)){
+            std:: cout << "Calculated argument of periapsis was undefined. One possible cause of this is an orbit with zero inclination. Current magnitude of line of nodes: " << n << "\n";
+            error_code=1;
         }
     }
     else {
@@ -361,7 +374,7 @@ void Satellite::update_orbital_elements_from_position_and_velocity(){
     arg_of_periapsis_=calculated_arg_of_periapsis;
     true_anomaly_=calculated_true_anomaly;
 
-    return;
+    return error_code;
 }
 
 std::array<double,6> Satellite::get_orbital_elements(){
@@ -376,7 +389,8 @@ std::array<double,6> Satellite::get_orbital_elements(){
 }
 
 
-double Satellite::evolve_RK45(double input_epsilon,double input_step_size){
+std::pair<double,int> Satellite::evolve_RK45(double input_epsilon,double input_step_size,bool perturbation){
+    //perturbation is a flag which, when set to true, currently accounts for J2 perturbation.
 
     //Format input position and velocity arrays into single array for RK4(5) step
     std::array<double,6> combined_initial_position_and_velocity_array={};
@@ -391,7 +405,7 @@ double Satellite::evolve_RK45(double input_epsilon,double input_step_size){
 
     
 
-    std::pair<std::array<double, 6>,std::pair<double,double>> output_pair= RK45_step<6>(combined_initial_position_and_velocity_array,input_step_size,RK45_deriv_function_orbit_position_and_velocity,m_,thrust_profile_list_,t_,input_epsilon);
+    std::pair<std::array<double, 6>,std::pair<double,double>> output_pair= RK45_step<6>(combined_initial_position_and_velocity_array,input_step_size,RK45_deriv_function_orbit_position_and_velocity,m_,thrust_profile_list_,t_,input_epsilon,inclination_, arg_of_periapsis_, true_anomaly_,perturbation);
     std::array<double, 6> output_combined_position_and_velocity_array=output_pair.first;
     double step_size_successfully_used_here=output_pair.second.first;
     double new_step_size=output_pair.second.second;
@@ -410,8 +424,37 @@ double Satellite::evolve_RK45(double input_epsilon,double input_step_size){
 
 
     //Update orbital parameters
-    update_orbital_elements_from_position_and_velocity();
-
-    return new_step_size;
+    int orbit_elems_error_code = update_orbital_elements_from_position_and_velocity();
+    std::pair<double,int> evolve_RK45_output_pair;
     
+    evolve_RK45_output_pair.first=new_step_size;
+    evolve_RK45_output_pair.second=orbit_elems_error_code;
+
+    return evolve_RK45_output_pair;
+    
+}
+
+double Satellite::get_orbital_element(std::string orbital_element_name){
+    if (orbital_element_name=="Semimajor Axis"){
+        return a_;
+    }
+    else if (orbital_element_name=="Eccentricity"){
+        return eccentricity_;
+    }
+    else if (orbital_element_name=="Inclination"){
+        return inclination_;
+    }
+    else if (orbital_element_name=="RAAN"){
+        return raan_;
+    }
+    else if (orbital_element_name=="Argument of Periapsis"){
+        return arg_of_periapsis_;
+    }
+    else if (orbital_element_name=="True Anomaly"){
+        return true_anomaly_;
+    }
+    else {
+        std::cout << "Unrecognized argument, returning -1";
+        return -1;
+    }
 }
