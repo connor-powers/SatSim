@@ -5,8 +5,9 @@ Features so far:
 - RK4(5) method for time evolution
 
 - Construct and plot multiple satellite objects simultaneously
+- Optionally includes calculation of accelerations due to J2 perturbation
 
-- Support for adding body-frame (LVLH) thrust profiles to satellites
+- Support for adding LVLH frame thrust profiles to satellites
 
    - Currently supports constant-thrust profiles over a specified time period
 
