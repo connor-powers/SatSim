@@ -165,6 +165,6 @@ std::array<double,3> convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_v
 std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time,double input_inclination, double input_arg_of_periapsis, double input_true_anomaly,bool perturbation);
 
 std::array<double,3> convert_cylindrical_to_cartesian(double input_r_comp,double input_theta_comp,double input_z_comp, double input_theta);
-void sim_and_plot_orbital_param_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time, double input_epsilon,std::string input_orbital_element_name);
+void sim_and_plot_orbital_elem_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time, double input_epsilon,std::string input_orbital_element_name);
 
 #endif
