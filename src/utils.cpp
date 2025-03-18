@@ -302,19 +302,20 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
     //if it exists
     if (gnuplot_pipe){
 
-
+        fprintf(gnuplot_pipe,"set terminal qt size 900,700 font 'Helvetica,14'\n");
         //formatting
-        fprintf(gnuplot_pipe,"set xlabel 'x'\n");
-        fprintf(gnuplot_pipe,"set ylabel 'y'\n");
-        fprintf(gnuplot_pipe,"set zlabel 'z'\n");
-        fprintf(gnuplot_pipe,"set title 'Simulated orbits up to time %.2f s'\n",input_total_sim_time);
+        fprintf(gnuplot_pipe,"set xlabel 'x [m]' offset 0,-2\n");
+        fprintf(gnuplot_pipe,"set ylabel 'y [m]' offset -2,0\n");
+        fprintf(gnuplot_pipe,"set zlabel 'z [m]'\n");
+        fprintf(gnuplot_pipe,"set title 'Simulated orbits up to time %.2f s' offset 0,-7.5\n",input_total_sim_time);
         // fprintf(gnuplot_pipe,"set view 70,1,1,1\n");        
         fprintf(gnuplot_pipe,"set view equal xyz\n");        
-
+        fprintf(gnuplot_pipe,"set xtics offset 0,-1\n");   
+        fprintf(gnuplot_pipe,"set ytics offset -1,0\n");   
         fprintf(gnuplot_pipe,"unset colorbox\n");    
         fprintf(gnuplot_pipe,"set style fill transparent solid 1.0\n");    
 
-        fprintf(gnuplot_pipe,"set key\n");   
+        fprintf(gnuplot_pipe,"set key offset 0,-10\n");   
         fprintf(gnuplot_pipe,"set hidden3d front\n");   
 
 
@@ -427,11 +428,12 @@ void sim_and_plot_orbital_param_gnuplot(std::vector<Satellite> input_satellite_v
     //if it exists
     if (gnuplot_pipe){
 
-
+        fprintf(gnuplot_pipe,"set terminal qt size 600,400 font 'Helvetica,14'\n");
         //formatting
         fprintf(gnuplot_pipe,"set xlabel 'Time [s]'\n");
         fprintf(gnuplot_pipe,"set ylabel '%s'\n",input_orbital_element_name.c_str());
         fprintf(gnuplot_pipe,"set title '%s simulated up to time %.2f s'\n",input_orbital_element_name.c_str(), input_total_sim_time);
+        fprintf(gnuplot_pipe,"set key right bottom\n");
 
 
         //plotting
