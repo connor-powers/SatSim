@@ -1,7 +1,7 @@
 {
-    "Inclination": 0,
+    "Inclination": 1.5,
     "RAAN": 1,
-    "Argument of Periapsis": 1,
+    "Argument of Periapsis": 20,
     "Eccentricity": 0.1,
     "Semimajor Axis": 10000,
     "True Anomaly": 0,

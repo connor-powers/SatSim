@@ -39,7 +39,10 @@ TEST(CircularOrbitTests,TotalEnergyTimestep1){
     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
     double initial_energy=test_satellite.get_total_energy();
     double test_timestep=1; //s
-    double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
+    bool perturbation_bool=false;
+    std::pair<double,int> new_timestep_and_error_code =test_satellite.evolve_RK45(epsilon,test_timestep,perturbation_bool);
+    double next_timestep=new_timestep_and_error_code.first;
+    int error_code=new_timestep_and_error_code.second;
     double evolved_energy=test_satellite.get_total_energy();
 
     EXPECT_TRUE(abs(initial_energy-evolved_energy)<energy_cons_tolerance) << "Total energy not preserved within tolerance. Difference: " << initial_energy-evolved_energy << "\n";
@@ -50,7 +53,11 @@ TEST(CircularOrbitTests,EvolvedOrbitalRadius1){
     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
     double calculated_initial_radius=test_satellite.get_radius();
     double test_timestep=1;
-    double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
+    bool perturbation_bool=false; //While from what I can tell (see, e.g., https://ocw.tudelft.nl/wp-content/uploads/AE2104-Orbital-Mechanics-Slides_8.pdf) there's no major effects on semimajor axis from J2 perturbation, not clear to me that this should be exactly constant with J2 perturbation enabled
+
+    std::pair<double,int> new_timestep_and_error_code=test_satellite.evolve_RK45(epsilon,test_timestep,perturbation_bool);
+    double next_timestep=new_timestep_and_error_code.first;
+    int error_code=new_timestep_and_error_code.second;
     double calculated_evolved_radius=test_satellite.get_radius();
 
     EXPECT_TRUE(abs(calculated_initial_radius-calculated_evolved_radius)<length_tolerance) << "Orbital radius not constant within tolerance. Difference: " << calculated_initial_radius-calculated_evolved_radius << "\n";
@@ -61,7 +68,11 @@ TEST(CircularOrbitTests,EvolvedOrbitalSpeed1){
     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
     double calculated_initial_speed=test_satellite.get_speed();
     double test_timestep=1;
-    double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
+    bool perturbation_bool=false; //While from what I can tell (see, e.g., https://ocw.tudelft.nl/wp-content/uploads/AE2104-Orbital-Mechanics-Slides_8.pdf) there's no major effects on semimajor axis from J2 perturbation, not clear to me that this should be exactly constant with J2 perturbation enabled
+
+    std::pair<double,int> new_timestep_and_error_code=test_satellite.evolve_RK45(epsilon,test_timestep,perturbation_bool);
+    double next_timestep=new_timestep_and_error_code.first;
+    int error_code=new_timestep_and_error_code.second;
     double calculated_evolved_speed=test_satellite.get_speed();
 
     EXPECT_TRUE(abs(calculated_initial_speed-calculated_evolved_speed)<tolerance) << "Orbital speed not constant within tolerance. Difference: " << calculated_initial_speed-calculated_evolved_speed << "\n";
@@ -97,12 +108,16 @@ TEST(CircularOrbitTests,BasicOrbitalElementsTest){
 }
 
 TEST(CircularOrbitTests,ConstantEvolvedOrbitalElementsTest){
-
+    //The idea behind this test is that after evolving a timestep, orbital elements besides true anomaly should be constant (when J2 perturbation is not taken into account)
     Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
     std::array<double,6> initial_orbit_elements=test_satellite.get_orbital_elements();
 
     double test_timestep=1;
-    double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
+    bool perturbation_bool=false;
+
+    std::pair<double,int> new_timestep_and_error_code=test_satellite.evolve_RK45(epsilon,test_timestep,perturbation_bool);
+    double next_timestep=new_timestep_and_error_code.first;
+    int error_code=new_timestep_and_error_code.second;
     std::array<double,6> evolved_orbit_elements=test_satellite.get_orbital_elements();
 
     std::array<std::string,6> orbital_element_name_array;
@@ -141,7 +156,10 @@ TEST(CircularOrbitTests,Thruster_Eccentricity_Change){
     double current_satellite_time=test_satellite.get_instantaneous_time();
     double sim_end_time=110;
     while (current_satellite_time<sim_end_time){
-        double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
+
+        std::pair<double,int> new_timestep_and_error_code =test_satellite.evolve_RK45(epsilon,test_timestep);
+        double next_timestep=new_timestep_and_error_code.first;
+        int error_code=new_timestep_and_error_code.second;
         test_timestep=next_timestep;
         current_satellite_time=test_satellite.get_instantaneous_time();
     }
