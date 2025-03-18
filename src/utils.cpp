@@ -93,6 +93,7 @@ std::array<double,3> convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_v
 
 std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> input_r_vec,const double input_spacecraft_mass,std::vector<std::array<double,3>> input_vec_of_force_vectors_in_ECI)
 {
+    //Note: this is the version used in the RK4 solver
     //orbital acceleration = -G m_Earth/distance^3 * r_vec (just based on rearranging F=ma with a the acceleration due to gravitational attraction between satellite and Earth https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation)
     //going to be assuming Earth's position doesn't change for now
     //also assuming Earth is spherical, can loosen this assumption in the future
@@ -123,10 +124,23 @@ std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> i
     return acceleration_vec;
 }
 
+std::array<double,3> convert_cylindrical_to_cartesian(double input_r_comp,double input_theta_comp,double input_z_comp,double input_theta){
+    std::array<double,3> output_cartesian_vec={0,0,0};
 
+    //Dot product method
+    double x_comp=input_r_comp*cos(input_theta) + input_theta_comp*(-sin(input_theta));
+    double y_comp=input_r_comp*sin(input_theta) + input_theta_comp*(cos(input_theta));
+    double z_comp=input_z_comp;
 
-std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> input_r_vec,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time,const std::array<double,3> input_velocity_vec)
+    output_cartesian_vec.at(0)=x_comp;
+    output_cartesian_vec.at(1)=y_comp;
+    output_cartesian_vec.at(2)=z_comp;
+    return output_cartesian_vec;
+}
+
+std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> input_r_vec,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time,const std::array<double,3> input_velocity_vec, double input_inclination,double input_arg_of_periapsis,double input_true_anomaly, bool perturbation)
 {
+    //Note: this is the version used in the RK45 solver (this has a more updated workflow)
     //orbital acceleration = -G m_Earth/distance^3 * r_vec (just based on rearranging F=ma with a the acceleration due to gravitational attraction between satellite and Earth https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation)
     //going to be assuming Earth's position doesn't change for now
     //also assuming Earth is spherical, can loosen this assumption in the future
@@ -167,6 +181,43 @@ std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> i
         acceleration_vec.at(1)+=(external_force_vec_in_ECI.at(1)/input_spacecraft_mass);
         acceleration_vec.at(2)+=(external_force_vec_in_ECI.at(2)/input_spacecraft_mass);
     }
+
+    if (perturbation){
+        //If accounting for J2 perturbation
+
+        //Now let's add the additional acceleration components due to the J2 perturbation
+        //Ref: https://vatankhahghadim.github.io/AER506/Notes/6%20-%20Orbital%20Perturbations.pdf
+        double J2=1.083*pow(10,-3);
+        double mu=G*mass_Earth;
+        double C=3*mu*J2*radius_Earth*radius_Earth/(2*pow(distance,4));
+        double x=input_r_vec.at(0);
+        double y=input_r_vec.at(1);
+        double rho=sqrt(pow(x,2) + pow(y,2));
+        double theta;
+        //Ref: https://en.wikipedia.org/wiki/Cylindrical_coordinate_system#Line_and_volume_elements
+        if (x>=0){
+            theta=asin(y/rho); //Note: here setting theta=0 even if both x and y are zero, whereas it should technically be indeterminate, but I'm going to assume this edge condition won't be hit and I don't want undefined behavior
+        }
+        else {
+            if (y>=0){
+                theta=-asin(y/rho) + M_PI;
+            }
+            else {
+                theta=-asin(y/rho) - M_PI;
+            }
+        }
+        
+        double a_r=C*(3*pow(sin(input_inclination),2)*pow(sin(input_arg_of_periapsis+input_true_anomaly),2)-1);
+        double a_theta=-C*pow(sin(input_inclination),2)*sin(2*(input_arg_of_periapsis+input_true_anomaly));
+        double a_z=-C*sin(2*input_inclination)*sin(input_arg_of_periapsis+input_true_anomaly);
+        std::array<double,3> cartesian_acceleration_components=convert_cylindrical_to_cartesian(a_r,a_theta,a_z,theta);
+
+
+        for (size_t ind=0;ind<3;ind++){
+            acceleration_vec.at(ind)+=cartesian_acceleration_components.at(ind);
+        }
+    }
+
     return acceleration_vec;
 }
 
@@ -197,7 +248,7 @@ std::array<double,6> RK4_deriv_function_orbit_position_and_velocity(std::array<d
 }
 
 
-std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time){
+std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time,double input_inclination, double input_arg_of_periapsis, double input_true_anomaly,bool perturbation){
     std::array<double,6> derivative_of_input_y={};
     std::array<double,3> position_array={};
     std::array<double,3> velocity_array={};
@@ -208,7 +259,7 @@ std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<
         position_array.at(ind)=input_position_and_velocity.at(ind);
     }
     
-    std::array<double,3> calculated_orbital_acceleration=calculate_orbital_acceleration(position_array,input_spacecraft_mass,input_list_of_thrust_profiles_LVLH,input_evaluation_time,velocity_array);
+    std::array<double,3> calculated_orbital_acceleration=calculate_orbital_acceleration(position_array,input_spacecraft_mass,input_list_of_thrust_profiles_LVLH,input_evaluation_time,velocity_array, input_inclination, input_arg_of_periapsis, input_true_anomaly,perturbation);
 
     for (size_t ind=3;ind<6;ind++){
         derivative_of_input_y.at(ind)=calculated_orbital_acceleration.at(ind-3);
@@ -331,7 +382,16 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
             double timestep_to_use=input_timestep;
             double current_satellite_time=current_satellite.get_instantaneous_time();
             while (current_satellite_time<input_total_sim_time){
-                double new_timestep=current_satellite.evolve_RK45(input_epsilon,timestep_to_use);
+                std::pair<double,int> new_timestep_and_error_code=current_satellite.evolve_RK45(input_epsilon,timestep_to_use);
+                double new_timestep=new_timestep_and_error_code.first;
+                int error_code=new_timestep_and_error_code.second;
+                if (error_code!=0){
+                    std::cout << "Error detected, halting visualization\n";
+                    fprintf(gnuplot_pipe,"e\n");
+                    fprintf(gnuplot_pipe,"exit \n");
+                    pclose(gnuplot_pipe);
+                    return;
+                }
                 timestep_to_use=new_timestep;
                 evolved_position=current_satellite.get_ECI_position();
                 current_satellite_time=current_satellite.get_instantaneous_time();
@@ -354,6 +414,116 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
     return;
 }
 
+
+void sim_and_plot_orbital_param_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time, double input_epsilon,std::string input_orbital_element_name){
+    if (input_satellite_vector.size()<1){
+        std::cout << "No input Satellite objects\n";
+        return;
+    }
+
+    //first, open "pipe" to gnuplot
+    FILE *gnuplot_pipe = popen("gnuplot", "w");
+    //if it exists
+    if (gnuplot_pipe){
+
+
+        //formatting
+        fprintf(gnuplot_pipe,"set xlabel 'Time [s]'\n");
+        fprintf(gnuplot_pipe,"set ylabel '%s'\n",input_orbital_element_name.c_str());
+        fprintf(gnuplot_pipe,"set title '%s simulated up to time %.2f s'\n",input_orbital_element_name.c_str(), input_total_sim_time);
+
+
+        //plotting
+
+
+        //first satellite
+        Satellite current_satellite=input_satellite_vector.at(0);
+        if (input_satellite_vector.size()==1){
+            if (current_satellite.plotting_color_.size()>0){
+                fprintf(gnuplot_pipe,"plot '-' using 1:2 with lines lw 1 lc rgb '%s' title '%s' \n",current_satellite.plotting_color_.c_str(),current_satellite.get_name().c_str());
+            }
+            else {
+                fprintf(gnuplot_pipe,"pplot '-' using 1:2 with lines lw 1 title '%s' \n",current_satellite.get_name().c_str());
+            }
+            
+        }
+
+        else {
+            if (current_satellite.plotting_color_.size()>0){
+                fprintf(gnuplot_pipe,"plot '-' using 1:2 with lines lw 1 lc rgb '%s' title '%s'\\\n",current_satellite.plotting_color_.c_str(),current_satellite.get_name().c_str());
+            }
+            else {
+                fprintf(gnuplot_pipe,"plot '-' using 1:2 with lines lw 1 title '%s'\\\n",current_satellite.get_name().c_str());
+            }
+        }
+
+        for (size_t satellite_index=1;satellite_index<input_satellite_vector.size();satellite_index++){
+            current_satellite=input_satellite_vector.at(satellite_index);
+            if (satellite_index<input_satellite_vector.size()-1){
+                if (current_satellite.plotting_color_.size()>0){
+                    fprintf(gnuplot_pipe,",'-' using 1:2 with lines lw 1 lc rgb '%s' title '%s' \\\n",current_satellite.plotting_color_.c_str(),current_satellite.get_name().c_str());
+                }
+                else {
+                    fprintf(gnuplot_pipe,",'-' using 1:2 with lines lw 1 title '%s' \\\n",current_satellite.get_name().c_str());
+                }
+                
+            }
+
+            else {
+                if (current_satellite.plotting_color_.size()>0){
+                    fprintf(gnuplot_pipe,",'-' using 1:2 with lines lw 1 lc rgb '%s' title '%s'\n",current_satellite.plotting_color_.c_str(),current_satellite.get_name().c_str());
+                }
+                else {
+                    fprintf(gnuplot_pipe,",'-' using 1:2 with lines lw 1 title '%s'\n",current_satellite.get_name().c_str());
+                }
+            }
+        }
+
+        //now the orbit data, inline, one satellite at a time
+        for (size_t satellite_index=0;satellite_index<input_satellite_vector.size();satellite_index++){
+            Satellite current_satellite=input_satellite_vector.at(satellite_index);
+            double val=current_satellite.get_orbital_element(input_orbital_element_name);
+            double current_satellite_time=current_satellite.get_instantaneous_time();
+            fprintf(gnuplot_pipe,"%f %f\n",current_satellite_time,val);
+    
+    
+            double evolved_val={0};
+    
+            double timestep_to_use=input_timestep;
+            current_satellite_time=current_satellite.get_instantaneous_time();
+            while (current_satellite_time<input_total_sim_time){
+                std::pair<double,int> new_timestep_and_error_code=current_satellite.evolve_RK45(input_epsilon,timestep_to_use);
+                double new_timestep=new_timestep_and_error_code.first;
+                int error_code=new_timestep_and_error_code.second;
+
+                if (error_code!=0){
+                    std::cout << "Error detected, halting visualization\n";
+                    fprintf(gnuplot_pipe,"e\n");
+                    fprintf(gnuplot_pipe,"exit \n");
+                    pclose(gnuplot_pipe);
+                    return;
+                }
+                timestep_to_use=new_timestep;
+                evolved_val=current_satellite.get_orbital_element(input_orbital_element_name);
+                current_satellite_time=current_satellite.get_instantaneous_time();
+                fprintf(gnuplot_pipe,"%f %f\n",current_satellite_time,evolved_val);
+            }
+            fprintf(gnuplot_pipe,"e\n");
+
+        }
+        fprintf(gnuplot_pipe,"pause mouse keypress\n");
+
+        fprintf(gnuplot_pipe,"exit \n");
+        pclose(gnuplot_pipe);
+
+
+    }
+    else {
+        std::cout << "gnuplot not found";
+    }
+
+    return;
+}
 
 
 

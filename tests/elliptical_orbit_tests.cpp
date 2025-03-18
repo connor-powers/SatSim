@@ -18,7 +18,9 @@ TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed1){
     double current_time=test_satellite.get_instantaneous_time();
     double next_timestep=0;
     while (current_time<sim_time){
-        next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
+        std::pair<double,int> new_timestep_and_error_code=test_satellite.evolve_RK45(epsilon,test_timestep);
+        next_timestep=new_timestep_and_error_code.first;
+        int error_code=new_timestep_and_error_code.second;
         test_timestep=next_timestep;
         current_time=test_satellite.get_instantaneous_time();
     }
@@ -32,7 +34,9 @@ TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed2){
     Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
     double calculated_initial_speed=test_satellite.get_speed();
     double test_timestep=1; //s
-    double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
+    std::pair<double,int> new_timestep_and_error_code =test_satellite.evolve_RK45(epsilon,test_timestep);
+    double next_timestep=new_timestep_and_error_code.first;
+    int error_code=new_timestep_and_error_code.second;
     double calculated_evolved_speed=test_satellite.get_speed();
 
     EXPECT_TRUE(calculated_initial_speed<calculated_evolved_speed) << "Apogee speed not smaller than calculated evolved speed. Difference: " << calculated_initial_speed-calculated_evolved_speed << "\n";
@@ -40,12 +44,16 @@ TEST(EllipticalOrbitTests,EvolvedOrbitalSpeed2){
 
 
 TEST(EllipticalOrbitTests,ConstantEvolvedOrbitalElementsTest){
+    //The idea behind this test is that after evolving a timestep, orbital elements besides true anomaly should be constant (when J2 perturbation is not taken into account)
 
     Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
     std::array<double,6> initial_orbit_elements=test_satellite.get_orbital_elements();
 
     double test_timestep=1; //s
-    double next_timestep=test_satellite.evolve_RK45(epsilon,test_timestep);
+    bool perturbation_bool=false;
+    std::pair<double,int> new_timestep_and_error_code =test_satellite.evolve_RK45(epsilon,test_timestep,perturbation_bool);
+    double next_timestep=new_timestep_and_error_code.first;
+    int error_code=new_timestep_and_error_code.second;
     std::array<double,6> evolved_orbit_elements=test_satellite.get_orbital_elements();
 
     std::array<std::string,6> orbital_element_name_array;

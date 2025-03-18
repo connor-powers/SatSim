@@ -11,6 +11,7 @@ using Eigen::MatrixXd;
 
 
 std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> input_r_vec,const double input_spacecraft_mass,std::vector<std::array<double,3>> input_vec_of_force_vectors_in_ECI={});
+std::array<double,3> calculate_orbital_acceleration(const std::array<double,3> input_r_vec,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time,const std::array<double,3> input_velocity_vec, double input_inclination,double input_arg_of_periapsis,double input_true_anomaly, bool perturbation);
 
 
 std::array<double,6> RK4_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<std::array<double,3>> input_vec_of_force_vectors_in_ECI={});
@@ -67,7 +68,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
 
 
 
-template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_step(std::array<double, T> y_n, double input_step_size,std::function<std::array<double,T>(const std::array<double,T>,const double,std::vector<ThrustProfileLVLH>, double)> input_derivative_function,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_t_n,double input_epsilon){
+template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_step(std::array<double, T> y_n, double input_step_size,std::function<std::array<double,T>(const std::array<double,T>,const double,std::vector<ThrustProfileLVLH>, double,double,double,double,bool)> input_derivative_function,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_t_n,double input_epsilon,double input_inclination, double input_arg_of_periapsis, double input_true_anomaly,bool perturbation){
     
     //Implementing RK4(5) method for its adaptive step size
     //Refs:https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method , https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods#The_Runge%E2%80%93Kutta_method
@@ -107,7 +108,7 @@ template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_
                 y_n_evaluated_value.at(y_val_ind) += input_step_size*RK_matrix(k_ind,s_ind)*k_vec_vec.at(s_ind).at(y_val_ind);
             }
         }
-        std::array<double,6> derivative_function_output=input_derivative_function(y_n_evaluated_value,input_spacecraft_mass,input_list_of_thrust_profiles_LVLH,evaluation_time);
+        std::array<double,6> derivative_function_output=input_derivative_function(y_n_evaluated_value,input_spacecraft_mass,input_list_of_thrust_profiles_LVLH,evaluation_time,input_inclination, input_arg_of_periapsis, input_true_anomaly,perturbation);
         for (size_t y_val_ind=0;y_val_ind<y_n.size();y_val_ind++){
             k_vec_at_this_s.at(y_val_ind)=input_step_size*derivative_function_output.at(y_val_ind);
         }
@@ -153,7 +154,7 @@ template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_
         return output_pair;
     }
     else {
-        return RK45_step<6>(y_n, h_new,input_derivative_function,input_spacecraft_mass,input_list_of_thrust_profiles_LVLH, input_t_n, input_epsilon);
+        return RK45_step<6>(y_n, h_new,input_derivative_function,input_spacecraft_mass,input_list_of_thrust_profiles_LVLH, input_t_n, input_epsilon,input_inclination, input_arg_of_periapsis, input_true_anomaly,perturbation);
     }
 
 
@@ -161,7 +162,9 @@ template <int T> std::pair<std::array<double, T>,std::pair<double,double>> RK45_
 
 std::array<double,3> convert_LVLH_to_ECI_manual(std::array<double,3> input_LVLH_vec,std::array<double,3> input_position_vec,std::array<double,3> input_velocity_vec);
 std::array<double,3> convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_vec,std::array<double,3> input_position_vec,std::array<double,3> input_velocity_vec);
-std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time);
+std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time,double input_inclination, double input_arg_of_periapsis, double input_true_anomaly,bool perturbation);
 
+std::array<double,3> convert_cylindrical_to_cartesian(double input_r_comp,double input_theta_comp,double input_z_comp, double input_theta);
+void sim_and_plot_orbital_param_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time, double input_epsilon,std::string input_orbital_element_name);
 
 #endif
