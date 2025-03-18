@@ -163,7 +163,12 @@ std::array<double,3> convert_LVLH_to_ECI_manual(std::array<double,3> input_LVLH_
 std::array<double,3> convert_ECI_to_LVLH_manual(std::array<double,3> input_ECI_vec,std::array<double,3> input_position_vec,std::array<double,3> input_velocity_vec);
 std::array<double,6> RK45_deriv_function_orbit_position_and_velocity(std::array<double,6> input_position_and_velocity,const double input_spacecraft_mass,std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,double input_evaluation_time);
 
-std::array<double,4> bodyframe_quaternion_deriv(std::array<double,4> input_bodyframe_quaternion,double input_w_1, double input_w_2, double input_w_3);
 
+
+
+
+
+
+std::array<double,4> bodyframe_quaternion_deriv(std::array<double,4> input_bodyframe_quaternion,double input_w_1, double input_w_2, double input_w_3);
 
 #endif
