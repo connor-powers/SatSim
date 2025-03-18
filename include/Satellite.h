@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
-
+#include <stdexcept>
 using json=nlohmann::json;
 
 //Define constants
@@ -85,6 +85,9 @@ class Satellite
             inclination_=input_data.at("Inclination");
             //convert to radians
             inclination_*=(M_PI/180);
+            if (inclination_==0){
+                throw std::invalid_argument("Zero inclination orbits are not currently supported");
+            }
 
             raan_=input_data.at("RAAN");
             //convert to radians
