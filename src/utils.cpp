@@ -417,7 +417,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,do
 }
 
 
-void sim_and_plot_orbital_param_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time, double input_epsilon,std::string input_orbital_element_name){
+void sim_and_plot_orbital_elem_gnuplot(std::vector<Satellite> input_satellite_vector,double input_timestep, double input_total_sim_time, double input_epsilon,std::string input_orbital_element_name){
     if (input_satellite_vector.size()<1){
         std::cout << "No input Satellite objects\n";
         return;
@@ -431,7 +431,15 @@ void sim_and_plot_orbital_param_gnuplot(std::vector<Satellite> input_satellite_v
         fprintf(gnuplot_pipe,"set terminal qt size 600,400 font 'Helvetica,14'\n");
         //formatting
         fprintf(gnuplot_pipe,"set xlabel 'Time [s]'\n");
-        fprintf(gnuplot_pipe,"set ylabel '%s'\n",input_orbital_element_name.c_str());
+        if (input_orbital_element_name=="Semimajor Axis"){
+            fprintf(gnuplot_pipe,"set ylabel '%s [m]'\n",input_orbital_element_name.c_str());
+        }
+        else if (input_orbital_element_name=="Eccentricity"){
+            fprintf(gnuplot_pipe,"set ylabel '%s'\n",input_orbital_element_name.c_str());
+        }
+        else {
+            fprintf(gnuplot_pipe,"set ylabel '%s [rad]'\n",input_orbital_element_name.c_str());
+        }
         fprintf(gnuplot_pipe,"set title '%s simulated up to time %.2f s'\n",input_orbital_element_name.c_str(), input_total_sim_time);
         fprintf(gnuplot_pipe,"set key right bottom\n");
 
