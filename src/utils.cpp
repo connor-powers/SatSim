@@ -128,6 +128,7 @@ std::array<double,3> convert_cylindrical_to_cartesian(double input_r_comp,double
     std::array<double,3> output_cartesian_vec={0,0,0};
 
     //Dot product method
+    //See https://en.wikipedia.org/wiki/Vector_fields_in_cylindrical_and_spherical_coordinates for relation between unit vectors
     double x_comp=input_r_comp*cos(input_theta) + input_theta_comp*(-sin(input_theta));
     double y_comp=input_r_comp*sin(input_theta) + input_theta_comp*(cos(input_theta));
     double z_comp=input_z_comp;
