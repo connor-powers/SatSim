@@ -339,6 +339,7 @@ int Satellite::update_orbital_elements_from_position_and_velocity(){
             calculated_arg_of_periapsis=2*M_PI-calculated_arg_of_periapsis;
         }
 
+
         calculated_true_anomaly=acos(e_vec.dot(position_vector)/(calculated_eccentricity*r_magnitude));
         if (position_vector.dot(velocity_vector)<0){
             calculated_true_anomaly=2*M_PI-calculated_true_anomaly;
@@ -356,6 +357,10 @@ int Satellite::update_orbital_elements_from_position_and_velocity(){
         calculated_arg_of_periapsis=0; //Setting this
 
         double calculated_arg_of_latitude=acos(n_vector.dot(position_vector)/(n*r_magnitude));
+        if (std::isnan(calculated_arg_of_latitude)){
+            std:: cout << "Calculated argument of latitude was undefined. One possible cause of this is an orbit with zero inclination. Current magnitude of line of nodes: " << n << "\n";
+            error_code=1;
+        }
         if (position_vector(2)<0){
             calculated_arg_of_latitude=(2*M_PI-calculated_arg_of_latitude);
         }

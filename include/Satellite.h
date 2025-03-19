@@ -193,16 +193,19 @@ class Satellite
             initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame();
             //making initial omega_x an optional parameter
             if (input_data.find("Initial omega_x")!=input_data.end()){
-                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0)+=input_data.at("Initial omega_x");
+                double initial_omega_x_wrt_LVLH_in_body_frame=input_data.at("Initial omega_x");
+                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0)+=initial_omega_x_wrt_LVLH_in_body_frame;
             }
             //making initial omega_y an optional parameter
             if (input_data.find("Initial omega_y")!=input_data.end()){
-                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1)+=input_data.at("Initial omega_y");
+                double initial_omega_y_wrt_LVLH_in_body_frame=input_data.at("Initial omega_y");
+                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1)+=initial_omega_y_wrt_LVLH_in_body_frame;
             }
 
             //making initial omega_z an optional parameter
             if (input_data.find("Initial omega_z")!=input_data.end()){
-                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2)+=input_data.at("Initial omega_z");
+                double initial_omega_z_wrt_LVLH_in_body_frame=input_data.at("Initial omega_z");
+                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2)+=initial_omega_z_wrt_LVLH_in_body_frame;
             }
 
             orbital_angular_acceleration_=calculate_instantaneous_orbit_angular_acceleration();

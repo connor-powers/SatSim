@@ -46,7 +46,7 @@ int main()
 
     double timestep=2;
     double total_sim_time=25000;
-    double epsilon=pow(10,-11);
+    double epsilon=pow(10,-12);
     // sim_and_draw_orbit_gnuplot(satellite_vector_1,timestep,total_sim_time,epsilon);
 
     //Now some demonstrations of plotting orbital parameters
@@ -63,17 +63,19 @@ int main()
     std::vector<Satellite> satellite_vector_3={test_sat_7};
         sim_and_draw_orbit_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon);
 
-    sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"True Anomaly");
-    sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Orbital Rate");
-    sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Orbital Angular Acceleration");
+    // sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"True Anomaly");
+    sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Eccentricity");
 
-    sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"omega_y",false);
+    // sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Orbital Rate");
+    // sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Orbital Angular Acceleration");
+
+    // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"omega_y",false);
 
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"q_0",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"q_1",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"q_2",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"q_3",false);
-    sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Pitch",false);
+    // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Pitch",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Yaw",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Roll",false);
 
