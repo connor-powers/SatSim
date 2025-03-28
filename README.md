@@ -31,8 +31,22 @@ Note: this tool requires gnuplot to be installed.
 3. Run "cmake --build ."
 
 # Example workflow
-1. Make an input json file for each satellite you'd like to simulate. Currently, each satellite is defined by its 6 initial orbital parameters (semimajor axis, inclination, RAAN, argument of periapsis, eccentricity, and true anomaly), the satellite mass, and the satellite name. Plotting color (the display color of its orbit) is an optional parameter, but must be one of the named colors ("colornames") in gnuplot. (see existing examples, e.g., input.json). All angles are entered as degrees. Note: zero-inclination orbits are not currently supported.
-2. Modify simulation_setup.cpp as your simulation requires, creating Satellite objects for each simulated satellite, adding thrust profiles to satellites, etc. Make sure all satellites you want to simulate are contained in the vector passed into the sim_and_draw_orbit_gnuplot call.
+1. Make an input json file for each satellite you'd like to simulate. All angles are entered as degrees. Currently, each satellite is defined by:
+   -  Its 6 initial orbital parameters (semimajor axis, inclination, RAAN, argument of periapsis, eccentricity, and true anomaly)
+       - Note: zero-inclination orbits are not currently supported.
+   -  Satellite mass
+   -  Satellite name
+   -  (Optional) Initial Roll, Pitch, Yaw angles of satellite body relative to LVLH frame (note: A x-z'-y'' rotation sequence is currently baselined between the LVLH frame and the satellite body frame)
+   -  (Optional) Initial angular velocities $\omega$ of satellite body frame around its x,y,z axes with respect to the LVLH frame, represented in the satellite body frame
+   -  (Optional) Diagonal components of satellite inertia ($J$) matrix
+   -  (Optional) Plotting color (the display color of its orbit) is an optional parameter, but must be one of the named colors ("colornames") in gnuplot. (see existing examples, e.g., input.json).
+2. Modify simulation_setup.cpp as your simulation requires, e.g.,
+   - Creating Satellite objects for each simulated satellite from JSON input files
+   - Setting simulation parameters
+   - Adding thrust and/or torque profiles to satellites
+   - Calling the simulation+plotting functions you're interested in
+       - e.g., sim_and_draw_orbit_gnuplot for a 3D visualization of the orbit(s)
+       - Make sure all satellites you want to simulate are contained in the vector passed into the simulation+plotting function call(s)
 3. Re-run "cmake --build ." to build the updated executables
 4. Run the "run" executable in the build directory to simulate and visualize the satellite orbit(s)
 
