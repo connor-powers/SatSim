@@ -20,7 +20,7 @@ Features so far:
 
 - Plotting of orbital elements over time
 
-- Plotting of spacecraft attitude values (Tait-Bryan angles and angular velocities of spacecraft body frame) over time
+- Plotting of spacecraft attitude values (e.g., Tait-Bryan angles and angular velocities of spacecraft body frame) over time
 
 
 # Build Instructions
