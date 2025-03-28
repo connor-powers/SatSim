@@ -4,14 +4,23 @@ Features so far:
 
 - RK4(5) method for time evolution
 
-- Construct and plot multiple satellite objects simultaneously
+- Construction and plotting of multiple satellite objects simultaneously
+  
 - Optionally includes calculation of accelerations due to J2 perturbation
 
 - Support for adding LVLH frame thrust profiles to satellites
 
    - Currently supports constant-thrust profiles over a specified time period
+ 
+- Support for adding body-frame torque profiles to satellites
+
+   - Currently supports constant-torque profiles over a specified time period
 
 - 3D visualization of simulated satellite orbits
+
+- Plotting of orbital elements over time
+
+- Plotting of spacecraft attitude values (Tait-Bryan angles and angular velocities of spacecraft body frame) over time
 
 
 # Build Instructions
@@ -30,6 +39,8 @@ Note: this tool requires gnuplot to be installed.
 Note: You can click and drag the resulting 3D plot to adjust camera angle as desired.
 
 # Misc
+It's not currently recommended to simulate zero-inclination orbits, as the magnitude of the line of nodes is currently used in the denominator of calculations updating orbital elements over the course of time evolution. The line of nodes has zero magnitude during zero-inclination orbits, causing NaNs in several calculations of orbital elements (specifically the RAAN, argument of periapsis, and argument of latitude). It's also not recommended to simulate orbits with eccentricities too close to 0, as eccentricity isn't exactly preserved (it's calculated numerically from orbital position and velocity), which can cause unexpected orbital behavior.
+
 Visualization/plotting is done via Gnuplot. The copyright and permission notice of Gnuplot is shown below:
 
 Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
