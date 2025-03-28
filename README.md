@@ -55,6 +55,8 @@ Note: You can click and drag the resulting 3D plot to adjust camera angle as des
 # Misc
 Simulation of zero-inclination orbits isn't currently supported, as the magnitude of the line of nodes is currently used in the denominator of calculations updating orbital elements over the course of time evolution. The line of nodes has zero magnitude during zero-inclination orbits, causing NaNs in several calculations of orbital elements (specifically the RAAN, argument of periapsis, and argument of latitude). It's also not recommended to simulate orbits with eccentricities too close to 0, as eccentricity isn't exactly preserved (it's calculated numerically from orbital position and velocity), which can cause unexpected orbital behavior.
 
+Calculation of instantaneous orbital angular acceleration does not currently include any contribution from the time derivative of the magnitude of the orbital angular momentum vector.
+
 Visualization/plotting is done via Gnuplot. The copyright and permission notice of Gnuplot is shown below:
 
 Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
