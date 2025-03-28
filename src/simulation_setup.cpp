@@ -59,12 +59,16 @@ int main()
     total_sim_time=9952;
     // sim_and_plot_orbital_elem_gnuplot(satellite_vector_2,timestep,total_sim_time,epsilon,"Argument of Periapsis");
     Satellite test_sat_7("../input_7.json");
-
+    std::array<double,3> torque_direction={0,-1,0};
+    double torque_magnitude=0.0005; //N
+    double t_torque_start=3000;
+    double t_torque_end=3002;
+    test_sat_7.add_bodyframe_torque_profile(torque_direction,torque_magnitude,t_torque_start,t_torque_end);
     std::vector<Satellite> satellite_vector_3={test_sat_7};
-        sim_and_draw_orbit_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon);
+    // sim_and_draw_orbit_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon);
 
     // sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"True Anomaly");
-    sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Eccentricity");
+    // sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Eccentricity");
 
     // sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Orbital Rate");
     // sim_and_plot_orbital_elem_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Orbital Angular Acceleration");
@@ -75,7 +79,7 @@ int main()
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"q_1",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"q_2",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"q_3",false);
-    // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Pitch",false);
+    sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Pitch",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Yaw",false);
     // sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3,timestep,total_sim_time,epsilon,"Roll",false);
 

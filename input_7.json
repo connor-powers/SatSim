@@ -7,6 +7,8 @@
     "True Anomaly": 0,
     "Mass": 100,
     "Name" : "Satellite 7",
-    "Plotting Color" : "dark-goldenrod"
+    "Plotting Color" : "dark-goldenrod",
+    "Initial Roll Angle": 0,
+    "Initial omega_y": 0
 
 }
