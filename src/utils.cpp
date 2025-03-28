@@ -909,7 +909,7 @@ std::array<double,3> convert_quaternion_to_roll_yaw_pitch_angles(std::array<doub
     //Again, here I'm going off the pitch-yaw-roll sequence used in https://ntrs.nasa.gov/api/citations/19770024112/downloads/19770024112.pdf
     //Where the angles which defined the orbiter attitude with respect to LVLH are [A]_from_LVLH_to_BY = Rx(roll)*R_z(yaw)*R_y(pitch)
 
-    Vector3d v3={1,0,0}; //unit vector in direction of last rotation performed, which in this sequence is the x unit vector
+    Vector3d v3={0,1,0}; //unit vector in direction of last rotation performed, which in this sequence is the y unit vector
     Quaterniond eigen_quaternion(input_quaternion.at(0),input_quaternion.at(1),input_quaternion.at(2),input_quaternion.at(3));
     eigen_quaternion.normalize(); //Just in case
     Matrix3d rotation_matrix=eigen_quaternion.toRotationMatrix();
