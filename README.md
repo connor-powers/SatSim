@@ -4,7 +4,7 @@ Features so far:
 
 - RK4(5) method for time evolution
 
-- Construction and plotting of multiple satellite objects simultaneously
+- Simulation and plotting of multiple satellite objects simultaneously
   
 - Optionally includes calculation of accelerations due to J2 perturbation
 
