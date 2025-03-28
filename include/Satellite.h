@@ -5,6 +5,8 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
+
+
 using json=nlohmann::json;
 
 //Define constants
@@ -33,6 +35,27 @@ class ThrustProfileLVLH
         }
 };
 
+class BodyframeTorqueProfile
+{
+    
+    public:
+        double t_start_={0};
+        double t_end_={0};
+        std::array<double,3> bodyframe_torque_list={0,0,0};
+        BodyframeTorqueProfile(double t_start, double t_end, std::array<double,3> bodyframe_torque_vec){
+            t_start_=t_start;
+            t_end_=t_end;
+            bodyframe_torque_list=bodyframe_torque_vec;
+        }
+        BodyframeTorqueProfile(double t_start, double t_end, std::array<double,3> bodyframe_normalized_torque_axis_vec,double input_torque_magnitude){
+            t_start_=t_start;
+            t_end_=t_end;
+            for (size_t ind=0;ind<3;ind++){
+                bodyframe_torque_list.at(ind)=input_torque_magnitude*bodyframe_normalized_torque_axis_vec.at(ind);
+            }
+        }
+};
+
 class Satellite
 {
     private:
@@ -47,15 +70,24 @@ class Satellite
         // double I_={1}; //moment of inertia, taken to be same for all 3 principal axes, set to default value for same reasons as mass
         double t_={0};
 
+        double orbital_rate_={0};
+        double orbital_angular_acceleration_={0}; //Time derivative of orbital rate
 
         //Now body-frame attributes
-        // double pitch_angle_={0};
-        // double roll_angle_={0};
-        // double yaw_angle_={0};
+        //Assuming diagonal J matrix
+        double J_11_={1};
+        double J_22_={1};
+        double J_33_={1};
+        //The following angles are angles of the satellite body frame with respect to the LVLH frame, represented in the body frame
+        double pitch_angle_={0};
+        double roll_angle_={0};
+        double yaw_angle_={0};
 
-        // double theta_={0};
-        // double phi_={0};
-        // double psi_={0};
+        //body-frame angular velocities relative to the LVLH frame, represented in the body frame
+        std::array<double,3> body_angular_velocity_vec_wrt_LVLH_in_body_frame_={0,0,0};
+
+        //quaternion representing attitude of satellite body frame with respect to the LVLH frame
+        std::array<double,4> quaternion_satellite_bodyframe_wrt_LVLH_;
 
         std::string name_="";
 
@@ -66,13 +98,16 @@ class Satellite
         std::array<double,3> ECI_velocity_={0,0,0};
 
         std::vector<ThrustProfileLVLH> thrust_profile_list_={};
+        std::vector<BodyframeTorqueProfile> bodyframe_torque_profile_list_={};
 
         std::vector<std::array<double,3>> list_of_LVLH_forces_at_this_time_={};
         std::vector<std::array<double,3>> list_of_ECI_forces_at_this_time_={};
+        std::vector<std::array<double,3>> list_of_body_frame_torques_at_this_time_={};
         // std::vector<std::array<double,3>> list_of_body_frame_torques_at_this_time_={};
 
         std::pair<double,double> calculate_eccentric_anomaly(const double input_eccentricity, const double input_true_anomaly,const double input_semimajor_axis);
         double calculate_orbital_period(double input_semimajor_axis);
+        void initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame();
     public:
         std::string plotting_color_="";
         Satellite(std::string input_file_name){
@@ -113,19 +148,27 @@ class Satellite
             true_anomaly_*=(M_PI/180);
 
 
-            // pitch_angle_=input_data.at("Pitch Angle");
-            // //convert to radians
-            // pitch_angle_*=(M_PI/180);
+            //making initial pitch angle an optional parameter
+            if (input_data.find("Initial Pitch Angle")!=input_data.end()){
+                pitch_angle_=input_data.at("Initial Pitch Angle");
+                //convert to radians
+                pitch_angle_*=(M_PI/180);
+            }
+            //making initial roll angle an optional parameter
+            if (input_data.find("Initial Roll Angle")!=input_data.end()){
+                roll_angle_=input_data.at("Initial Roll Angle");
+                //convert to radians
+                roll_angle_*=(M_PI/180);
+            }
+            //making initial yaw angle an optional parameter
+            if (input_data.find("Initial Yaw Angle")!=input_data.end()){
+                yaw_angle_=input_data.at("Initial Yaw Angle");
+                //convert to radians
+                yaw_angle_*=(M_PI/180);
+            }
 
-            // roll_angle_=input_data.at("Roll Angle");
-            // //convert to radians
-            // roll_angle_*=(M_PI/180);
 
-
-            // yaw_angle_=input_data.at("Yaw Angle");
-            // //convert to radians
-            // yaw_angle_*=(M_PI/180);
-
+            initialize_and_normalize_body_quaternion(roll_angle_,pitch_angle_,yaw_angle_);
 
             m_=input_data.at("Mass");
             name_=input_data.at("Name");
@@ -146,6 +189,26 @@ class Satellite
             ECI_position_=convert_perifocal_to_ECI(perifocal_position_);
             ECI_velocity_=convert_perifocal_to_ECI(perifocal_velocity_);
 
+            orbital_rate_=calculate_instantaneous_orbit_rate();
+            initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame();
+            //making initial omega_x an optional parameter
+            if (input_data.find("Initial omega_x")!=input_data.end()){
+                double initial_omega_x_wrt_LVLH_in_body_frame=input_data.at("Initial omega_x");
+                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0)+=initial_omega_x_wrt_LVLH_in_body_frame;
+            }
+            //making initial omega_y an optional parameter
+            if (input_data.find("Initial omega_y")!=input_data.end()){
+                double initial_omega_y_wrt_LVLH_in_body_frame=input_data.at("Initial omega_y");
+                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1)+=initial_omega_y_wrt_LVLH_in_body_frame;
+            }
+
+            //making initial omega_z an optional parameter
+            if (input_data.find("Initial omega_z")!=input_data.end()){
+                double initial_omega_z_wrt_LVLH_in_body_frame=input_data.at("Initial omega_z");
+                body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2)+=initial_omega_z_wrt_LVLH_in_body_frame;
+            }
+
+            orbital_angular_acceleration_=calculate_instantaneous_orbit_angular_acceleration();
 
         }
 
@@ -197,7 +260,8 @@ class Satellite
         void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_normalized_thrust_direction,double input_LVLH_thrust_magnitude,double input_thrust_start_time, double input_thrust_end_time);
         void add_LVLH_thrust_profile(std::array<double,3> input_LVLH_thrust_vector,double input_thrust_start_time, double input_thrust_end_time);
         
-
+        void add_bodyframe_torque_profile(std::array<double,3> input_bodyframe_direction_unit_vec,double input_bodyframe_torque_magnitude,double input_torque_start_time, double input_torque_end_time);
+        void add_bodyframe_torque_profile(std::array<double,3> input_bodyframe_torque_vector,double input_torque_start_time, double input_torque_end_time);
 
         // std::array<double,3> convert_body_frame_to_LVLH(std::array<double,3> input_body_frame_vec);
 
@@ -211,6 +275,10 @@ class Satellite
         std::pair<double,int> evolve_RK45(double input_epsilon,double input_initial_timestep,bool perturbation=true);
 
         double get_orbital_element(std::string orbital_element_name);
+        double calculate_instantaneous_orbit_rate();
+        double calculate_instantaneous_orbit_angular_acceleration();
+        void initialize_and_normalize_body_quaternion(double roll_angle,double pitch_angle,double yaw_angle);
+        double get_attitude_val(std::string input_attitude_val_name);
 };
 
 

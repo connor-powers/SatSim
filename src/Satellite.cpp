@@ -71,8 +71,8 @@ std::array<double,3> Satellite::calculate_perifocal_velocity(){
 
 
 std::array<double,3> Satellite::convert_perifocal_to_ECI(std::array<double,3> input_perifocal_vec){
-    //method from Fundamentals of Astrodynamics
-    //sounds like what they describe as their "Geocentric-Equatorial" coordinate system is ECI
+    //Method from Fundamentals of Astrodynamics
+    //Sounds like what they describe as their "Geocentric-Equatorial" coordinate system is ECI
     Matrix3d R_tilde_matrix;
 
     R_tilde_matrix(0,0)=cos(raan_)*cos(arg_of_periapsis_)-sin(raan_)*sin(arg_of_periapsis_)*cos(inclination_);
@@ -112,8 +112,8 @@ std::array<double,3> Satellite::convert_perifocal_to_ECI(std::array<double,3> in
 
 
 std::array<double,3> Satellite::convert_ECI_to_perifocal(std::array<double,3> input_ECI_vec){
-    //method from Fundamentals of Astrodynamics, and using https://en.wikipedia.org/wiki/Perifocal_coordinate_system
-    //sounds like what they describe as their "Geocentric-Equatorial" coordinate system is ECI
+    //Method from Fundamentals of Astrodynamics, and using https://en.wikipedia.org/wiki/Perifocal_coordinate_system
+    //Sounds like what they describe as their "Geocentric-Equatorial" coordinate system is ECI
     Matrix3d R_tilde_matrix;
 
     R_tilde_matrix(0,0)=cos(raan_)*cos(arg_of_periapsis_)-sin(raan_)*sin(arg_of_periapsis_)*cos(inclination_);
@@ -339,6 +339,7 @@ int Satellite::update_orbital_elements_from_position_and_velocity(){
             calculated_arg_of_periapsis=2*M_PI-calculated_arg_of_periapsis;
         }
 
+
         calculated_true_anomaly=acos(e_vec.dot(position_vector)/(calculated_eccentricity*r_magnitude));
         if (position_vector.dot(velocity_vector)<0){
             calculated_true_anomaly=2*M_PI-calculated_true_anomaly;
@@ -356,6 +357,10 @@ int Satellite::update_orbital_elements_from_position_and_velocity(){
         calculated_arg_of_periapsis=0; //Setting this
 
         double calculated_arg_of_latitude=acos(n_vector.dot(position_vector)/(n*r_magnitude));
+        if (std::isnan(calculated_arg_of_latitude)){
+            std:: cout << "Calculated argument of latitude was undefined. One possible cause of this is an orbit with zero inclination. Current magnitude of line of nodes: " << n << "\n";
+            error_code=1;
+        }
         if (position_vector(2)<0){
             calculated_arg_of_latitude=(2*M_PI-calculated_arg_of_latitude);
         }
@@ -392,39 +397,78 @@ std::array<double,6> Satellite::get_orbital_elements(){
 std::pair<double,int> Satellite::evolve_RK45(double input_epsilon,double input_step_size,bool perturbation){
     //perturbation is a flag which, when set to true, currently accounts for J2 perturbation.
 
-    //Format input position and velocity arrays into single array for RK4(5) step
-    std::array<double,6> combined_initial_position_and_velocity_array={};
+    //Let's do a single RK45_step call with y_n combined between orbital motion and attitude variables,
+    // y_n = {ECI_position_x, ECI_position_y, ECI_position_z, ECI_velocity_x, ECI_velocity_y, ECI_velocity_z, q_0, q_1, q_2, q_3, omega_x, omega_y, omega_z}
+    // Where the quaternion represents the attitude of the spacecraft body frame with respect to the LVLH frame, and omega_i is the angular velocity around the ith axis of the body frame with respect to the LVLH frame, represented in the body frame
+    std::array<double,13> combined_initial_position_velocity_quaternion_angular_velocity_array={};
     std::pair<std::array<double,3>,std::array<double,3>> output_position_velocity_pair={};
 
     for (size_t ind=0;ind<3;ind++){
-        combined_initial_position_and_velocity_array.at(ind) = ECI_position_.at(ind);
+        combined_initial_position_velocity_quaternion_angular_velocity_array.at(ind) = ECI_position_.at(ind);
     }
     for (size_t ind=3;ind<6;ind++){
-        combined_initial_position_and_velocity_array.at(ind) = ECI_velocity_.at(ind-3);
+        combined_initial_position_velocity_quaternion_angular_velocity_array.at(ind) = ECI_velocity_.at(ind-3);
+    }
+    for (size_t ind=6;ind<10;ind++){
+        combined_initial_position_velocity_quaternion_angular_velocity_array.at(ind) = quaternion_satellite_bodyframe_wrt_LVLH_.at(ind-6);
     }
 
+    for (size_t ind=10;ind<13;ind++){
+        combined_initial_position_velocity_quaternion_angular_velocity_array.at(ind) = body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(ind-10);
+    }
     
 
-    std::pair<std::array<double, 6>,std::pair<double,double>> output_pair= RK45_step<6>(combined_initial_position_and_velocity_array,input_step_size,RK45_deriv_function_orbit_position_and_velocity,m_,thrust_profile_list_,t_,input_epsilon,inclination_, arg_of_periapsis_, true_anomaly_,perturbation);
-    std::array<double, 6> output_combined_position_and_velocity_array=output_pair.first;
+    Matrix3d LVLH_to_body_transformation_matrix= LVLH_to_body_transformation_matrix_from_quaternion(quaternion_satellite_bodyframe_wrt_LVLH_);
+
+
+    Vector3d body_angular_velocity_vec_wrt_LVLH_in_body_frame_eigenform={body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0),body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1),body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2)};
+
+    Vector3d omega_I=calculate_omega_I(body_angular_velocity_vec_wrt_LVLH_in_body_frame_eigenform,LVLH_to_body_transformation_matrix,orbital_rate_);
+
+
+    Vector3d omega_LVLH_wrt_inertial_in_LVLH={0,-orbital_rate_,0};
+
+    Matrix3d J_matrix= construct_J_matrix(J_11_, J_22_, J_33_);
+
+
+
+    std::pair<std::array<double, 13>,std::pair<double,double>> output_pair=RK45_step<13>(combined_initial_position_velocity_quaternion_angular_velocity_array, input_step_size,RK45_combined_orbit_position_velocity_attitude_deriv_function, J_matrix,bodyframe_torque_profile_list_, omega_I, orbital_angular_acceleration_, LVLH_to_body_transformation_matrix, omega_LVLH_wrt_inertial_in_LVLH,m_,thrust_profile_list_,  inclination_,  arg_of_periapsis_,  true_anomaly_, perturbation,t_, input_epsilon);
+
+    std::array<double, 13> output_combined_position_velocity_quaternion_angular_velocity_array=output_pair.first;
     double step_size_successfully_used_here=output_pair.second.first;
     double new_step_size=output_pair.second.second;
 
-    // std::array<double,6> output_combined_angular_array= RK4_step<6>(combined_initial_angular_array,input_step_size,RK4_deriv_function_angular,I_,list_of_body_frame_torques_at_this_time_,list_of_body_frame_torques_at_half_timestep_past,list_of_body_frame_torques_at_one_timestep_past);
 
     
     for (size_t ind=0;ind<3;ind++){
-        ECI_position_.at(ind) = output_combined_position_and_velocity_array.at(ind);
-        ECI_velocity_.at(ind) = output_combined_position_and_velocity_array.at(ind+3);
+        ECI_position_.at(ind) = output_combined_position_velocity_quaternion_angular_velocity_array.at(ind);
+        ECI_velocity_.at(ind) = output_combined_position_velocity_quaternion_angular_velocity_array.at(ind+3);
         //Also update the perifocal versions
         perifocal_position_=convert_ECI_to_perifocal(ECI_position_);
         perifocal_velocity_=convert_ECI_to_perifocal(ECI_velocity_);
     }
     t_+=step_size_successfully_used_here;
 
+    for (size_t ind=0;ind<quaternion_satellite_bodyframe_wrt_LVLH_.size();ind++){
+        quaternion_satellite_bodyframe_wrt_LVLH_.at(ind)=output_combined_position_velocity_quaternion_angular_velocity_array.at(ind+6);
+    }
+    quaternion_satellite_bodyframe_wrt_LVLH_=normalize_quaternion(quaternion_satellite_bodyframe_wrt_LVLH_);
+    std::array<double,3> updated_roll_yaw_pitch= convert_quaternion_to_roll_yaw_pitch_angles(quaternion_satellite_bodyframe_wrt_LVLH_);
+    
+    roll_angle_=updated_roll_yaw_pitch.at(0);
+    yaw_angle_=updated_roll_yaw_pitch.at(1);
+    pitch_angle_=updated_roll_yaw_pitch.at(2);
+
+    for (size_t ind=0;ind<body_angular_velocity_vec_wrt_LVLH_in_body_frame_.size();ind++){
+        body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(ind)=output_combined_position_velocity_quaternion_angular_velocity_array.at(ind+10);
+    }
+
+
 
     //Update orbital parameters
     int orbit_elems_error_code = update_orbital_elements_from_position_and_velocity();
+    orbital_rate_=calculate_instantaneous_orbit_rate();
+    orbital_angular_acceleration_=calculate_instantaneous_orbit_angular_acceleration();
     std::pair<double,int> evolve_RK45_output_pair;
     
     evolve_RK45_output_pair.first=new_step_size;
@@ -453,8 +497,118 @@ double Satellite::get_orbital_element(std::string orbital_element_name){
     else if (orbital_element_name=="True Anomaly"){
         return true_anomaly_;
     }
+    else if (orbital_element_name=="Orbital Rate"){
+        return orbital_rate_;
+    }
+    else if (orbital_element_name=="Orbital Angular Acceleration"){
+        return orbital_angular_acceleration_;
+    }
     else {
         std::cout << "Unrecognized argument, returning -1";
         return -1;
     }
+}
+
+void Satellite::add_bodyframe_torque_profile(std::array<double,3> input_bodyframe_torque_vector,double input_torque_start_time, double input_torque_end_time){
+    BodyframeTorqueProfile new_torque_profile(input_torque_start_time, input_torque_end_time, input_bodyframe_torque_vector);
+    bodyframe_torque_profile_list_.push_back(new_torque_profile);
+    if (input_torque_start_time==0){
+        list_of_body_frame_torques_at_this_time_.push_back(input_bodyframe_torque_vector);
+    }
+}
+
+void Satellite::add_bodyframe_torque_profile(std::array<double,3> input_bodyframe_direction_unit_vec,double input_bodyframe_torque_magnitude,double input_torque_start_time, double input_torque_end_time){
+    std::array<double,3> input_bodyframe_torque_vector={0,0,0};
+
+    for (size_t ind=0;ind<3;ind++){
+        input_bodyframe_torque_vector.at(ind)=input_bodyframe_torque_magnitude*input_bodyframe_direction_unit_vec.at(ind);
+    }    
+    BodyframeTorqueProfile new_torque_profile(input_torque_start_time, input_torque_end_time, input_bodyframe_torque_vector);
+    bodyframe_torque_profile_list_.push_back(new_torque_profile);
+    if (input_torque_start_time==0){
+        list_of_body_frame_torques_at_this_time_.push_back(input_bodyframe_torque_vector);
+    }
+}
+
+
+double Satellite::calculate_instantaneous_orbit_rate(){
+    //Need to figure out how to calculate the equivalent of w_0 in section 4.3.1 of https://ntrs.nasa.gov/api/citations/20240009554/downloads/Space%20Attitude%20Development%20Control.pdf but for general elliptical orbits
+    //Is this proportional to the rate of change of the true anomaly? 
+    //Proof sketched out here: https://space.stackexchange.com/questions/21615/how-to-calculate-the-complete-true-anomaly-motion-in-an-elliptical-orbit
+    Vector3d position_vector={perifocal_position_.at(0),perifocal_position_.at(1),perifocal_position_.at(2)};
+    Vector3d velocity_vector={perifocal_velocity_.at(0),perifocal_velocity_.at(1),perifocal_velocity_.at(2)};
+    Vector3d h_vector=position_vector.cross(velocity_vector);
+    double h=h_vector.norm();
+    double r=get_radius();
+    double orbit_rate=h/(r*r);
+    return orbit_rate;
+}
+
+double Satellite::calculate_instantaneous_orbit_angular_acceleration(){
+    //Need to figure out how to calculate the equivalent of w_0^dot to get the w_lvlh^dot term in Ch.4 of https://ntrs.nasa.gov/api/citations/20240009554/downloads/Space%20Attitude%20Development%20Control.pdf but for general elliptical orbits
+    //Proof sketched out here: https://space.stackexchange.com/questions/21615/how-to-calculate-the-complete-true-anomaly-motion-in-an-elliptical-orbit
+    //This assumes angular momentum is constant
+    Vector3d position_vector={perifocal_position_.at(0),perifocal_position_.at(1),perifocal_position_.at(2)};
+    Vector3d velocity_vector={perifocal_velocity_.at(0),perifocal_velocity_.at(1),perifocal_velocity_.at(2)};
+    Vector3d h_vector=position_vector.cross(velocity_vector);
+    double h=h_vector.norm();
+    double r=get_radius();
+    Vector3d unit_position_vector=position_vector;
+    unit_position_vector.normalize();
+    double orbit_angular_acceleration=-2*h/(r*r*r)*velocity_vector.dot(unit_position_vector);
+
+    //Neglecting term relating to derivative of h for now (would be an h^dot / r^2 term added to the above term)
+    return orbit_angular_acceleration;
+}
+
+
+void Satellite::initialize_and_normalize_body_quaternion(double roll_angle,double pitch_angle,double yaw_angle){
+    std::array<double,4> quaternion= rollyawpitch_angles_to_quaternion(roll_angle,pitch_angle,yaw_angle);
+    std::array<double,4>  normalized_quaternion=normalize_quaternion(quaternion);
+    quaternion_satellite_bodyframe_wrt_LVLH_=normalized_quaternion;
+    return;
+}
+
+double Satellite::get_attitude_val(std::string input_attitude_val_name){
+    if (input_attitude_val_name=="Roll"){
+        return roll_angle_;
+    }
+    else if (input_attitude_val_name=="Pitch"){
+        return pitch_angle_;
+    }
+    else if (input_attitude_val_name=="Yaw"){
+        return yaw_angle_;
+    }
+    else if (input_attitude_val_name=="omega_x"){
+        return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0);
+    }
+    else if (input_attitude_val_name=="omega_y"){
+        return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1);
+    }
+    else if (input_attitude_val_name=="omega_z"){
+        return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2);
+    }
+    else if (input_attitude_val_name=="q_0"){
+        return quaternion_satellite_bodyframe_wrt_LVLH_.at(0);
+    }
+    else if (input_attitude_val_name=="q_1"){
+        return quaternion_satellite_bodyframe_wrt_LVLH_.at(1);
+    }
+    else if (input_attitude_val_name=="q_2"){
+        return quaternion_satellite_bodyframe_wrt_LVLH_.at(2);
+    }
+    else if (input_attitude_val_name=="q_3"){
+        return quaternion_satellite_bodyframe_wrt_LVLH_.at(3);
+    }
+    else {
+        std::cout << "Invalid attitude val choice " << input_attitude_val_name<< ", returning -1\n";
+        return -1.0;
+    }
+}
+
+
+
+void Satellite::initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame(){
+    std::array<double,3> initial_body_angular_velocity_in_LVLH_frame={0,orbital_rate_,0};
+    body_angular_velocity_vec_wrt_LVLH_in_body_frame_=convert_array_from_LVLH_to_bodyframe( initial_body_angular_velocity_in_LVLH_frame,roll_angle_, yaw_angle_,  pitch_angle_); //Because LVLH is always rotating around y axis to keep z pointed towards Earth
 }
