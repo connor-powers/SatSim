@@ -1,11 +1,11 @@
 {
-    "Inclination": 1.5,
-    "RAAN": 1,
-    "Argument of Periapsis": 10,
-    "Eccentricity": 0.5,
-    "Semimajor Axis": 15000,
-    "True Anomaly": 90,
-    "Mass": 100,
-    "Name" : "Satellite 6",
-    "Plotting Color": "forest-green"
+  "Inclination": 1.5,
+  "RAAN": 1,
+  "Argument of Periapsis": 10,
+  "Eccentricity": 0.5,
+  "Semimajor Axis": 15000,
+  "True Anomaly": 90,
+  "Mass": 100,
+  "Name": "Satellite 6",
+  "Plotting Color": "forest-green"
 }

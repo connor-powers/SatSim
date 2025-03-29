@@ -1,11 +1,11 @@
 {
-    "Inclination": 1.5,
-    "RAAN": 1,
-    "Argument of Periapsis": 10,
-    "Eccentricity": 0.25,
-    "Semimajor Axis": 15000,
-    "True Anomaly": 90,
-    "Mass": 100,
-    "Name" : "Satellite 4",
-    "Plotting Color": "dark-goldenrod"
+  "Inclination": 1.5,
+  "RAAN": 1,
+  "Argument of Periapsis": 10,
+  "Eccentricity": 0.25,
+  "Semimajor Axis": 15000,
+  "True Anomaly": 90,
+  "Mass": 100,
+  "Name": "Satellite 4",
+  "Plotting Color": "dark-goldenrod"
 }
