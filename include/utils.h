@@ -96,7 +96,6 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
                                 double input_total_sim_time,
                                 double input_epsilon, bool perturbation = true);
 
-
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
     std::array<double, T> y_n, double input_step_size,

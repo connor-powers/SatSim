@@ -303,7 +303,6 @@ class Satellite {
       std::array<double, 3> input_bodyframe_torque_vector,
       double input_torque_start_time, double input_torque_end_time);
 
-
   int update_orbital_elements_from_position_and_velocity();
   std::array<double, 6> get_orbital_elements();
 
