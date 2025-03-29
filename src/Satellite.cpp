@@ -250,34 +250,6 @@ void Satellite::evolve_RK4(double input_step_size) {
   return;
 }
 
-// std::array<double,3> Satellite::convert_LVLH_to_ECI(std::array<double,3>
-// input_LVLH_vec){
-//     Vector3d input_LVLH_vec_eigen;
-//     input_LVLH_vec_eigen <<
-//     input_LVLH_vec.at(0),input_LVLH_vec.at(1),input_LVLH_vec.at(2);
-//     //ref:
-//     https://ntrs.nasa.gov/api/citations/20205003902/downloads/Introduction%20to%20Orbital%20Mechanics%20and%20Spacecraft%20Attitudes%20for%20Thermal%20Engineers%20CHARTS%20PDF.pdf
-//     Matrix3d ref_mat;
-//     ref_mat << 0,0,-1,
-//                1,0,0,
-//                0,-1,0;
-
-//     Matrix3d omega_mat=z_rot_matrix(raan_);
-//     Matrix3d inclination_mat=y_rot_matrix(inclination_);
-//     Matrix3d arg_periapsis_mat=z_rot_matrix(arg_of_periapsis_);
-//     Matrix3d true_anomaly_mat=z_rot_matrix(true_anomaly_);
-
-//     Matrix3d pitch_angle_mat=y_rot_matrix(pitch_angle_);
-//     Matrix3d yaw_angle_mat=z_rot_matrix(yaw_angle_);
-//     Matrix3d roll_angle_mat=x_rot_matrix(roll_angle_);
-
-//     Vector3d
-//     ECI_vec_eigen=omega_mat*inclination_mat*arg_periapsis_mat*true_anomaly_mat*ref_mat*pitch_angle_mat*yaw_angle_mat*roll_angle_mat*input_LVLH_vec_eigen;
-
-//     std::array<double,3>
-//     ECI_vec_output={ECI_vec_eigen(0),ECI_vec_eigen(1),ECI_vec_eigen(2)};
-//     return ECI_vec_output;
-// }
 
 void Satellite::add_LVLH_thrust_profile(
     std::array<double, 3> input_LVLH_thrust_vector,
@@ -317,26 +289,7 @@ void Satellite::add_LVLH_thrust_profile(
   }
 }
 
-// std::array<double,3>
-// Satellite::convert_body_frame_to_LVLH(std::array<double,3>
-// input_body_frame_vec){
-//     //taking LVLH to be the "unrotated" body frame
 
-//     std::array<double,3>
-//     LVLH_vec=convert_rotated_body_frame_to_unrotated_body_frame(input_body_frame_vec,
-//     theta_, phi_, psi_); return LVLH_vec;
-// }
-
-// std::array<double,3>
-// Satellite::convert_body_frame_to_ECI(std::array<double,3>
-// input_body_frame_vec){
-//     //Current strategy: first convert rotated body frame to unrotated body
-//     frame, which I'm taking to be the LVLH frame
-//     //Then convert the unrotated LVLH frame into ECI
-//     std::array<double,3>
-//     LVLH_vec=convert_body_frame_to_LVLH(input_body_frame_vec);
-//     std::array<double,3> ECI_vec=convert_LVLH_to_ECI_manual(LVLH_vec);
-// }
 
 int Satellite::update_orbital_elements_from_position_and_velocity() {
   // Anytime the orbit is changed via external forces, need to update the

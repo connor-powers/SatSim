@@ -96,19 +96,6 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
                                 double input_total_sim_time,
                                 double input_epsilon, bool perturbation = true);
 
-// Matrix3d z_rot_matrix(double input_angle);
-
-// Matrix3d y_rot_matrix(double input_angle);
-
-// Matrix3d x_rot_matrix(double input_angle);
-
-// std::array<double,3>
-// convert_rotated_body_frame_to_unrotated_body_frame(std::array<double,3>
-// input_rotated_body_frame_array,double theta, double phi, double psi);
-// std::array<double,6> RK4_deriv_function_angular(std::array<double,6>
-// input_angular_vec,const double
-// input_spacecraft_MOI,std::vector<std::array<double,3>>
-// input_vec_of_body_frame_torque_vectors);
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(

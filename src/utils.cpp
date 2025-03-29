@@ -364,25 +364,6 @@ std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
   return derivative_of_input_y;
 }
 
-// std::array<double,6> RK4_deriv_function_angular(std::array<double,6>
-// input_angular_vec,const double
-// input_spacecraft_MOI,std::vector<std::array<double,3>>
-// input_vec_of_body_frame_torque_vectors){
-//     std::array<double,6> derivative_of_input_y={};
-
-//     for (size_t ind=0;ind<3;ind++){
-//         derivative_of_input_y.at(ind)=input_angular_vec.at(ind+3);
-//     }
-
-//     std::array<double,3>
-//     calculated_angular_acceleration=calculate_body_frame_angular_acceleration(input_spacecraft_MOI,input_vec_of_body_frame_torque_vectors);
-
-//     for (size_t ind=3;ind<6;ind++){
-//         derivative_of_input_y.at(ind)=calculated_angular_acceleration.at(ind-3);
-//     }
-
-//     return derivative_of_input_y;
-// }
 
 void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
                                 double input_timestep,

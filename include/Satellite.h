@@ -303,14 +303,6 @@ class Satellite {
       std::array<double, 3> input_bodyframe_torque_vector,
       double input_torque_start_time, double input_torque_end_time);
 
-  // std::array<double,3> convert_body_frame_to_LVLH(std::array<double,3>
-  // input_body_frame_vec);
-
-  // std::array<double,3> convert_body_frame_to_LVLH(std::array<double,3>
-  // input_body_frame_vec);
-
-  // std::array<double,3> convert_body_frame_to_ECI(std::array<double,3>
-  // input_body_frame_vec);
 
   int update_orbital_elements_from_position_and_velocity();
   std::array<double, 6> get_orbital_elements();
