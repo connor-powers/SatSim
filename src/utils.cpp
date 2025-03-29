@@ -31,7 +31,7 @@ Vector4d quaternion_multiplication(Vector4d quaternion_1,
 }
 
 //"manual" version, via dot products and cross products with position and
-//velocity vectors
+// velocity vectors
 std::array<double, 3> convert_LVLH_to_ECI_manual(
     std::array<double, 3> input_LVLH_vec,
     std::array<double, 3> input_position_vec,
@@ -363,7 +363,6 @@ std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
 
   return derivative_of_input_y;
 }
-
 
 void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
                                 double input_timestep,

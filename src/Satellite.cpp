@@ -250,7 +250,6 @@ void Satellite::evolve_RK4(double input_step_size) {
   return;
 }
 
-
 void Satellite::add_LVLH_thrust_profile(
     std::array<double, 3> input_LVLH_thrust_vector,
     double input_thrust_start_time, double input_thrust_end_time) {
@@ -288,8 +287,6 @@ void Satellite::add_LVLH_thrust_profile(
     list_of_ECI_forces_at_this_time_.push_back(ECI_thrust_vector);
   }
 }
-
-
 
 int Satellite::update_orbital_elements_from_position_and_velocity() {
   // Anytime the orbit is changed via external forces, need to update the
