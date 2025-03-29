@@ -39,8 +39,7 @@ int main() {
   std::vector<Satellite> satellite_vector_2 = {test_sat_4, test_sat_5,
                                                test_sat_6};
   total_sim_time = 9952;
-  sim_and_plot_orbital_elem_gnuplot(satellite_vector_2,timestep,total_sim_time,epsilon,"Argument"
-  " of Periapsis");
+  sim_and_plot_orbital_elem_gnuplot(satellite_vector_2,timestep,total_sim_time,epsilon,"Argument of Periapsis");
   Satellite test_sat_7("../input_7.json");
   std::array<double, 3> torque_direction = {0, -1, 0};
   double torque_magnitude = 0.0005;  // N
