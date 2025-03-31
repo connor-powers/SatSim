@@ -1,2 +1,0 @@
-attitude_test_input_1.json
-attitude_tests.cpp

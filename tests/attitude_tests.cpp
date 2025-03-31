@@ -34,8 +34,8 @@ TEST(AttitudeTests, PassivePitchTest1) {
       << "Pitch didn't progress 2*pi radians over one orbit as expected. "
          "Difference: "
       << evolved_pitch - initial_pitch
-      << ", whereas the difference between the initial "
-         " and after-loop true anomalies was "
+      << ", whereas the difference between the after-loop "
+         "time and orbital period was "
       << after_loop_time - orbital_period << "\n";
 }
 
