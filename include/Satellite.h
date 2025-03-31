@@ -129,7 +129,6 @@ class Satellite {
   std::pair<double, double> calculate_eccentric_anomaly(
       const double input_eccentricity, const double input_true_anomaly,
       const double input_semimajor_axis);
-  double calculate_orbital_period(const double input_semimajor_axis);
   void initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame();
 
  public:
@@ -203,7 +202,7 @@ class Satellite {
 
     t_ = 0;  // for now, assuming satellites are initialized at time t=0;
 
-    orbital_period_ = calculate_orbital_period(a_);
+    orbital_period_ = calculate_orbital_period();
 
     // updated workflow
     perifocal_position_ = calculate_perifocal_position();
@@ -320,6 +319,8 @@ class Satellite {
                                                 const double pitch_angle,
                                                 const double yaw_angle);
   double get_attitude_val(const std::string input_attitude_val_name);
+  double calculate_orbital_period();
+
 };
 
 #endif
