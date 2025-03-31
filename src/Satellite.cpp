@@ -14,15 +14,15 @@ using Eigen::Vector3d;
 // Currently baselining use of cartesian coordinates in ECI frame (J2000
 // specifically, if that comes up later)
 
-//Objective: given the semimajor axis of an orbit, calculate its orbital period
+// Objective: given the semimajor axis of an orbit, calculate its orbital period
 double Satellite::calculate_orbital_period(const double input_semimajor_axis) {
   // https://en.wikipedia.org/wiki/Orbital_period
   double T = 2 * M_PI * sqrt(pow(input_semimajor_axis, 3) / (G * mass_Earth));
   return T;
 }
 
-//Objective: given an orbit's eccentricity, true anomaly, and semimajor axis, compute
-//its eccentric anomaly
+// Objective: given an orbit's eccentricity, true anomaly, and semimajor axis,
+// compute its eccentric anomaly
 std::pair<double, double> Satellite::calculate_eccentric_anomaly(
     const double input_eccentricity, const double input_true_anomaly,
     const double input_semimajor_axis) {
@@ -40,7 +40,7 @@ std::pair<double, double> Satellite::calculate_eccentric_anomaly(
   return output_pair;
 }
 
-//Objective: calculate the perifocal position of the satellite
+// Objective: calculate the perifocal position of the satellite
 std::array<double, 3> Satellite::calculate_perifocal_position() {
   // Using approach from Fundamentals of Astrodynamics
   std::array<double, 3> calculated_perifocal_position;
@@ -61,7 +61,7 @@ std::array<double, 3> Satellite::calculate_perifocal_position() {
   return calculated_perifocal_position;
 }
 
-//Objective: calculate the perifocal velocity of the satellite
+// Objective: calculate the perifocal velocity of the satellite
 std::array<double, 3> Satellite::calculate_perifocal_velocity() {
   // Using approach from Fundamentals of Astrodynamics
   std::array<double, 3> calculated_perifocal_velocity;
@@ -79,7 +79,7 @@ std::array<double, 3> Satellite::calculate_perifocal_velocity() {
   return calculated_perifocal_velocity;
 }
 
-//Objective: convert a vector from perifocal frame to ECI coordinates
+// Objective: convert a vector from perifocal frame to ECI coordinates
 std::array<double, 3> Satellite::convert_perifocal_to_ECI(
     const std::array<double, 3> input_perifocal_vec) {
   // Method from Fundamentals of Astrodynamics
@@ -129,7 +129,7 @@ std::array<double, 3> Satellite::convert_perifocal_to_ECI(
   return output_vector_ijk;
 }
 
-//Objective: convert vector from ECI frame to perifocal frame
+// Objective: convert vector from ECI frame to perifocal frame
 std::array<double, 3> Satellite::convert_ECI_to_perifocal(
     const std::array<double, 3> input_ECI_vec) {
   // Method from Fundamentals of Astrodynamics, and using
@@ -178,7 +178,8 @@ std::array<double, 3> Satellite::convert_ECI_to_perifocal(
   return output_vector_pqw;
 }
 
-//Objective: evolve position and velocity (combined into one vector) one timestep via RK4 method
+// Objective: evolve position and velocity (combined into one vector) one
+// timestep via RK4 method
 void Satellite::evolve_RK4(const double input_step_size) {
   // format input position and velocity arrays into single array for RK4 step
   std::array<double, 6> combined_initial_position_and_velocity_array = {};
@@ -257,7 +258,7 @@ void Satellite::evolve_RK4(const double input_step_size) {
   return;
 }
 
-//Objective: add a LVLH frame thrust profile to the satellite
+// Objective: add a LVLH frame thrust profile to the satellite
 void Satellite::add_LVLH_thrust_profile(
     const std::array<double, 3> input_LVLH_thrust_vector,
     const double input_thrust_start_time, const double input_thrust_end_time) {
@@ -272,11 +273,11 @@ void Satellite::add_LVLH_thrust_profile(
   }
 }
 
-//Alternate input argument style
+// Alternate input argument style
 void Satellite::add_LVLH_thrust_profile(
     const std::array<double, 3> input_LVLH_normalized_thrust_direction,
-    const double input_LVLH_thrust_magnitude, const double input_thrust_start_time,
-    const double input_thrust_end_time) {
+    const double input_LVLH_thrust_magnitude,
+    const double input_thrust_start_time, const double input_thrust_end_time) {
   ThrustProfileLVLH new_thrust_profile(
       input_thrust_start_time, input_thrust_end_time,
       input_LVLH_normalized_thrust_direction, input_LVLH_thrust_magnitude);
@@ -536,7 +537,7 @@ std::pair<double, int> Satellite::evolve_RK45(const double input_epsilon,
   return evolve_RK45_output_pair;
 }
 
-//Returns a specific orbital element
+// Returns a specific orbital element
 double Satellite::get_orbital_element(const std::string orbital_element_name) {
   if (orbital_element_name == "Semimajor Axis") {
     return a_;
@@ -560,7 +561,7 @@ double Satellite::get_orbital_element(const std::string orbital_element_name) {
   }
 }
 
-//Objective: add a body frame torque profile to the satellite
+// Objective: add a body frame torque profile to the satellite
 void Satellite::add_bodyframe_torque_profile(
     const std::array<double, 3> input_bodyframe_torque_vector,
     const double input_torque_start_time, const double input_torque_end_time) {
@@ -573,11 +574,11 @@ void Satellite::add_bodyframe_torque_profile(
         input_bodyframe_torque_vector);
   }
 }
-//Alternate input argument style
+// Alternate input argument style
 void Satellite::add_bodyframe_torque_profile(
     const std::array<double, 3> input_bodyframe_direction_unit_vec,
-    const double input_bodyframe_torque_magnitude, const double input_torque_start_time,
-    const double input_torque_end_time) {
+    const double input_bodyframe_torque_magnitude,
+    const double input_torque_start_time, const double input_torque_end_time) {
   std::array<double, 3> input_bodyframe_torque_vector = {0, 0, 0};
 
   for (size_t ind = 0; ind < 3; ind++) {
@@ -641,9 +642,8 @@ double Satellite::calculate_instantaneous_orbit_angular_acceleration() {
   return orbit_angular_acceleration;
 }
 
-void Satellite::initialize_and_normalize_body_quaternion(const double roll_angle,
-                                                         const double pitch_angle,
-                                                         const double yaw_angle) {
+void Satellite::initialize_and_normalize_body_quaternion(
+    const double roll_angle, const double pitch_angle, const double yaw_angle) {
   std::array<double, 4> quaternion =
       rollyawpitch_angles_to_quaternion(roll_angle, pitch_angle, yaw_angle);
   std::array<double, 4> normalized_quaternion =
@@ -652,7 +652,7 @@ void Satellite::initialize_and_normalize_body_quaternion(const double roll_angle
   return;
 }
 
-//Return a specific attitude-related value
+// Return a specific attitude-related value
 double Satellite::get_attitude_val(std::string input_attitude_val_name) {
   if (input_attitude_val_name == "Roll") {
     return roll_angle_;

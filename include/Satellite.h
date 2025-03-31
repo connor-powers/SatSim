@@ -30,9 +30,10 @@ class ThrustProfileLVLH {
     t_end_ = t_end;
     LVLH_force_vec_ = LVLH_force_vec;
   }
-  ThrustProfileLVLH(const double t_start, const double t_end,
-                    const std::array<double, 3> LVLH_normalized_force_direction_vec,
-                    const double input_force_magnitude) {
+  ThrustProfileLVLH(
+      const double t_start, const double t_end,
+      const std::array<double, 3> LVLH_normalized_force_direction_vec,
+      const double input_force_magnitude) {
     t_start_ = t_start;
     t_end_ = t_end;
     for (size_t ind = 0; ind < 3; ind++) {
@@ -48,15 +49,15 @@ class BodyframeTorqueProfile {
   double t_end_ = {0};
   std::array<double, 3> bodyframe_torque_list = {0, 0, 0};
   BodyframeTorqueProfile(const double t_start, const double t_end,
-    const std::array<double, 3> bodyframe_torque_vec) {
+                         const std::array<double, 3> bodyframe_torque_vec) {
     t_start_ = t_start;
     t_end_ = t_end;
     bodyframe_torque_list = bodyframe_torque_vec;
   }
   BodyframeTorqueProfile(
-    const double t_start, const double t_end,
-    const std::array<double, 3> bodyframe_normalized_torque_axis_vec,
-    const double input_torque_magnitude) {
+      const double t_start, const double t_end,
+      const std::array<double, 3> bodyframe_normalized_torque_axis_vec,
+      const double input_torque_magnitude) {
     t_start_ = t_start;
     t_end_ = t_end;
     for (size_t ind = 0; ind < 3; ind++) {
@@ -271,9 +272,11 @@ class Satellite {
   std::string get_name() { return name_; }
   void evolve_RK4(const double input_timestep);
 
-  std::array<double, 3> body_frame_to_ECI(const std::array<double, 3> input_vector);
+  std::array<double, 3> body_frame_to_ECI(
+      const std::array<double, 3> input_vector);
 
-  std::array<double, 3> ECI_to_body_frame(const std::array<double, 3> input_vector);
+  std::array<double, 3> ECI_to_body_frame(
+      const std::array<double, 3> input_vector);
 
   std::array<double, 3> calculate_perifocal_position();
 
@@ -289,16 +292,16 @@ class Satellite {
 
   void add_LVLH_thrust_profile(
       const std::array<double, 3> input_LVLH_normalized_thrust_direction,
-      const double input_LVLH_thrust_magnitude, const double input_thrust_start_time,
-      const double input_thrust_end_time);
-  void add_LVLH_thrust_profile(const std::array<double, 3> input_LVLH_thrust_vector,
-                               const double input_thrust_start_time,
-                               const double input_thrust_end_time);
+      const double input_LVLH_thrust_magnitude,
+      const double input_thrust_start_time, const double input_thrust_end_time);
+  void add_LVLH_thrust_profile(
+      const std::array<double, 3> input_LVLH_thrust_vector,
+      const double input_thrust_start_time, const double input_thrust_end_time);
 
   void add_bodyframe_torque_profile(
       const std::array<double, 3> input_bodyframe_direction_unit_vec,
-      const double input_bodyframe_torque_magnitude, const double input_torque_start_time,
-      const double input_torque_end_time);
+      const double input_bodyframe_torque_magnitude,
+      const double input_torque_start_time, const double input_torque_end_time);
   void add_bodyframe_torque_profile(
       const std::array<double, 3> input_bodyframe_torque_vector,
       const double input_torque_start_time, const double input_torque_end_time);

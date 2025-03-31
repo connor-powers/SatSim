@@ -4,14 +4,14 @@
 #include "utils.h"
 
 int main() {
-  //Initialize satellite object from an input JSON file
+  // Initialize satellite object from an input JSON file
   Satellite test_sat_1("../input.json");
-  //Define parameters for an LVLH frame thrust profile
+  // Define parameters for an LVLH frame thrust profile
   std::array<double, 3> LVLH_thrust_direction = {1, 0, 0};
   double thrust_magnitude = 100;  // N
   double t_thrust_start = 5000;
   double t_thrust_end = 6000;
-  //Add the thrust profile to the satellite object
+  // Add the thrust profile to the satellite object
   test_sat_1.add_LVLH_thrust_profile(LVLH_thrust_direction, thrust_magnitude,
                                      t_thrust_start, t_thrust_end);
 
