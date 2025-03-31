@@ -14,34 +14,34 @@ using Eigen::Vector4d;
 
 std::array<double, 3> calculate_orbital_acceleration(
     const std::array<double, 3> input_r_vec, const double input_spacecraft_mass,
-    std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI = {});
+    const std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI = {});
 std::array<double, 3> calculate_orbital_acceleration(
     const std::array<double, 3> input_r_vec, const double input_spacecraft_mass,
-    std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
-    double input_evaluation_time,
-    const std::array<double, 3> input_velocity_vec, double input_inclination,
-    double input_arg_of_periapsis, double input_true_anomaly,
-    bool perturbation);
+    const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
+    const double input_evaluation_time,
+    const std::array<double, 3> input_velocity_vec, const double input_inclination,
+    const double input_arg_of_periapsis, const double input_true_anomaly,
+    const bool perturbation);
 
 std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
-    std::array<double, 6> input_position_and_velocity,
+    const std::array<double, 6> input_position_and_velocity,
     const double input_spacecraft_mass,
-    std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI = {});
+    const std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI = {});
 
 template <int T>
 std::array<double, T> RK4_step(
-    std::array<double, T> y_n, double input_step_size,
+    const std::array<double, T> y_n, const double input_step_size,
     std::function<std::array<double, T>(
         const std::array<double, T> input_y_vec,
         const double input_spacecraft_mass,
-        std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI)>
+        const std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI)>
         input_derivative_function,
     const double input_spacecraft_mass,
-    std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI_at_t =
+    const std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI_at_t =
         {},
-    std::vector<std::array<double, 3>>
+    const std::vector<std::array<double, 3>>
         input_vec_of_force_vectors_in_ECI_at_t_and_halfstep = {},
-    std::vector<std::array<double, 3>>
+    const std::vector<std::array<double, 3>>
         input_vec_of_force_vectors_in_ECI_at_t_and_step = {}) {
   // ref:
   // https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods#The_Runge%E2%80%93Kutta_method
@@ -92,9 +92,9 @@ std::array<double, T> RK4_step(
 }
 
 void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
-                                double input_timestep,
-                                double input_total_sim_time,
-                                double input_epsilon, bool perturbation = true);
+                                const double input_timestep,
+                                const double input_total_sim_time,
+                                const double input_epsilon, const bool perturbation = true);
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
@@ -215,90 +215,90 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
 }
 
 std::array<double, 3> convert_LVLH_to_ECI_manual(
-    std::array<double, 3> input_LVLH_vec,
-    std::array<double, 3> input_position_vec,
-    std::array<double, 3> input_velocity_vec);
+    const std::array<double, 3> input_LVLH_vec,
+    const std::array<double, 3> input_position_vec,
+    const std::array<double, 3> input_velocity_vec);
 std::array<double, 3> convert_ECI_to_LVLH_manual(
-    std::array<double, 3> input_ECI_vec,
-    std::array<double, 3> input_position_vec,
-    std::array<double, 3> input_velocity_vec);
+    const std::array<double, 3> input_ECI_vec,
+    const std::array<double, 3> input_position_vec,
+    const std::array<double, 3> input_velocity_vec);
 std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
-    std::array<double, 6> input_position_and_velocity,
+    const std::array<double, 6> input_position_and_velocity,
     const double input_spacecraft_mass,
-    std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
-    double input_evaluation_time, double input_inclination,
-    double input_arg_of_periapsis, double input_true_anomaly,
-    bool perturbation);
+    const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
+    const double input_evaluation_time, const double input_inclination,
+    const double input_arg_of_periapsis, const double input_true_anomaly,
+    const bool perturbation);
 
-std::array<double, 3> convert_cylindrical_to_cartesian(double input_r_comp,
-                                                       double input_theta_comp,
-                                                       double input_z_comp,
-                                                       double input_theta);
+std::array<double, 3> convert_cylindrical_to_cartesian(const double input_r_comp,
+                                                       const double input_theta_comp,
+                                                       const double input_z_comp,
+                                                       const double input_theta);
 void sim_and_plot_orbital_elem_gnuplot(
-    std::vector<Satellite> input_satellite_vector, double input_timestep,
-    double input_total_sim_time, double input_epsilon,
-    std::string input_orbital_element_name, bool perturbation = true);
+    std::vector<Satellite> input_satellite_vector, const double input_timestep,
+    const double input_total_sim_time, const double input_epsilon,
+    const std::string input_orbital_element_name, const bool perturbation = true);
 void sim_and_plot_attitude_evolution_gnuplot(
-    std::vector<Satellite> input_satellite_vector, double input_timestep,
-    double input_total_sim_time, double input_epsilon,
-    std::string input_plotted_val_name, bool perturbation = true);
+    std::vector<Satellite> input_satellite_vector, const double input_timestep,
+    const double input_total_sim_time, const double input_epsilon,
+    const std::string input_plotted_val_name, const bool perturbation = true);
 
 Matrix3d rollyawpitch_bodyframe_to_LVLH(
-    std::array<double, 3> input_bodyframe_vec, double input_roll,
-    double input_pitch, double input_yaw);
-std::array<double, 4> rollyawpitch_angles_to_quaternion(double input_roll,
-                                                        double input_pitch,
-                                                        double input_yaw);
-std::array<double, 4> rollpitchyaw_angles_to_quaternion(double input_roll,
-                                                        double input_pitch,
-                                                        double input_yaw);
+    const std::array<double, 3> input_bodyframe_vec, const double input_roll,
+    const double input_pitch, const double input_yaw);
+std::array<double, 4> rollyawpitch_angles_to_quaternion(const double input_roll,
+                                                        const double input_pitch,
+                                                        const double input_yaw);
+std::array<double, 4> rollpitchyaw_angles_to_quaternion(const double input_roll,
+                                                        const double input_pitch,
+                                                        const double input_yaw);
 
 Matrix3d LVLH_to_body_transformation_matrix_from_quaternion(
-    std::array<double, 4> input_bodyframe_quaternion_relative_to_LVLH);
-Vector4d quaternion_multiplication(Vector4d quaternion_1,
-                                   Vector4d quaternion_2);
+    const std::array<double, 4> input_bodyframe_quaternion_relative_to_LVLH);
+Vector4d quaternion_multiplication(const Vector4d quaternion_1,
+                                   const Vector4d quaternion_2);
 Vector4d quaternion_kinematics_equation(
-    Vector4d quaternion_of_bodyframe_relative_to_ref_frame,
-    Vector3d angular_velocity_vec_wrt_ref_frame_in_body_frame);
+    const Vector4d quaternion_of_bodyframe_relative_to_ref_frame,
+    const Vector3d angular_velocity_vec_wrt_ref_frame_in_body_frame);
 std::array<double, 7> RK45_satellite_body_angular_deriv_function(
-    std::array<double, 7> combined_bodyframe_angular_array, Matrix3d J_matrix,
-    std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
-    Vector3d input_omega_I, double input_orbital_angular_acceleration,
-    Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-    Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
-    double input_evaluation_time);
+    const std::array<double, 7> combined_bodyframe_angular_array, const Matrix3d J_matrix,
+    const std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
+    const Vector3d input_omega_I, const double input_orbital_angular_acceleration,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
+    const double input_evaluation_time);
 std::array<double, 13>
 RK45_combined_orbit_position_velocity_attitude_deriv_function(
-    std::array<double, 13> combined_position_velocity_bodyframe_angular_array,
-    Matrix3d J_matrix,
-    std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
-    Vector3d input_omega_I, double input_orbital_angular_acceleration,
-    Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-    Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
+    const std::array<double, 13> combined_position_velocity_bodyframe_angular_array,
+    const Matrix3d J_matrix,
+    const std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
+    const Vector3d input_omega_I, double input_orbital_angular_acceleration,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
     const double input_spacecraft_mass,
-    std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
-    double input_evaluation_time, double input_inclination,
-    double input_arg_of_periapsis, double input_true_anomaly,
-    bool perturbation);
+    const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
+    const double input_evaluation_time, const double input_inclination,
+    const double input_arg_of_periapsis, const double input_true_anomaly,
+    const bool perturbation);
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
-    std::array<double, T> y_n, double input_step_size,
+    const std::array<double, T> y_n, const double input_step_size,
     std::function<std::array<double, T>(
-        std::array<double, T>, Matrix3d, std::vector<BodyframeTorqueProfile>,
-        Vector3d, double, Matrix3d, Vector3d, double,
-        std::vector<ThrustProfileLVLH>, double, double, double, double, bool)>
+        const std::array<double, T>, const Matrix3d, const std::vector<BodyframeTorqueProfile>,
+        const Vector3d, const double, const Matrix3d, const Vector3d, const double,
+        const std::vector<ThrustProfileLVLH>, const double, const double, const double, const double, const bool)>
         input_combined_derivative_function,
-    Matrix3d J_matrix,
-    std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
-    Vector3d input_omega_I, double input_orbital_angular_acceleration,
-    Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-    Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
-    double input_spacecraft_mass,
-    std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
-    double input_inclination, double input_arg_of_periapsis,
-    double input_true_anomaly, bool perturbation, double input_t_n,
-    double input_epsilon) {
+    const Matrix3d J_matrix,
+    const std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
+    const Vector3d input_omega_I, double input_orbital_angular_acceleration,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
+    const double input_spacecraft_mass,
+    const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
+    const double input_inclination, const double input_arg_of_periapsis,
+    const double input_true_anomaly, const bool perturbation, const double input_t_n,
+    const double input_epsilon) {
   // Version for combined satellite orbital motion and attitude time evolution
   // Implementing RK4(5) method for its adaptive step size
   // Refs:https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
@@ -415,24 +415,24 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
   }
 }
 Vector3d calculate_omega_I(
-    Vector3d input_bodyframe_ang_vel_vector_wrt_lvlh,
-    Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-    double input_orbital_rate);
+    const Vector3d input_bodyframe_ang_vel_vector_wrt_lvlh,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const double input_orbital_rate);
 
-Matrix3d construct_J_matrix(double input_Jxx, double input_Jyy,
-                            double input_Jzz);
+Matrix3d construct_J_matrix(const double input_Jxx, const double input_Jyy,
+                            const double input_Jzz);
 
 std::array<double, 3> convert_quaternion_to_roll_yaw_pitch_angles(
-    std::array<double, 4>);
+    const std::array<double, 4>);
 
 std::array<double, 4> normalize_quaternion(
     std::array<double, 4> input_quaternion);
 
 std::array<double, 4> bodyframe_quaternion_deriv(
-    std::array<double, 4> input_bodyframe_quaternion, double input_w_1,
-    double input_w_2, double input_w_3);
+    const std::array<double, 4> input_bodyframe_quaternion, const double input_w_1,
+    const double input_w_2, const double input_w_3);
 std::array<double, 3> convert_array_from_LVLH_to_bodyframe(
-    std::array<double, 3> input_LVLH_frame_array, double input_roll,
-    double input_yaw, double input_pitch);
+    const std::array<double, 3> input_LVLH_frame_array, const double input_roll,
+    const double input_yaw, const double input_pitch);
 
 #endif
