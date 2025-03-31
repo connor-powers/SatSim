@@ -15,9 +15,9 @@ using Eigen::Vector3d;
 // specifically, if that comes up later)
 
 // Objective: given the semimajor axis of an orbit, calculate its orbital period
-double Satellite::calculate_orbital_period(const double input_semimajor_axis) {
+double Satellite::calculate_orbital_period() {
   // https://en.wikipedia.org/wiki/Orbital_period
-  double T = 2 * M_PI * sqrt(pow(input_semimajor_axis, 3) / (G * mass_Earth));
+  double T = 2 * M_PI * sqrt(pow(a_, 3) / (G * mass_Earth));
   return T;
 }
 
