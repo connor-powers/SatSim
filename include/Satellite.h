@@ -24,15 +24,16 @@ class ThrustProfileLVLH {
   double t_start_ = {0};
   double t_end_ = {0};
   std::array<double, 3> LVLH_force_vec_ = {0, 0, 0};
-  ThrustProfileLVLH(double t_start, double t_end,
-                    std::array<double, 3> LVLH_force_vec) {
+  ThrustProfileLVLH(const double t_start, const double t_end,
+                    const std::array<double, 3> LVLH_force_vec) {
     t_start_ = t_start;
     t_end_ = t_end;
     LVLH_force_vec_ = LVLH_force_vec;
   }
-  ThrustProfileLVLH(double t_start, double t_end,
-                    std::array<double, 3> LVLH_normalized_force_direction_vec,
-                    double input_force_magnitude) {
+  ThrustProfileLVLH(
+      const double t_start, const double t_end,
+      const std::array<double, 3> LVLH_normalized_force_direction_vec,
+      const double input_force_magnitude) {
     t_start_ = t_start;
     t_end_ = t_end;
     for (size_t ind = 0; ind < 3; ind++) {
@@ -47,16 +48,16 @@ class BodyframeTorqueProfile {
   double t_start_ = {0};
   double t_end_ = {0};
   std::array<double, 3> bodyframe_torque_list = {0, 0, 0};
-  BodyframeTorqueProfile(double t_start, double t_end,
-                         std::array<double, 3> bodyframe_torque_vec) {
+  BodyframeTorqueProfile(const double t_start, const double t_end,
+                         const std::array<double, 3> bodyframe_torque_vec) {
     t_start_ = t_start;
     t_end_ = t_end;
     bodyframe_torque_list = bodyframe_torque_vec;
   }
   BodyframeTorqueProfile(
-      double t_start, double t_end,
-      std::array<double, 3> bodyframe_normalized_torque_axis_vec,
-      double input_torque_magnitude) {
+      const double t_start, const double t_end,
+      const std::array<double, 3> bodyframe_normalized_torque_axis_vec,
+      const double input_torque_magnitude) {
     t_start_ = t_start;
     t_end_ = t_end;
     for (size_t ind = 0; ind < 3; ind++) {
@@ -128,12 +129,12 @@ class Satellite {
   std::pair<double, double> calculate_eccentric_anomaly(
       const double input_eccentricity, const double input_true_anomaly,
       const double input_semimajor_axis);
-  double calculate_orbital_period(double input_semimajor_axis);
+  double calculate_orbital_period(const double input_semimajor_axis);
   void initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame();
 
  public:
   std::string plotting_color_ = "";
-  Satellite(std::string input_file_name) {
+  Satellite(const std::string input_file_name) {
     // baselining JSON input file format specifying initial orbital parameters
     // of satellite semimajor axis is read in units of km angles are read in
     // units of degrees, then internally translated to radians
@@ -269,54 +270,56 @@ class Satellite {
 
   double get_instantaneous_time() { return t_; }
   std::string get_name() { return name_; }
-  void evolve_RK4(double input_timestep);
+  void evolve_RK4(const double input_timestep);
 
-  std::array<double, 3> body_frame_to_ECI(std::array<double, 3> input_vector);
+  std::array<double, 3> body_frame_to_ECI(
+      const std::array<double, 3> input_vector);
 
-  std::array<double, 3> ECI_to_body_frame(std::array<double, 3> input_vector);
+  std::array<double, 3> ECI_to_body_frame(
+      const std::array<double, 3> input_vector);
 
   std::array<double, 3> calculate_perifocal_position();
 
   std::array<double, 3> calculate_perifocal_velocity();
 
   std::array<double, 3> convert_perifocal_to_ECI(
-      std::array<double, 3> input_perifocal_vec);
+      const std::array<double, 3> input_perifocal_vec);
   std::array<double, 3> convert_ECI_to_perifocal(
-      std::array<double, 3> input_ECI_vec);
+      const std::array<double, 3> input_ECI_vec);
 
   // std::array<double,3> convert_LVLH_to_ECI(std::array<double,3>
   // input_LVLH_vec);
 
   void add_LVLH_thrust_profile(
-      std::array<double, 3> input_LVLH_normalized_thrust_direction,
-      double input_LVLH_thrust_magnitude, double input_thrust_start_time,
-      double input_thrust_end_time);
-  void add_LVLH_thrust_profile(std::array<double, 3> input_LVLH_thrust_vector,
-                               double input_thrust_start_time,
-                               double input_thrust_end_time);
+      const std::array<double, 3> input_LVLH_normalized_thrust_direction,
+      const double input_LVLH_thrust_magnitude,
+      const double input_thrust_start_time, const double input_thrust_end_time);
+  void add_LVLH_thrust_profile(
+      const std::array<double, 3> input_LVLH_thrust_vector,
+      const double input_thrust_start_time, const double input_thrust_end_time);
 
   void add_bodyframe_torque_profile(
-      std::array<double, 3> input_bodyframe_direction_unit_vec,
-      double input_bodyframe_torque_magnitude, double input_torque_start_time,
-      double input_torque_end_time);
+      const std::array<double, 3> input_bodyframe_direction_unit_vec,
+      const double input_bodyframe_torque_magnitude,
+      const double input_torque_start_time, const double input_torque_end_time);
   void add_bodyframe_torque_profile(
-      std::array<double, 3> input_bodyframe_torque_vector,
-      double input_torque_start_time, double input_torque_end_time);
+      const std::array<double, 3> input_bodyframe_torque_vector,
+      const double input_torque_start_time, const double input_torque_end_time);
 
   int update_orbital_elements_from_position_and_velocity();
   std::array<double, 6> get_orbital_elements();
 
-  std::pair<double, int> evolve_RK45(double input_epsilon,
-                                     double input_initial_timestep,
-                                     bool perturbation = true);
+  std::pair<double, int> evolve_RK45(const double input_epsilon,
+                                     const double input_initial_timestep,
+                                     const bool perturbation = true);
 
-  double get_orbital_element(std::string orbital_element_name);
+  double get_orbital_element(const std::string orbital_element_name);
   double calculate_instantaneous_orbit_rate();
   double calculate_instantaneous_orbit_angular_acceleration();
-  void initialize_and_normalize_body_quaternion(double roll_angle,
-                                                double pitch_angle,
-                                                double yaw_angle);
-  double get_attitude_val(std::string input_attitude_val_name);
+  void initialize_and_normalize_body_quaternion(const double roll_angle,
+                                                const double pitch_angle,
+                                                const double yaw_angle);
+  double get_attitude_val(const std::string input_attitude_val_name);
 };
 
 #endif

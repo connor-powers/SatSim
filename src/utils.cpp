@@ -11,8 +11,9 @@ using Eigen::Quaterniond;
 using Eigen::Vector3d;
 using Eigen::Vector4d;
 
-Vector4d quaternion_multiplication(Vector4d quaternion_1,
-                                   Vector4d quaternion_2) {
+Vector4d quaternion_multiplication(const Vector4d quaternion_1,
+                                   const Vector4d quaternion_2) {
+  // Ref: https://en.wikipedia.org/wiki/Quaternion#Scalar_and_vector_parts
   Vector3d quat_1_vec_component = {
       quaternion_1(1), quaternion_1(2),
       quaternion_1(3)};  // Here adopting convention that scalar part is first
@@ -33,9 +34,9 @@ Vector4d quaternion_multiplication(Vector4d quaternion_1,
 //"manual" version, via dot products and cross products with position and
 // velocity vectors
 std::array<double, 3> convert_LVLH_to_ECI_manual(
-    std::array<double, 3> input_LVLH_vec,
-    std::array<double, 3> input_position_vec,
-    std::array<double, 3> input_velocity_vec) {
+    const std::array<double, 3> input_LVLH_vec,
+    const std::array<double, 3> input_position_vec,
+    const std::array<double, 3> input_velocity_vec) {
   // LVLH x-axis is defined as in the direction of motion
   // LVLH z-axis is defined as pointing back towards Earth, so along the
   // reversed direction of the position vector from the center of the Earth
@@ -82,9 +83,9 @@ std::array<double, 3> convert_LVLH_to_ECI_manual(
 }
 
 std::array<double, 3> convert_ECI_to_LVLH_manual(
-    std::array<double, 3> input_ECI_vec,
-    std::array<double, 3> input_position_vec,
-    std::array<double, 3> input_velocity_vec) {
+    const std::array<double, 3> input_ECI_vec,
+    const std::array<double, 3> input_position_vec,
+    const std::array<double, 3> input_velocity_vec) {
   // LVLH x-axis is defined as in the direction of motion
   // LVLH z-axis is defined as pointing back towards Earth, so along the
   // reversed direction of the position vector from the center of the Earth
@@ -134,7 +135,8 @@ std::array<double, 3> convert_ECI_to_LVLH_manual(
 
 std::array<double, 3> calculate_orbital_acceleration(
     const std::array<double, 3> input_r_vec, const double input_spacecraft_mass,
-    std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI) {
+    const std::vector<std::array<double, 3>>
+        input_vec_of_force_vectors_in_ECI) {
   // Note: this is the version used in the RK4 solver
   // orbital acceleration = -G m_Earth/distance^3 * r_vec (just based on
   // rearranging F=ma with a the acceleration due to gravitational attraction
@@ -176,10 +178,9 @@ std::array<double, 3> calculate_orbital_acceleration(
   return acceleration_vec;
 }
 
-std::array<double, 3> convert_cylindrical_to_cartesian(double input_r_comp,
-                                                       double input_theta_comp,
-                                                       double input_z_comp,
-                                                       double input_theta) {
+std::array<double, 3> convert_cylindrical_to_cartesian(
+    const double input_r_comp, const double input_theta_comp,
+    const double input_z_comp, const double input_theta) {
   std::array<double, 3> output_cartesian_vec = {0, 0, 0};
 
   // Dot product method
@@ -200,11 +201,11 @@ std::array<double, 3> convert_cylindrical_to_cartesian(double input_r_comp,
 
 std::array<double, 3> calculate_orbital_acceleration(
     const std::array<double, 3> input_r_vec, const double input_spacecraft_mass,
-    std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
-    double input_evaluation_time,
-    const std::array<double, 3> input_velocity_vec, double input_inclination,
-    double input_arg_of_periapsis, double input_true_anomaly,
-    bool perturbation) {
+    const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
+    const double input_evaluation_time,
+    const std::array<double, 3> input_velocity_vec,
+    const double input_inclination, const double input_arg_of_periapsis,
+    const double input_true_anomaly, const bool perturbation) {
   // Note: this is the version used in the RK45 solver (this has a more updated
   // workflow) orbital acceleration = -G m_Earth/distance^3 * r_vec (just based
   // on rearranging F=ma with a the acceleration due to gravitational attraction
@@ -240,7 +241,8 @@ std::array<double, 3> calculate_orbital_acceleration(
       {};
   std::vector<std::array<double, 3>> list_of_ECI_forces_at_evaluation_time = {};
 
-  for (ThrustProfileLVLH thrust_profile : input_list_of_thrust_profiles_LVLH) {
+  for (const ThrustProfileLVLH thrust_profile :
+       input_list_of_thrust_profiles_LVLH) {
     if ((input_evaluation_time >= thrust_profile.t_start_) &&
         (input_evaluation_time <= thrust_profile.t_end_)) {
       list_of_LVLH_forces_at_evaluation_time.push_back(
@@ -311,9 +313,10 @@ std::array<double, 3> calculate_orbital_acceleration(
 }
 
 std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
-    std::array<double, 6> input_position_and_velocity,
+    const std::array<double, 6> input_position_and_velocity,
     const double input_spacecraft_mass,
-    std::vector<std::array<double, 3>> input_vec_of_force_vectors_in_ECI) {
+    const std::vector<std::array<double, 3>>
+        input_vec_of_force_vectors_in_ECI) {
   std::array<double, 6> derivative_of_input_y = {};
   std::array<double, 3> position_array = {};
 
@@ -334,12 +337,12 @@ std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
 }
 
 std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
-    std::array<double, 6> input_position_and_velocity,
+    const std::array<double, 6> input_position_and_velocity,
     const double input_spacecraft_mass,
-    std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
-    double input_evaluation_time, double input_inclination,
-    double input_arg_of_periapsis, double input_true_anomaly,
-    bool perturbation) {
+    const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
+    const double input_evaluation_time, const double input_inclination,
+    const double input_arg_of_periapsis, const double input_true_anomaly,
+    const bool perturbation) {
   std::array<double, 6> derivative_of_input_y = {};
   std::array<double, 3> position_array = {};
   std::array<double, 3> velocity_array = {};
@@ -364,10 +367,13 @@ std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
   return derivative_of_input_y;
 }
 
+// Objective: simulate the input satellites over the specified total sim time,
+// and visualize the resulting orbits in an interactive 3D plot using gnuplot
 void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
-                                double input_timestep,
-                                double input_total_sim_time,
-                                double input_epsilon, bool perturbation) {
+                                const double input_timestep,
+                                const double input_total_sim_time,
+                                const double input_epsilon,
+                                const bool perturbation) {
   if (input_satellite_vector.size() < 1) {
     std::cout << "No input Satellite objects\n";
     return;
@@ -509,10 +515,12 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
   return;
 }
 
+// Objective: simulate the input satellites over the specified total sim time,
+// and plot a specific orbital element over time
 void sim_and_plot_orbital_elem_gnuplot(
-    std::vector<Satellite> input_satellite_vector, double input_timestep,
-    double input_total_sim_time, double input_epsilon,
-    std::string input_orbital_element_name, bool perturbation) {
+    std::vector<Satellite> input_satellite_vector, const double input_timestep,
+    const double input_total_sim_time, const double input_epsilon,
+    const std::string input_orbital_element_name, const bool perturbation) {
   if (input_satellite_vector.size() < 1) {
     std::cout << "No input Satellite objects\n";
     return;
@@ -649,7 +657,7 @@ void sim_and_plot_orbital_elem_gnuplot(
   return;
 }
 
-Matrix3d z_rot_matrix(double input_angle) {
+Matrix3d z_rot_matrix(const double input_angle) {
   Matrix3d z_rotation_matrix;
   z_rotation_matrix << cos(input_angle), -sin(input_angle), 0, sin(input_angle),
       cos(input_angle), 0, 0, 0, 1;
@@ -657,7 +665,7 @@ Matrix3d z_rot_matrix(double input_angle) {
   return z_rotation_matrix;
 }
 
-Matrix3d y_rot_matrix(double input_angle) {
+Matrix3d y_rot_matrix(const double input_angle) {
   Matrix3d y_rotation_matrix;
   y_rotation_matrix << cos(input_angle), 0, sin(input_angle), 0, 1, 0,
       -sin(input_angle), 0, cos(input_angle);
@@ -665,7 +673,7 @@ Matrix3d y_rot_matrix(double input_angle) {
   return y_rotation_matrix;
 }
 
-Matrix3d x_rot_matrix(double input_angle) {
+Matrix3d x_rot_matrix(const double input_angle) {
   Matrix3d x_rotation_matrix;
   x_rotation_matrix << 1, 0, 0, 0, cos(input_angle), -sin(input_angle), 0,
       sin(input_angle), cos(input_angle);
@@ -674,8 +682,8 @@ Matrix3d x_rot_matrix(double input_angle) {
 }
 
 std::array<double, 4> bodyframe_quaternion_deriv(
-    std::array<double, 4> input_bodyframe_quaternion, double input_w_1,
-    double input_w_2, double input_w_3) {
+    const std::array<double, 4> input_bodyframe_quaternion,
+    const double input_w_1, const double input_w_2, const double input_w_3) {
   // Assumes quaternions are input as [q_0, q_1, q_2, q_3] and omega is the
   // spacecraft "body rate", represented in the body frame, w.r.t. a chosen
   // reference frame Ref:
@@ -700,10 +708,12 @@ std::array<double, 4> bodyframe_quaternion_deriv(
   return quaternion_deriv_array;
 }
 
+// Objective: simulate the input satellites over the specified total sim time,
+// and plot a specific attitude-related value over time
 void sim_and_plot_attitude_evolution_gnuplot(
-    std::vector<Satellite> input_satellite_vector, double input_timestep,
-    double input_total_sim_time, double input_epsilon,
-    std::string input_plotted_val_name, bool perturbation) {
+    std::vector<Satellite> input_satellite_vector, const double input_timestep,
+    const double input_total_sim_time, const double input_epsilon,
+    const std::string input_plotted_val_name, const bool perturbation) {
   if (input_satellite_vector.size() < 1) {
     std::cout << "No input Satellite objects\n";
     return;
@@ -843,9 +853,9 @@ void sim_and_plot_attitude_evolution_gnuplot(
   return;
 }
 
-Matrix3d rollyawpitch_bodyframe_to_LVLH_matrix(double input_roll,
-                                               double input_pitch,
-                                               double input_yaw) {
+Matrix3d rollyawpitch_bodyframe_to_LVLH_matrix(const double input_roll,
+                                               const double input_pitch,
+                                               const double input_yaw) {
   // Going off convention in
   // https://ntrs.nasa.gov/api/citations/19770024112/downloads/19770024112.pdf
   // which appears to be first rotating by pitch, then yaw, then roll
@@ -865,9 +875,8 @@ Matrix3d rollyawpitch_bodyframe_to_LVLH_matrix(double input_roll,
   return bodyframe_to_LVLH_matrix;
 }
 
-std::array<double, 4> rollyawpitch_angles_to_quaternion(double input_roll,
-                                                        double input_pitch,
-                                                        double input_yaw) {
+std::array<double, 4> rollyawpitch_angles_to_quaternion(
+    const double input_roll, const double input_pitch, const double input_yaw) {
   // Refs :
   // https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/Euler%20to%20quat.pdf
   //  and
@@ -883,7 +892,7 @@ std::array<double, 4> rollyawpitch_angles_to_quaternion(double input_roll,
 }
 
 Matrix3d LVLH_to_body_transformation_matrix_from_quaternion(
-    std::array<double, 4> input_bodyframe_quaternion_relative_to_LVLH) {
+    const std::array<double, 4> input_bodyframe_quaternion_relative_to_LVLH) {
   // Ref:
   // https://ntrs.nasa.gov/api/citations/20240009554/downloads/Space%20Attitude%20Development%20Control.pdf
   // section 4.3.1
@@ -902,14 +911,17 @@ Matrix3d LVLH_to_body_transformation_matrix_from_quaternion(
   return LVLH_to_body_mat;
 }
 
+// Objective: compute time derivatives of bodyframe angular velocities
 std::array<double, 3> calculate_spacecraft_bodyframe_angular_acceleration(
-    Matrix3d J_matrix,
-    std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
-    Vector3d input_omega_I, double input_orbital_angular_acceleration,
-    Vector3d input_omega_bodyframe_wrt_LVLH_in_body_frame,
-    Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-    Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
-    double input_evaluation_time) {
+    const Matrix3d J_matrix,
+    const std::vector<BodyframeTorqueProfile>
+        input_bodyframe_torque_profile_list,
+    const Vector3d input_omega_I,
+    const double input_orbital_angular_acceleration,
+    const Vector3d input_omega_bodyframe_wrt_LVLH_in_body_frame,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
+    const double input_evaluation_time) {
   // Using approach from
   // https://ntrs.nasa.gov/api/citations/20240009554/downloads/Space%20Attitude%20Development%20Control.pdf
   // , Ch. 4 especially Objective: calculate omega_dot in spacecraft body frame
@@ -919,7 +931,7 @@ std::array<double, 3> calculate_spacecraft_bodyframe_angular_acceleration(
   // includes both disturbance and control torques
   Vector3d bodyframe_torque_vec = {0, 0, 0};
 
-  for (BodyframeTorqueProfile bodyframe_torque_profile :
+  for (const BodyframeTorqueProfile bodyframe_torque_profile :
        input_bodyframe_torque_profile_list) {
     if ((input_evaluation_time >= bodyframe_torque_profile.t_start_) &&
         (input_evaluation_time <= bodyframe_torque_profile.t_end_)) {
@@ -956,9 +968,11 @@ std::array<double, 3> calculate_spacecraft_bodyframe_angular_acceleration(
   return angular_acceleration_bodyframe_wrt_LVLH_in_bodyframe_array;
 }
 
+// Objective: compute time derivatives of components of quaternion describing
+// orientation of satellite body frame with respect to LVLH frame
 Vector4d quaternion_kinematics_equation(
-    Vector4d quaternion_of_bodyframe_relative_to_ref_frame,
-    Vector3d angular_velocity_vec_wrt_ref_frame_in_body_frame) {
+    const Vector4d quaternion_of_bodyframe_relative_to_ref_frame,
+    const Vector3d angular_velocity_vec_wrt_ref_frame_in_body_frame) {
   // Ref:
   // https://ntrs.nasa.gov/api/citations/20240009554/downloads/Space%20Attitude%20Development%20Control.pdf
   // Section 4.1.2
@@ -983,13 +997,17 @@ Vector4d quaternion_kinematics_equation(
   return quaternion_derivative;
 }
 
+// Computes time derivative of combined satellite quaternion + angular velocity
+// vector
 std::array<double, 7> RK45_satellite_body_angular_deriv_function(
-    std::array<double, 7> combined_bodyframe_angular_array, Matrix3d J_matrix,
-    std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
-    Vector3d input_omega_I, double input_orbital_angular_acceleration,
-    Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-    Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
-    double input_evaluation_time) {
+    const std::array<double, 7> combined_bodyframe_angular_array,
+    const Matrix3d J_matrix,
+    const std::vector<BodyframeTorqueProfile>
+        input_bodyframe_torque_profile_list,
+    const Vector3d input_omega_I, double input_orbital_angular_acceleration,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
+    const double input_evaluation_time) {
   // Setting this up for an RK45 step with
   // y={q_0,q_1,q_2,q_3,omega_1,omega_2,omega_3} Objective is to produce dy/dt
   // Input quaternion should be quaternion of bodyframe relative to LVLH
@@ -1024,10 +1042,12 @@ std::array<double, 7> RK45_satellite_body_angular_deriv_function(
   return combined_angular_derivative_array;
 }
 
+// Calculate angular velocity of spacecraft body frame with respect to
+// inertial (ECI) frame
 Vector3d calculate_omega_I(
-    Vector3d input_bodyframe_ang_vel_vector_wrt_lvlh,
-    Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-    double input_orbital_rate) {
+    const Vector3d input_bodyframe_ang_vel_vector_wrt_lvlh,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const double input_orbital_rate) {
   // Eq. 4.17 in
   // https://ntrs.nasa.gov/api/citations/20240009554/downloads/Space%20Attitude%20Development%20Control.pdf
   Vector3d omega_LVLH_wrt_inertial_in_LVLH = {0, -input_orbital_rate, 0};
@@ -1037,8 +1057,8 @@ Vector3d calculate_omega_I(
   return omega_I;
 }
 
-Matrix3d construct_J_matrix(double input_Jxx, double input_Jyy,
-                            double input_Jzz) {
+Matrix3d construct_J_matrix(const double input_Jxx, const double input_Jyy,
+                            const double input_Jzz) {
   Matrix3d J_matrix = Matrix3d::Zero();
   J_matrix(0, 0) = input_Jxx;
   J_matrix(1, 1) = input_Jyy;
@@ -1048,17 +1068,19 @@ Matrix3d construct_J_matrix(double input_Jxx, double input_Jyy,
 
 std::array<double, 13>
 RK45_combined_orbit_position_velocity_attitude_deriv_function(
-    std::array<double, 13> combined_position_velocity_bodyframe_angular_array,
-    Matrix3d J_matrix,
-    std::vector<BodyframeTorqueProfile> input_bodyframe_torque_profile_list,
-    Vector3d input_omega_I, double input_orbital_angular_acceleration,
-    Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-    Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
-    double input_spacecraft_mass,
-    std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
-    double input_evaluation_time, double input_inclination,
-    double input_arg_of_periapsis, double input_true_anomaly,
-    bool perturbation) {
+    const std::array<double, 13>
+        combined_position_velocity_bodyframe_angular_array,
+    const Matrix3d J_matrix,
+    const std::vector<BodyframeTorqueProfile>
+        input_bodyframe_torque_profile_list,
+    const Vector3d input_omega_I, double input_orbital_angular_acceleration,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
+    const double input_spacecraft_mass,
+    const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
+    const double input_evaluation_time, const double input_inclination,
+    const double input_arg_of_periapsis, const double input_true_anomaly,
+    const bool perturbation) {
   // Input vector is in the form of {ECI_position,
   // ECI_velocity,bodyframe_quaternion_to_LVLH,bodyframe_omega_wrt_LVLH}
   // Objective is to output derivative of that vector
@@ -1117,7 +1139,7 @@ std::array<double, 4> normalize_quaternion(
 }
 
 std::array<double, 3> convert_quaternion_to_roll_yaw_pitch_angles(
-    std::array<double, 4> input_quaternion) {
+    const std::array<double, 4> input_quaternion) {
   // Based on approach in
   // https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/quat_2_euler_paper_ver2-1.pdf
   // Again, here I'm going off the pitch-yaw-roll sequence used in
@@ -1148,8 +1170,8 @@ std::array<double, 3> convert_quaternion_to_roll_yaw_pitch_angles(
 }
 
 std::array<double, 3> convert_array_from_LVLH_to_bodyframe(
-    std::array<double, 3> input_LVLH_frame_array, double input_roll,
-    double input_yaw, double input_pitch) {
+    const std::array<double, 3> input_LVLH_frame_array, const double input_roll,
+    const double input_yaw, const double input_pitch) {
   Matrix3d transformation_matrix =
       rollyawpitch_bodyframe_to_LVLH_matrix(input_roll, input_pitch, input_yaw);
   Vector3d input_LVLH_frame_vector = {input_LVLH_frame_array.at(0),
