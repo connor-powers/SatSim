@@ -5,8 +5,8 @@
 #include "Satellite.h"
 #include "utils.h"
 
-const double tolerance = pow(10.0, -12);
-const double epsilon = pow(10.0, -11);
+const double pitch_tolerance = 3*pow(10.0, -3);
+const double epsilon = pow(10.0, -12);
 
 TEST(AttitudeTests, PassivePitchTest1) {
   // Without any external or initial torques, the satellite's pitch angle
@@ -17,26 +17,26 @@ TEST(AttitudeTests, PassivePitchTest1) {
   const double initial_pitch = test_satellite.get_attitude_val("Pitch");
   const double orbital_period = test_satellite.calculate_orbital_period();
   double test_timestep = 0.1;  // s
-  double current_time = test_satellite.get_instantaneous_time();
+  double current_true_anomaly = initial_true_anomaly;
   double next_timestep = 0;
-  while (current_time < orbital_period) {
+  bool wrapped_around = false;
+  while ((current_true_anomaly < initial_true_anomaly) || (wrapped_around == false)) {
     std::pair<double, int> new_timestep_and_error_code =
         test_satellite.evolve_RK45(epsilon, test_timestep);
-    current_time = test_satellite.get_instantaneous_time();
+    current_true_anomaly = test_satellite.get_orbital_element("True Anomaly");
+    if ((!wrapped_around) && (0 <= current_true_anomaly) && (current_true_anomaly <= initial_true_anomaly)){
+      wrapped_around = true;
+    }
     next_timestep = new_timestep_and_error_code.first;
     int error_code = new_timestep_and_error_code.second;
     test_timestep = next_timestep;
   }
   double evolved_pitch = test_satellite.get_attitude_val("Pitch");
-  double after_loop_time = test_satellite.get_instantaneous_time();
-  EXPECT_TRUE(abs(evolved_pitch - initial_pitch) <=
-              abs(after_loop_time - orbital_period))
-      << "Pitch didn't progress 2*pi radians over one orbit as expected. "
-         "Difference: "
-      << evolved_pitch - initial_pitch
-      << ", whereas the difference between the after-loop "
-         "time and orbital period was "
-      << after_loop_time - orbital_period << "\n";
+  EXPECT_TRUE(abs(evolved_pitch - initial_pitch) <
+  pitch_tolerance)
+      << "Pitch didn't progress 2*pi radians (within tolerance) "
+      "over one orbit as expected. Difference: "
+      << evolved_pitch - initial_pitch << "\n";
 }
 
 TEST(AttitudeTests, PassivePitchTest2) {
