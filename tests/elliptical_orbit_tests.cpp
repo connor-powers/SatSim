@@ -6,12 +6,13 @@
 #include "utils.h"
 
 const double tolerance = pow(10.0, -12);
-// Setting a different tolerance for semimajor axis than the other orbital
+// Setting a different tolerance for semimajor axis and orbital radius than the other orbital
 // parameters since there appears to be a minimum error associated with
 // converting position and velocity to semimajor axis, best guess is this has to
 // do with the scale of distances and/or velocities being dealt with here
-const double semimajor_axis_tolerance = pow(10.0, -7);
-const double epsilon = pow(10.0, -7);
+const double length_tolerance = pow(10.0, -7);
+const double epsilon = pow(10.0, -11);
+const double energy_cons_relative_tolerance = pow(10.0, -5);
 
 TEST(EllipticalOrbitTests, EvolvedOrbitalSpeed1) {
   // Starting at true anomaly=0 means it's starting at perigee, which is where
@@ -86,7 +87,7 @@ TEST(EllipticalOrbitTests, ConstantEvolvedOrbitalElementsTest) {
     if (orbital_elem_index == 0) {
       EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index) -
                       evolved_orbit_elements.at(orbital_elem_index)) <
-                  semimajor_axis_tolerance)
+                      length_tolerance)
           << orbital_element_name_array.at(orbital_elem_index)
           << " was not constant within tolerance. Diff:"
           << initial_orbit_elements.at(orbital_elem_index) -
@@ -127,7 +128,7 @@ TEST(EllipticalOrbitTests, BasicOrbitalElementsTest) {
     if (orbital_elem_index == 0) {
       EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index) -
                       recalculated_orbit_elements.at(orbital_elem_index)) <
-                  semimajor_axis_tolerance)
+                      length_tolerance)
           << orbital_element_name_array.at(orbital_elem_index)
           << " was not constant within tolerance. Diff:"
           << initial_orbit_elements.at(orbital_elem_index) -
@@ -144,4 +145,103 @@ TEST(EllipticalOrbitTests, BasicOrbitalElementsTest) {
           << "\n";
     }
   }
+}
+
+TEST(EllipticalOrbitTests,OrbitalRadiusCalcs1) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
+  double orbital_radius_perifocal=test_satellite.get_radius();
+  double orbital_radius_ECI=test_satellite.get_radius_ECI();
+  EXPECT_TRUE(abs(orbital_radius_perifocal - orbital_radius_ECI) < length_tolerance)
+      << "Difference between orbital radii calculated with "
+      " perifocal and ECI coordinates: "
+      << orbital_radius_perifocal - orbital_radius_ECI <<"\n";
+}
+
+TEST(EllipticalOrbitTests,OrbitalRadiusCalcs2) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = false;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  double orbital_radius_perifocal=test_satellite.get_radius();
+  double orbital_radius_ECI=test_satellite.get_radius_ECI();
+
+  EXPECT_TRUE(abs(orbital_radius_perifocal - orbital_radius_ECI) < length_tolerance)
+      << "Difference between evolved orbital radii calculated with "
+      " perifocal and ECI coordinates: "
+      << orbital_radius_perifocal - orbital_radius_ECI <<"\n";
+}
+
+TEST(EllipticalOrbitTests,OrbitalSpeedCalcs1) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
+  double orbital_speed_perifocal=test_satellite.get_speed();
+  double orbital_speed_ECI=test_satellite.get_speed_ECI();
+  EXPECT_TRUE(abs(orbital_speed_ECI - orbital_speed_perifocal) < tolerance)
+      << "Difference between orbital radii calculated with "
+      " perifocal and ECI coordinates: "
+      << orbital_speed_ECI - orbital_speed_perifocal <<"\n";
+}
+
+TEST(EllipticalOrbitTests,OrbitalSpeedCalcs2) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = false;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  double orbital_speed_perifocal=test_satellite.get_speed();
+  double orbital_speed_ECI=test_satellite.get_speed_ECI();
+
+  EXPECT_TRUE(abs(orbital_speed_ECI - orbital_speed_perifocal) < tolerance)
+      << "Difference between evolved orbital speeds calculated with "
+      " perifocal and ECI coordinates: "
+      << orbital_speed_ECI - orbital_speed_perifocal <<"\n";
+}
+
+TEST(EllipticalOrbitTests, TotalEnergyTimestep1) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_1.json");
+  double initial_energy = test_satellite.get_total_energy();
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = true;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  double evolved_energy = test_satellite.get_total_energy();
+  EXPECT_TRUE(abs(initial_energy - evolved_energy)/initial_energy < energy_cons_relative_tolerance)
+      << "Total energy not preserved within relative tolerance. Relative difference: "
+      << abs(initial_energy - evolved_energy)/initial_energy << "\n";
+}
+
+TEST(EllipticalOrbitTests, TotalEnergyTimestep2) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
+  double initial_energy = test_satellite.get_total_energy();
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = true;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  double evolved_energy = test_satellite.get_total_energy();
+  EXPECT_TRUE(abs(initial_energy - evolved_energy)/initial_energy < energy_cons_relative_tolerance)
+      << "Total energy not preserved within relative tolerance. Relative difference: "
+      << abs(initial_energy - evolved_energy)/initial_energy << "\n";
+}
+
+TEST(EllipticalOrbitTests, TotalEnergyTimestep3) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_3.json");
+  double initial_energy = test_satellite.get_total_energy();
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = true;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  double evolved_energy = test_satellite.get_total_energy();
+  EXPECT_TRUE(abs(initial_energy - evolved_energy)/initial_energy < energy_cons_relative_tolerance)
+      << "Total energy not preserved within relative tolerance. Relative difference: "
+      << abs(initial_energy - evolved_energy)/initial_energy << "\n";
 }

@@ -142,7 +142,7 @@ class Satellite {
 
     inclination_ = input_data.at("Inclination");
     // convert to radians
-    inclination_ *= (M_PI / 180);
+    inclination_ *= (M_PI / 180.0);
     if (inclination_ == 0) {
       throw std::invalid_argument(
           "Zero inclination orbits are not currently supported");
@@ -150,11 +150,11 @@ class Satellite {
 
     raan_ = input_data.at("RAAN");
     // convert to radians
-    raan_ *= (M_PI / 180);
+    raan_ *= (M_PI / 180.0);
 
     arg_of_periapsis_ = input_data.at("Argument of Periapsis");
     // convert to radians
-    arg_of_periapsis_ *= (M_PI / 180);
+    arg_of_periapsis_ *= (M_PI / 180.0);
 
     eccentricity_ = input_data.at("Eccentricity");
     // If circular orbit, arg of periapsis is undefined, using convention of
@@ -164,29 +164,29 @@ class Satellite {
     }
 
     a_ = input_data.at("Semimajor Axis");
-    a_ *= 1000;  // converting from km to m
+    a_ *= 1000.0;  // converting from km to m
 
     true_anomaly_ = input_data.at("True Anomaly");
     // convert to radians
-    true_anomaly_ *= (M_PI / 180);
+    true_anomaly_ *= (M_PI / 180.0);
 
     // making initial pitch angle an optional parameter
     if (input_data.find("Initial Pitch Angle") != input_data.end()) {
       pitch_angle_ = input_data.at("Initial Pitch Angle");
       // convert to radians
-      pitch_angle_ *= (M_PI / 180);
+      pitch_angle_ *= (M_PI / 180.0);
     }
     // making initial roll angle an optional parameter
     if (input_data.find("Initial Roll Angle") != input_data.end()) {
       roll_angle_ = input_data.at("Initial Roll Angle");
       // convert to radians
-      roll_angle_ *= (M_PI / 180);
+      roll_angle_ *= (M_PI / 180.0);
     }
     // making initial yaw angle an optional parameter
     if (input_data.find("Initial Yaw Angle") != input_data.end()) {
       yaw_angle_ = input_data.at("Initial Yaw Angle");
       // convert to radians
-      yaw_angle_ *= (M_PI / 180);
+      yaw_angle_ *= (M_PI / 180.0);
     }
 
     initialize_and_normalize_body_quaternion(roll_angle_, pitch_angle_,
@@ -249,6 +249,11 @@ class Satellite {
     return sqrt(pow(perifocal_velocity_.at(0), 2) +
                 pow(perifocal_velocity_.at(1), 2));
   }
+  double get_speed_ECI() {
+    return sqrt(pow(ECI_velocity_.at(0), 2) +
+                pow(ECI_velocity_.at(1), 2) +
+                pow(ECI_velocity_.at(2),2));
+  }
   double get_radius() {
     // shouldn't matter which frame I use, might as well use perifocal coords
     // since it's fewer operations (no W-direction component so can omit that
@@ -256,13 +261,18 @@ class Satellite {
     return sqrt(pow(perifocal_position_.at(0), 2) +
                 pow(perifocal_position_.at(1), 2));
   }
+  double get_radius_ECI() {
+    return sqrt(pow(ECI_position_.at(0), 2) +
+                pow(ECI_position_.at(1), 2) +
+                pow(ECI_position_.at(2),2));
+  }
   double get_total_energy() {
     double orbital_radius = get_radius();
     double gravitational_potential_energy =
         -G * mass_Earth * m_ / orbital_radius;
 
     double orbital_speed = get_speed();
-    double kinetic_energy = (1 / 2) * m_ * (orbital_speed * orbital_speed);
+    double kinetic_energy = (1.0 / 2.0) * m_ * (orbital_speed * orbital_speed);
 
     return (gravitational_potential_energy + kinetic_energy);
   }
