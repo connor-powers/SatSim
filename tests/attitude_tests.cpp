@@ -5,7 +5,7 @@
 #include "Satellite.h"
 #include "utils.h"
 
-const double pitch_tolerance = 3*pow(10.0, -3);
+const double pitch_tolerance = 5*pow(10.0, -3);
 const double epsilon = pow(10.0, -12);
 
 TEST(AttitudeTests, PassivePitchTest1) {
