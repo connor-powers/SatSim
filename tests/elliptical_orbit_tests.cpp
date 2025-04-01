@@ -179,7 +179,7 @@ TEST(EllipticalOrbitTests,OrbitalSpeedCalcs1) {
   double orbital_speed_perifocal=test_satellite.get_speed();
   double orbital_speed_ECI=test_satellite.get_speed_ECI();
   EXPECT_TRUE(abs(orbital_speed_ECI - orbital_speed_perifocal) < tolerance)
-      << "Difference between orbital radii calculated with "
+      << "Difference between orbital speeds calculated with "
       " perifocal and ECI coordinates: "
       << orbital_speed_ECI - orbital_speed_perifocal <<"\n";
 }
