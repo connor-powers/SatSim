@@ -203,8 +203,8 @@ void Satellite::evolve_RK4(const double input_step_size) {
       {};
 
   for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
-    if (((t_ + (input_step_size / 2)) >= thrust_profile.t_start_) &&
-        ((t_ + (input_step_size / 2)) <= thrust_profile.t_end_)) {
+    if (((t_ + (input_step_size / 2.0)) >= thrust_profile.t_start_) &&
+        ((t_ + (input_step_size / 2.0)) <= thrust_profile.t_end_)) {
       list_of_LVLH_forces_at_half_timestep_past.push_back(
           thrust_profile.LVLH_force_vec_);
       std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
@@ -555,6 +555,8 @@ double Satellite::get_orbital_element(const std::string orbital_element_name) {
     return orbital_rate_;
   } else if (orbital_element_name == "Orbital Angular Acceleration") {
     return orbital_angular_acceleration_;
+  } else if (orbital_element_name == "Total Energy") {
+    return get_total_energy();
   } else {
     std::cout << "Unrecognized argument, returning -1";
     return -1;

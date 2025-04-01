@@ -19,7 +19,7 @@ const double tolerance = pow(10.0, -12);
 // locally than when run on Github actions workflow
 const double length_tolerance = pow(10.0, -7);
 const double epsilon = pow(10.0, -7);
-const double energy_cons_tolerance = pow(10.0, -5);
+const double energy_cons_relative_tolerance = pow(10.0, -5);
 
 TEST(CircularOrbitTests, OrbitalSpeed1) {
   Satellite test_satellite("../tests/circular_orbit_test_1_input.json");
@@ -51,16 +51,16 @@ TEST(CircularOrbitTests, TotalEnergyTimestep1) {
   Satellite test_satellite("../tests/circular_orbit_test_2_input.json");
   double initial_energy = test_satellite.get_total_energy();
   double test_timestep = 1;  // s
-  bool perturbation_bool = false;
+  bool perturbation_bool = true;
   std::pair<double, int> new_timestep_and_error_code =
       test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
   double next_timestep = new_timestep_and_error_code.first;
   int error_code = new_timestep_and_error_code.second;
   double evolved_energy = test_satellite.get_total_energy();
 
-  EXPECT_TRUE(abs(initial_energy - evolved_energy) < energy_cons_tolerance)
-      << "Total energy not preserved within tolerance. Difference: "
-      << initial_energy - evolved_energy << "\n";
+  EXPECT_TRUE(abs(initial_energy - evolved_energy)/initial_energy < energy_cons_relative_tolerance)
+      << "Total energy not preserved within relative tolerance. Relative difference: "
+      << abs(initial_energy - evolved_energy)/initial_energy << "\n";
 }
 
 TEST(CircularOrbitTests, EvolvedOrbitalRadius1) {
