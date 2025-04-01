@@ -41,6 +41,10 @@ class ThrustProfileLVLH {
           input_force_magnitude * LVLH_normalized_force_direction_vec.at(ind);
     }
   }
+
+  bool operator == (const ThrustProfileLVLH& input_profile){
+    return ((t_start_ == input_profile.t_start_) && (t_end_ == input_profile.t_end_) && (std::equal(LVLH_force_vec_.begin(), LVLH_force_vec_.end(),input_profile.LVLH_force_vec_.begin())));
+  }
 };
 
 class BodyframeTorqueProfile {
@@ -64,6 +68,9 @@ class BodyframeTorqueProfile {
       bodyframe_torque_list.at(ind) =
           input_torque_magnitude * bodyframe_normalized_torque_axis_vec.at(ind);
     }
+  }
+  bool operator == (const BodyframeTorqueProfile& input_profile){
+    return ((t_start_ == input_profile.t_start_) && (t_end_ == input_profile.t_end_) && (std::equal(bodyframe_torque_list.begin(), bodyframe_torque_list.end(),input_profile.bodyframe_torque_list.begin())));
   }
 };
 
