@@ -6,8 +6,6 @@
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 
-using json = nlohmann::json;
-
 // Define constants
 const double G =
     6.674 *
@@ -16,6 +14,8 @@ const double mass_Earth =
     5.9722 * pow(10, 24);  // https://en.wikipedia.org/wiki/Earth_mass
 const double radius_Earth =
     6378137;  // https://en.wikipedia.org/wiki/Earth_radius
+    
+using json = nlohmann::json;
 
 class ThrustProfileLVLH {
   // Note: for now, thrust forces are assumed to act through center of mass of
@@ -106,6 +106,10 @@ class Satellite {
   double roll_angle_ = {0};
   double yaw_angle_ = {0};
 
+  // For atmospheric drag calculations
+  // Surface area of satellite assumed to face drag conditions
+  double A_s_ = {0};
+
   // body-frame angular velocities relative to the LVLH frame, represented in
   // the body frame
   std::array<double, 3> body_angular_velocity_vec_wrt_LVLH_in_body_frame_ = {
@@ -130,8 +134,9 @@ class Satellite {
   std::vector<std::array<double, 3>> list_of_ECI_forces_at_this_time_ = {};
   std::vector<std::array<double, 3>> list_of_body_frame_torques_at_this_time_ =
       {};
-  // std::vector<std::array<double,3>>
-  // list_of_body_frame_torques_at_this_time_={};
+
+  double drag_surface_area = {0}; // Surface area of satellite used for
+  // atmospheric drag calculations
 
   std::pair<double, double> calculate_eccentric_anomaly(
       const double input_eccentricity, const double input_true_anomaly,
@@ -202,9 +207,14 @@ class Satellite {
     m_ = input_data.at("Mass");
     name_ = input_data.at("Name");
 
-    // making plotting color an optional parameter
+    // Making plotting color an optional parameter
     if (input_data.find("Plotting Color") != input_data.end()) {
       plotting_color_ = input_data.at("Plotting Color");
+    }
+
+    // Making satellite surface area facing drag conditions an optional parameter
+    if (input_data.find("A_s") != input_data.end()) {
+      A_s_ = input_data.at("A_s");
     }
 
     t_ = 0;  // for now, assuming satellites are initialized at time t=0;
@@ -327,7 +337,9 @@ class Satellite {
 
   std::pair<double, int> evolve_RK45(const double input_epsilon,
                                      const double input_initial_timestep,
-                                     const bool perturbation = true);
+                                     const bool perturbation = true,
+                                     const bool atmospheric_drag = false,
+                                     std::pair<double,double> drag_elements = {});
 
   double get_orbital_element(const std::string orbital_element_name);
   double calculate_instantaneous_orbit_rate();

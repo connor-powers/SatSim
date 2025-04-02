@@ -30,7 +30,7 @@ int main() {
 
   double timestep = 2;
   double total_sim_time = 25000;
-  double epsilon = pow(10, -12);
+  double epsilon = pow(10, -14);
   sim_and_draw_orbit_gnuplot(satellite_vector_1, timestep, total_sim_time,
                              epsilon);
 
@@ -44,7 +44,7 @@ int main() {
   total_sim_time = 9952;
   sim_and_plot_orbital_elem_gnuplot(satellite_vector_2, timestep,
                                     total_sim_time, epsilon,
-                                    "Argument of Periapsis");
+                                    "Argument of Periapsis",true);
   Satellite test_sat_7("../input_7.json");
   std::array<double, 3> torque_direction = {0, -1, 0};
   double torque_magnitude = 0.0005;  // N
@@ -57,5 +57,23 @@ int main() {
   sim_and_plot_attitude_evolution_gnuplot(
       satellite_vector_3, timestep, total_sim_time, epsilon, "Pitch", false);
 
+  //Now let's demonstrate effect of atmospheric drag approximation
+  Satellite test_sat_8("../input_8.json");
+  Satellite test_sat_9("../input_9.json");
+  std::vector<Satellite> satellite_vector_4 = {test_sat_8,test_sat_9};
+
+  // Drag parameters
+  double F_10 = 100; // Solar radio ten centimeter flux
+  double A_p = 120; // Geomagnetic A_p index
+  
+  // Collect drag parameters into a tuple with F_10 first and A_p second
+  std::pair<double,double> drag_elements = {F_10, A_p};
+  total_sim_time = 10000;
+  sim_and_plot_orbital_elem_gnuplot(satellite_vector_4, timestep,
+    total_sim_time, epsilon,
+    "Eccentricity",false, true, drag_elements);
+  sim_and_plot_orbital_elem_gnuplot(satellite_vector_4, timestep,
+                                    total_sim_time, epsilon,
+                                    "Semimajor Axis",false, true, drag_elements);
   return 0;
 }
