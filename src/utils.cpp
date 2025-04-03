@@ -207,7 +207,7 @@ std::array<double, 3> calculate_orbital_acceleration(
     const double input_inclination, const double input_arg_of_periapsis,
     const double input_true_anomaly, const double input_F_10,
     const double input_A_p, const double input_A_s,
-    const double input_satellite_mass, const bool perturbation, 
+    const double input_satellite_mass, const bool perturbation,
     const bool atmospheric_drag) {
   // Note: this is the version used in the RK45 solver (this has a more updated
   // workflow) orbital acceleration = -G m_Earth/distance^3 * r_vec (just based
@@ -311,49 +311,59 @@ std::array<double, 3> calculate_orbital_acceleration(
       acceleration_vec.at(ind) += cartesian_acceleration_components.at(ind);
     }
   }
-  double altitude = (distance - radius_Earth)/1000; //km
+  double altitude = (distance - radius_Earth) / 1000;  // km
 
-  if ((atmospheric_drag) && (altitude >= 140) && (altitude <= 400)){
-    double speed = sqrt(pow(input_velocity_vec.at(0),2) + pow(input_velocity_vec.at(1),2) + pow(input_velocity_vec.at(2),2));
+  if ((atmospheric_drag) && (altitude >= 140) && (altitude <= 400)) {
+    double speed = sqrt(pow(input_velocity_vec.at(0), 2) +
+                        pow(input_velocity_vec.at(1), 2) +
+                        pow(input_velocity_vec.at(2), 2));
     // First, esimate atmospheric density
     double rho = {0};
     if (distance < 180000) {
-      //Ref: https://www.spaceacademy.net.au/watch/debris/atmosmod.htm
-      double a0 = 7.001985 * pow(10,-2);
-      double a1 = -4.336216 * pow(10,-3);
-      double a2 = -5.009831 * pow(10,-3);
-      double a3 = 1.621827 * pow(10,-4);
-      double a4 = -2.471283 * pow(10,-6);
-      double a5 = 1.904383 * pow(10,-8);
-      double a6 = -7.189421 * pow(10,-11);
+      // Ref: https://www.spaceacademy.net.au/watch/debris/atmosmod.htm
+      double a0 = 7.001985 * pow(10, -2);
+      double a1 = -4.336216 * pow(10, -3);
+      double a2 = -5.009831 * pow(10, -3);
+      double a3 = 1.621827 * pow(10, -4);
+      double a4 = -2.471283 * pow(10, -6);
+      double a5 = 1.904383 * pow(10, -8);
+      double a6 = -7.189421 * pow(10, -11);
       double a7 = 1.060067 * pow(10, -13);
-      double fit_val = ((((((a7*altitude + a6)*altitude + a4)*altitude + a3)*altitude)+a2)*altitude + a1)*altitude + a0;
-      rho = pow(10,fit_val);
-    }
-    else {
+      double fit_val =
+          ((((((a7 * altitude + a6) * altitude + a4) * altitude + a3) *
+             altitude) +
+            a2) *
+               altitude +
+           a1) *
+              altitude +
+          a0;
+      rho = pow(10, fit_val);
+    } else {
       double T = 900 + 2.5 * (input_F_10 - 70) + 1.5 * input_A_p;
       double new_mu = 27 - 0.012 * (altitude - 200);
       double H = T / new_mu;
-      rho = 6 * pow(10,-10) * exp(- (altitude - 175) / H);
+      rho = 6 * pow(10, -10) * exp(-(altitude - 175) / H);
     }
 
     // Now estimate the satellite's ballistic coefficient B
-    double C_d = 2.2; //Ref: https://angeo.copernicus.org/articles/39/397/2021/
+    double C_d = 2.2;  // Ref:
+                       // https://angeo.copernicus.org/articles/39/397/2021/
     double B = C_d * input_A_s / input_satellite_mass;
-    double drag_deceleration = (1.0/2.0) * rho * B * pow(speed,2);
-    //Should act in direction directly opposite to velocity
-    std::array<double,3> velocity_unit_vec = {0.0,0.0,0.0};
-    for (size_t ind=0;ind<3;ind++) {
-      velocity_unit_vec.at(ind) = input_velocity_vec.at(ind)/speed;
+    double drag_deceleration = (1.0 / 2.0) * rho * B * pow(speed, 2);
+    // Should act in direction directly opposite to velocity
+    std::array<double, 3> velocity_unit_vec = {0.0, 0.0, 0.0};
+    for (size_t ind = 0; ind < 3; ind++) {
+      velocity_unit_vec.at(ind) = input_velocity_vec.at(ind) / speed;
     }
-    std::array<double,3> drag_acceleration_vec = {0.0,0.0,0.0};
-    for (size_t ind=0;ind<3;ind++) {
-      drag_acceleration_vec.at(ind) = drag_deceleration * (-1) * velocity_unit_vec.at(ind);
-      // Factor of (-1) because this acceleration acts in direction opposite to velocity
+    std::array<double, 3> drag_acceleration_vec = {0.0, 0.0, 0.0};
+    for (size_t ind = 0; ind < 3; ind++) {
+      drag_acceleration_vec.at(ind) =
+          drag_deceleration * (-1) * velocity_unit_vec.at(ind);
+      // Factor of (-1) because this acceleration acts in direction opposite to
+      // velocity
     }
     for (size_t ind = 0; ind < 3; ind++) {
       acceleration_vec.at(ind) += drag_acceleration_vec.at(ind);
-
     }
   }
 
@@ -391,7 +401,7 @@ std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
     const double input_evaluation_time, const double input_inclination,
     const double input_arg_of_periapsis, const double input_true_anomaly,
     const double input_F_10, const double input_A_p, const double input_A_s,
-    const double input_satellite_mass, const bool perturbation, 
+    const double input_satellite_mass, const bool perturbation,
     const bool atmospheric_drag) {
   std::array<double, 6> derivative_of_input_y = {};
   std::array<double, 3> position_array = {};
@@ -404,13 +414,12 @@ std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
   }
 
   std::array<double, 3> calculated_orbital_acceleration =
-      calculate_orbital_acceleration(position_array, input_spacecraft_mass,
-                                     input_list_of_thrust_profiles_LVLH,
-                                     input_evaluation_time, velocity_array,
-                                     input_inclination, input_arg_of_periapsis,
-                                     input_true_anomaly, input_F_10,
-                                     input_A_p, input_A_s,input_satellite_mass,
-                                     perturbation, atmospheric_drag);
+      calculate_orbital_acceleration(
+          position_array, input_spacecraft_mass,
+          input_list_of_thrust_profiles_LVLH, input_evaluation_time,
+          velocity_array, input_inclination, input_arg_of_periapsis,
+          input_true_anomaly, input_F_10, input_A_p, input_A_s,
+          input_satellite_mass, perturbation, atmospheric_drag);
 
   for (size_t ind = 3; ind < 6; ind++) {
     derivative_of_input_y.at(ind) = calculated_orbital_acceleration.at(ind - 3);
@@ -427,7 +436,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
                                 const double input_epsilon,
                                 const bool perturbation,
                                 const bool atmospheric_drag,
-                                const std::pair<double,double> drag_elements) {
+                                const std::pair<double, double> drag_elements) {
   if (input_satellite_vector.size() < 1) {
     std::cout << "No input Satellite objects\n";
     return;
@@ -576,7 +585,8 @@ void sim_and_plot_orbital_elem_gnuplot(
     std::vector<Satellite> input_satellite_vector, const double input_timestep,
     const double input_total_sim_time, const double input_epsilon,
     const std::string input_orbital_element_name, const bool perturbation,
-    const bool atmospheric_drag, const std::pair<double,double> drag_elements) {
+    const bool atmospheric_drag,
+    const std::pair<double, double> drag_elements) {
   if (input_satellite_vector.size() < 1) {
     std::cout << "No input Satellite objects\n";
     return;
@@ -681,7 +691,8 @@ void sim_and_plot_orbital_elem_gnuplot(
       while (current_satellite_time < input_total_sim_time) {
         std::pair<double, int> new_timestep_and_error_code =
             current_satellite.evolve_RK45(input_epsilon, timestep_to_use,
-                                          perturbation, atmospheric_drag, drag_elements);
+                                          perturbation, atmospheric_drag,
+                                          drag_elements);
         double new_timestep = new_timestep_and_error_code.first;
         int error_code = new_timestep_and_error_code.second;
 
@@ -772,7 +783,8 @@ void sim_and_plot_attitude_evolution_gnuplot(
     std::vector<Satellite> input_satellite_vector, const double input_timestep,
     const double input_total_sim_time, const double input_epsilon,
     const std::string input_plotted_val_name, const bool perturbation,
-    const bool atmospheric_drag, const std::pair<double,double> drag_elements) {
+    const bool atmospheric_drag,
+    const std::pair<double, double> drag_elements) {
   if (input_satellite_vector.size() < 1) {
     std::cout << "No input Satellite objects\n";
     return;
@@ -1128,20 +1140,20 @@ Matrix3d construct_J_matrix(const double input_Jxx, const double input_Jyy,
 
 std::array<double, 13>
 RK45_combined_orbit_position_velocity_attitude_deriv_function(
-  const std::array<double, 13>
-      combined_position_velocity_bodyframe_angular_array,
-  const Matrix3d J_matrix,
-  const std::vector<BodyframeTorqueProfile>
-      input_bodyframe_torque_profile_list,
-  const Vector3d input_omega_I, double input_orbital_angular_acceleration,
-  const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
-  const Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
-  const double input_spacecraft_mass,
-  const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
-  const double input_evaluation_time, const double input_inclination,
-  const double input_arg_of_periapsis, const double input_true_anomaly,
-  const double input_F_10, const double input_A_p, const double input_A_s,
-  const bool perturbation, const bool atmospheric_drag) {
+    const std::array<double, 13>
+        combined_position_velocity_bodyframe_angular_array,
+    const Matrix3d J_matrix,
+    const std::vector<BodyframeTorqueProfile>
+        input_bodyframe_torque_profile_list,
+    const Vector3d input_omega_I, double input_orbital_angular_acceleration,
+    const Matrix3d input_LVLH_to_bodyframe_transformation_matrix,
+    const Vector3d input_omega_LVLH_wrt_inertial_in_LVLH,
+    const double input_spacecraft_mass,
+    const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
+    const double input_evaluation_time, const double input_inclination,
+    const double input_arg_of_periapsis, const double input_true_anomaly,
+    const double input_F_10, const double input_A_p, const double input_A_s,
+    const bool perturbation, const bool atmospheric_drag) {
   // Input vector is in the form of {ECI_position,
   // ECI_velocity,bodyframe_quaternion_to_LVLH,bodyframe_omega_wrt_LVLH}
   // Objective is to output derivative of that vector
@@ -1164,8 +1176,8 @@ RK45_combined_orbit_position_velocity_attitude_deriv_function(
           combined_position_and_velocity_array, input_spacecraft_mass,
           input_list_of_thrust_profiles_LVLH, input_evaluation_time,
           input_inclination, input_arg_of_periapsis, input_true_anomaly,
-          input_F_10, input_A_p, input_A_s, input_spacecraft_mass,
-          perturbation, atmospheric_drag);
+          input_F_10, input_A_p, input_A_s, input_spacecraft_mass, perturbation,
+          atmospheric_drag);
 
   std::array<double, 7> angular_derivative_array =
       RK45_satellite_body_angular_deriv_function(

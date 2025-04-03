@@ -416,11 +416,10 @@ std::array<double, 6> Satellite::get_orbital_elements() {
   return orbit_elems_array;
 }
 
-std::pair<double, int> Satellite::evolve_RK45(const double input_epsilon,
-                                              const double input_step_size,
-                                              const bool perturbation,
-                                              const bool atmospheric_drag,
-                                              const std::pair<double,double> drag_elements) {
+std::pair<double, int> Satellite::evolve_RK45(
+    const double input_epsilon, const double input_step_size,
+    const bool perturbation, const bool atmospheric_drag,
+    const std::pair<double, double> drag_elements) {
   // perturbation is a flag which, when set to true, currently accounts for J2
   // perturbation.
 
@@ -487,9 +486,8 @@ std::pair<double, int> Satellite::evolve_RK45(const double input_epsilon,
           J_matrix, bodyframe_torque_profile_list_, omega_I,
           orbital_angular_acceleration_, LVLH_to_body_transformation_matrix,
           omega_LVLH_wrt_inertial_in_LVLH, m_, thrust_profile_list_,
-          inclination_, arg_of_periapsis_, true_anomaly_, input_F_10, 
-          input_A_p, A_s_,perturbation, atmospheric_drag,
-          t_,input_epsilon);
+          inclination_, arg_of_periapsis_, true_anomaly_, input_F_10, input_A_p,
+          A_s_, perturbation, atmospheric_drag, t_, input_epsilon);
 
   std::array<double, 13>
       output_combined_position_velocity_quaternion_angular_velocity_array =
