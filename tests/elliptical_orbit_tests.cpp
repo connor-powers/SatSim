@@ -252,7 +252,7 @@ TEST(EllipticalOrbitTests, DragTest1) {
   // Drag parameters
   double F_10 = 100;  // Solar radio ten centimeter flux
   double A_p = 120;   // Geomagnetic A_p index
-  // Collect drag parameters into a tuple with F_10 first and A_p second
+  // Collect drag parameters into a pair with F_10 first and A_p second
   std::pair<double, double> drag_elements = {F_10, A_p};
   double test_timestep = 0.1;  // s
   bool perturbation_bool = true;
