@@ -319,7 +319,7 @@ std::array<double, 3> calculate_orbital_acceleration(
                         pow(input_velocity_vec.at(2), 2));
     // First, esimate atmospheric density
     double rho = {0};
-    if (distance < 180000) {
+    if (altitude < 180) {
       // Ref: https://www.spaceacademy.net.au/watch/debris/atmosmod.htm
       double a0 = 7.001985 * pow(10, -2);
       double a1 = -4.336216 * pow(10, -3);
