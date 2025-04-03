@@ -314,13 +314,14 @@ std::array<double, 3> calculate_orbital_acceleration(
   double altitude = (distance - radius_Earth) / 1000;  // km
 
   if ((atmospheric_drag) && (altitude >= 140) && (altitude <= 400)) {
+    // Refs: https://angeo.copernicus.org/articles/39/397/2021/
+    // https://www.spaceacademy.net.au/watch/debris/atmosmod.htm
     double speed = sqrt(pow(input_velocity_vec.at(0), 2) +
                         pow(input_velocity_vec.at(1), 2) +
                         pow(input_velocity_vec.at(2), 2));
     // First, esimate atmospheric density
     double rho = {0};
     if (altitude < 180) {
-      // Ref: https://www.spaceacademy.net.au/watch/debris/atmosmod.htm
       double a0 = 7.001985 * pow(10, -2);
       double a1 = -4.336216 * pow(10, -3);
       double a2 = -5.009831 * pow(10, -3);
@@ -346,8 +347,7 @@ std::array<double, 3> calculate_orbital_acceleration(
     }
 
     // Now estimate the satellite's ballistic coefficient B
-    double C_d = 2.2;  // Ref:
-                       // https://angeo.copernicus.org/articles/39/397/2021/
+    double C_d = 2.2;
     double B = C_d * input_A_s / input_satellite_mass;
     double drag_deceleration = (1.0 / 2.0) * rho * B * pow(speed, 2);
     // Should act in direction directly opposite to velocity
