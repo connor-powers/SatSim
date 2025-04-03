@@ -30,7 +30,7 @@ int main() {
 
   double timestep = 2;
   double total_sim_time = 25000;
-  double epsilon = pow(10, -14);
+  double epsilon = pow(10, -12);
   sim_and_draw_orbit_gnuplot(satellite_vector_1, timestep, total_sim_time,
                              epsilon);
 
@@ -69,6 +69,7 @@ int main() {
   // Collect drag parameters into a tuple with F_10 first and A_p second
   std::pair<double, double> drag_elements = {F_10, A_p};
   total_sim_time = 10000;
+  epsilon = pow(10,-14);
   sim_and_plot_orbital_elem_gnuplot(satellite_vector_4, timestep,
                                     total_sim_time, epsilon, "Eccentricity",
                                     false, true, drag_elements);
