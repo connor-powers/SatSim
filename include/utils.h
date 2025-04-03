@@ -22,7 +22,10 @@ std::array<double, 3> calculate_orbital_acceleration(
     const double input_evaluation_time,
     const std::array<double, 3> input_velocity_vec,
     const double input_inclination, const double input_arg_of_periapsis,
-    const double input_true_anomaly, const bool perturbation);
+    const double input_true_anomaly, const double input_F_10,
+    const double input_A_p, const double input_A_s,
+    const double input_satellite_mass, const bool perturbation,
+    const bool atmospheric_drag);
 
 std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
     const std::array<double, 6> input_position_and_velocity,
@@ -93,11 +96,11 @@ std::array<double, T> RK4_step(
   return y_nplus1;
 }
 
-void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
-                                const double input_timestep,
-                                const double input_total_sim_time,
-                                const double input_epsilon,
-                                const bool perturbation = true);
+void sim_and_draw_orbit_gnuplot(
+    std::vector<Satellite> input_satellite_vector, const double input_timestep,
+    const double input_total_sim_time, const double input_epsilon,
+    const bool perturbation = true, const bool atmospheric_drag = false,
+    const std::pair<double, double> drag_elements = {});
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
@@ -231,7 +234,9 @@ std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
     const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
     const double input_evaluation_time, const double input_inclination,
     const double input_arg_of_periapsis, const double input_true_anomaly,
-    const bool perturbation);
+    const double input_F_10, const double input_A_p, const double input_A_s,
+    const double input_satellite_mass, const bool perturbation,
+    const bool atmospheric_drag);
 
 std::array<double, 3> convert_cylindrical_to_cartesian(
     const double input_r_comp, const double input_theta_comp,
@@ -240,11 +245,14 @@ void sim_and_plot_orbital_elem_gnuplot(
     std::vector<Satellite> input_satellite_vector, const double input_timestep,
     const double input_total_sim_time, const double input_epsilon,
     const std::string input_orbital_element_name,
-    const bool perturbation = true);
+    const bool perturbation = true, const bool atmospheric_drag = false,
+    const std::pair<double, double> drag_elements = {});
 void sim_and_plot_attitude_evolution_gnuplot(
     std::vector<Satellite> input_satellite_vector, const double input_timestep,
     const double input_total_sim_time, const double input_epsilon,
-    const std::string input_plotted_val_name, const bool perturbation = true);
+    const std::string input_plotted_val_name, const bool perturbation = true,
+    const bool atmospheric_drag = false,
+    const std::pair<double, double> drag_elements = {});
 
 Matrix3d rollyawpitch_bodyframe_to_LVLH(
     const std::array<double, 3> input_bodyframe_vec, const double input_roll,
@@ -285,7 +293,8 @@ RK45_combined_orbit_position_velocity_attitude_deriv_function(
     const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
     const double input_evaluation_time, const double input_inclination,
     const double input_arg_of_periapsis, const double input_true_anomaly,
-    const bool perturbation);
+    const double input_F_10, const double input_A_p, const double input_A_s,
+    const bool perturbation, const bool atmospheric_drag);
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
@@ -295,7 +304,8 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
         const std::vector<BodyframeTorqueProfile>, const Vector3d, const double,
         const Matrix3d, const Vector3d, const double,
         const std::vector<ThrustProfileLVLH>, const double, const double,
-        const double, const double, const bool)>
+        const double, const double, const double, const double, const double,
+        const bool, const bool)>
         input_combined_derivative_function,
     const Matrix3d J_matrix,
     const std::vector<BodyframeTorqueProfile>
@@ -306,8 +316,10 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
     const double input_spacecraft_mass,
     const std::vector<ThrustProfileLVLH> input_list_of_thrust_profiles_LVLH,
     const double input_inclination, const double input_arg_of_periapsis,
-    const double input_true_anomaly, const bool perturbation,
-    const double input_t_n, const double input_epsilon) {
+    const double input_true_anomaly, const double input_F_10,
+    const double input_A_p, const double input_A_s, const bool perturbation,
+    const double atmospheric_drag, const double input_t_n,
+    const double input_epsilon) {
   // Version for combined satellite orbital motion and attitude time evolution
   // Implementing RK4(5) method for its adaptive step size
   // Refs:https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
@@ -361,7 +373,7 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
             input_omega_LVLH_wrt_inertial_in_LVLH, input_spacecraft_mass,
             input_list_of_thrust_profiles_LVLH, evaluation_time,
             input_inclination, input_arg_of_periapsis, input_true_anomaly,
-            perturbation);
+            input_F_10, input_A_p, input_A_s, perturbation, atmospheric_drag);
     for (size_t y_val_ind = 0; y_val_ind < y_n.size(); y_val_ind++) {
       k_vec_at_this_s.at(y_val_ind) =
           input_step_size * derivative_function_output.at(y_val_ind);
@@ -412,15 +424,15 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
     output_pair.second = output_timestep_pair;
     return output_pair;
   } else {
-    return RK45_step<T>(y_n, h_new, input_combined_derivative_function,
-                        J_matrix, input_bodyframe_torque_profile_list,
-                        input_omega_I, input_orbital_angular_acceleration,
-                        input_LVLH_to_bodyframe_transformation_matrix,
-                        input_omega_LVLH_wrt_inertial_in_LVLH,
-                        input_spacecraft_mass,
-                        input_list_of_thrust_profiles_LVLH, input_inclination,
-                        input_arg_of_periapsis, input_true_anomaly,
-                        perturbation, input_t_n, input_epsilon);
+    return RK45_step<T>(
+        y_n, h_new, input_combined_derivative_function, J_matrix,
+        input_bodyframe_torque_profile_list, input_omega_I,
+        input_orbital_angular_acceleration,
+        input_LVLH_to_bodyframe_transformation_matrix,
+        input_omega_LVLH_wrt_inertial_in_LVLH, input_spacecraft_mass,
+        input_list_of_thrust_profiles_LVLH, input_inclination,
+        input_arg_of_periapsis, input_true_anomaly, input_F_10, input_A_p,
+        input_A_s, perturbation, atmospheric_drag, input_t_n, input_epsilon);
   }
 }
 Vector3d calculate_omega_I(

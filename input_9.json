@@ -1,0 +1,15 @@
+{
+  "Inclination": 20,
+  "RAAN": 0,
+  "Argument of Periapsis": 20,
+  "Eccentricity": 0.2,
+  "Semimajor Axis": 6700,
+  "True Anomaly": 0,
+  "Mass": 100,
+  "Name": "Satellite 9",
+  "Plotting Color": "forest-green",
+  "Initial Roll Angle": 0,
+  "Initial omega_y": 0,
+  "A_s": 0
+
+}

@@ -416,9 +416,10 @@ std::array<double, 6> Satellite::get_orbital_elements() {
   return orbit_elems_array;
 }
 
-std::pair<double, int> Satellite::evolve_RK45(const double input_epsilon,
-                                              const double input_step_size,
-                                              const bool perturbation) {
+std::pair<double, int> Satellite::evolve_RK45(
+    const double input_epsilon, const double input_step_size,
+    const bool perturbation, const bool atmospheric_drag,
+    const std::pair<double, double> drag_elements) {
   // perturbation is a flag which, when set to true, currently accounts for J2
   // perturbation.
 
@@ -430,6 +431,13 @@ std::pair<double, int> Satellite::evolve_RK45(const double input_epsilon,
   //  body frame with respect to the LVLH frame, and omega_i is the angular
   //  velocity around the ith axis of the body frame with respect to the LVLH
   //  frame, represented in the body frame
+
+  // The tuple drag_elements contains the F_10 value and the A_p value used for
+  // atmospheric drag calculations, if applicable
+  // F_10 is the first element, A_p is the second element
+  double input_F_10 = drag_elements.first;
+  double input_A_p = drag_elements.second;
+
   std::array<double, 13>
       combined_initial_position_velocity_quaternion_angular_velocity_array = {};
   std::pair<std::array<double, 3>, std::array<double, 3>>
@@ -478,8 +486,8 @@ std::pair<double, int> Satellite::evolve_RK45(const double input_epsilon,
           J_matrix, bodyframe_torque_profile_list_, omega_I,
           orbital_angular_acceleration_, LVLH_to_body_transformation_matrix,
           omega_LVLH_wrt_inertial_in_LVLH, m_, thrust_profile_list_,
-          inclination_, arg_of_periapsis_, true_anomaly_, perturbation, t_,
-          input_epsilon);
+          inclination_, arg_of_periapsis_, true_anomaly_, input_F_10, input_A_p,
+          A_s_, perturbation, atmospheric_drag, t_, input_epsilon);
 
   std::array<double, 13>
       output_combined_position_velocity_quaternion_angular_velocity_array =
