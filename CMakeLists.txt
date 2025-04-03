@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "--coverage -g -O0")
 include_directories(include)
 
 project(orbital_sim)
@@ -21,7 +22,7 @@ FetchContent_MakeAvailable(json googletest Eigen)
 
 
 
-add_executable(run src/simulation_setup.cpp src/utils.cpp src/Satellite.cpp)
+add_executable(run simulation_setup.cpp src/utils.cpp src/Satellite.cpp)
 add_executable(circular_orbit_tests tests/circular_orbit_tests.cpp src/Satellite.cpp src/utils.cpp)
 add_executable(elliptical_orbit_tests tests/elliptical_orbit_tests.cpp src/Satellite.cpp src/utils.cpp)
 add_executable(attitude_tests tests/attitude_tests.cpp src/Satellite.cpp src/utils.cpp)
