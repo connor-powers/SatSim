@@ -14,7 +14,7 @@ const double mass_Earth =
     5.9722 * pow(10, 24);  // https://en.wikipedia.org/wiki/Earth_mass
 const double radius_Earth =
     6378137;  // https://en.wikipedia.org/wiki/Earth_radius
-    
+
 using json = nlohmann::json;
 
 class ThrustProfileLVLH {
@@ -42,8 +42,11 @@ class ThrustProfileLVLH {
     }
   }
 
-  bool operator == (const ThrustProfileLVLH& input_profile){
-    return ((t_start_ == input_profile.t_start_) && (t_end_ == input_profile.t_end_) && (std::equal(LVLH_force_vec_.begin(), LVLH_force_vec_.end(),input_profile.LVLH_force_vec_.begin())));
+  bool operator==(const ThrustProfileLVLH& input_profile) {
+    return ((t_start_ == input_profile.t_start_) &&
+            (t_end_ == input_profile.t_end_) &&
+            (std::equal(LVLH_force_vec_.begin(), LVLH_force_vec_.end(),
+                        input_profile.LVLH_force_vec_.begin())));
   }
 };
 
@@ -69,8 +72,12 @@ class BodyframeTorqueProfile {
           input_torque_magnitude * bodyframe_normalized_torque_axis_vec.at(ind);
     }
   }
-  bool operator == (const BodyframeTorqueProfile& input_profile){
-    return ((t_start_ == input_profile.t_start_) && (t_end_ == input_profile.t_end_) && (std::equal(bodyframe_torque_list.begin(), bodyframe_torque_list.end(),input_profile.bodyframe_torque_list.begin())));
+  bool operator==(const BodyframeTorqueProfile& input_profile) {
+    return (
+        (t_start_ == input_profile.t_start_) &&
+        (t_end_ == input_profile.t_end_) &&
+        (std::equal(bodyframe_torque_list.begin(), bodyframe_torque_list.end(),
+                    input_profile.bodyframe_torque_list.begin())));
   }
 };
 
@@ -135,7 +142,7 @@ class Satellite {
   std::vector<std::array<double, 3>> list_of_body_frame_torques_at_this_time_ =
       {};
 
-  double drag_surface_area = {0}; // Surface area of satellite used for
+  double drag_surface_area = {0};  // Surface area of satellite used for
   // atmospheric drag calculations
 
   std::pair<double, double> calculate_eccentric_anomaly(
@@ -212,7 +219,8 @@ class Satellite {
       plotting_color_ = input_data.at("Plotting Color");
     }
 
-    // Making satellite surface area facing drag conditions an optional parameter
+    // Making satellite surface area facing drag conditions an optional
+    // parameter
     if (input_data.find("A_s") != input_data.end()) {
       A_s_ = input_data.at("A_s");
     }
@@ -267,9 +275,8 @@ class Satellite {
                 pow(perifocal_velocity_.at(1), 2));
   }
   double get_speed_ECI() {
-    return sqrt(pow(ECI_velocity_.at(0), 2) +
-                pow(ECI_velocity_.at(1), 2) +
-                pow(ECI_velocity_.at(2),2));
+    return sqrt(pow(ECI_velocity_.at(0), 2) + pow(ECI_velocity_.at(1), 2) +
+                pow(ECI_velocity_.at(2), 2));
   }
   double get_radius() {
     // shouldn't matter which frame I use, might as well use perifocal coords
@@ -279,9 +286,8 @@ class Satellite {
                 pow(perifocal_position_.at(1), 2));
   }
   double get_radius_ECI() {
-    return sqrt(pow(ECI_position_.at(0), 2) +
-                pow(ECI_position_.at(1), 2) +
-                pow(ECI_position_.at(2),2));
+    return sqrt(pow(ECI_position_.at(0), 2) + pow(ECI_position_.at(1), 2) +
+                pow(ECI_position_.at(2), 2));
   }
   double get_total_energy() {
     double orbital_radius = get_radius();
@@ -335,11 +341,10 @@ class Satellite {
   int update_orbital_elements_from_position_and_velocity();
   std::array<double, 6> get_orbital_elements();
 
-  std::pair<double, int> evolve_RK45(const double input_epsilon,
-                                     const double input_initial_timestep,
-                                     const bool perturbation = true,
-                                     const bool atmospheric_drag = false,
-                                     std::pair<double,double> drag_elements = {});
+  std::pair<double, int> evolve_RK45(
+      const double input_epsilon, const double input_initial_timestep,
+      const bool perturbation = true, const bool atmospheric_drag = false,
+      std::pair<double, double> drag_elements = {});
 
   double get_orbital_element(const std::string orbital_element_name);
   double calculate_instantaneous_orbit_rate();
@@ -349,7 +354,6 @@ class Satellite {
                                                 const double yaw_angle);
   double get_attitude_val(const std::string input_attitude_val_name);
   double calculate_orbital_period();
-
 };
 
 #endif
