@@ -100,7 +100,8 @@ void sim_and_draw_orbit_gnuplot(
     std::vector<Satellite> input_satellite_vector, const double input_timestep,
     const double input_total_sim_time, const double input_epsilon,
     const bool perturbation = true, const bool atmospheric_drag = false,
-    const std::pair<double, double> drag_elements = {});
+    const std::pair<double, double> drag_elements = {},
+    const bool keep_plot_open = true);
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
@@ -224,10 +225,7 @@ std::array<double, 3> convert_LVLH_to_ECI_manual(
     const std::array<double, 3> input_LVLH_vec,
     const std::array<double, 3> input_position_vec,
     const std::array<double, 3> input_velocity_vec);
-std::array<double, 3> convert_ECI_to_LVLH_manual(
-    const std::array<double, 3> input_ECI_vec,
-    const std::array<double, 3> input_position_vec,
-    const std::array<double, 3> input_velocity_vec);
+
 std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
     const std::array<double, 6> input_position_and_velocity,
     const double input_spacecraft_mass,
@@ -452,9 +450,6 @@ std::array<double, 3> convert_quaternion_to_roll_yaw_pitch_angles(
 std::array<double, 4> normalize_quaternion(
     std::array<double, 4> input_quaternion);
 
-std::array<double, 4> bodyframe_quaternion_deriv(
-    const std::array<double, 4> input_bodyframe_quaternion,
-    const double input_w_1, const double input_w_2, const double input_w_3);
 std::array<double, 3> convert_array_from_LVLH_to_bodyframe(
     const std::array<double, 3> input_LVLH_frame_array, const double input_roll,
     const double input_yaw, const double input_pitch);

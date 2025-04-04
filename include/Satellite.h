@@ -145,9 +145,6 @@ class Satellite {
   double drag_surface_area = {0};  // Surface area of satellite used for
   // atmospheric drag calculations
 
-  std::pair<double, double> calculate_eccentric_anomaly(
-      const double input_eccentricity, const double input_true_anomaly,
-      const double input_semimajor_axis);
   void initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame();
 
  public:

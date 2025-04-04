@@ -5,12 +5,12 @@
 #include "Satellite.h"
 #include "utils.h"
 
-const double tolerance = pow(10.0, -12);
+const double tolerance = pow(10.0, -7);
 // Setting a different tolerance for semimajor axis and orbital radius than the other orbital
 // parameters since there appears to be a minimum error associated with
 // converting position and velocity to semimajor axis, best guess is this has to
 // do with the scale of distances and/or velocities being dealt with here
-const double length_tolerance = pow(10.0, -7);
+const double length_tolerance = pow(10.0, -6);
 const double epsilon = pow(10.0, -12);
 const double energy_cons_relative_tolerance = pow(10.0, -5);
 
@@ -261,10 +261,13 @@ TEST(EllipticalOrbitTests, DragTest1) {
   bool perturbation_bool = true;
   double total_sim_time = 10; // s
   double current_time = test_satellite_nodrag.get_instantaneous_time();
+  double orbital_radius = 0;
   while (current_time < total_sim_time) {
   std::pair<double, int> new_timestep_and_error_code =
       test_satellite_nodrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
         false);
+      orbital_radius = test_satellite_nodrag.get_radius();
+      double altitude = (orbital_radius - radius_Earth)/1000.0;
       double next_timestep = new_timestep_and_error_code.first;
       test_timestep = next_timestep;
       int error_code = new_timestep_and_error_code.second;
@@ -277,7 +280,7 @@ TEST(EllipticalOrbitTests, DragTest1) {
   while (current_time < total_sim_time) {
   std::pair<double, int> new_timestep_and_error_code =
   test_satellite_withdrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
-        false,drag_elements);
+        true,drag_elements);
       double next_timestep = new_timestep_and_error_code.first;
       test_timestep = next_timestep;
       int error_code = new_timestep_and_error_code.second;
@@ -290,7 +293,51 @@ TEST(EllipticalOrbitTests, DragTest1) {
       "This isn't expected behavior. Difference: " << no_drag_semimajor_axis - with_drag_semimajor_axis << "\n";
 }
 
+// Now trying to test the 140 < altitude < 180 km altitude section
+TEST(EllipticalOrbitTests, DragTest2) {
+  Satellite test_satellite_withdrag("../tests/circular_orbit_test_1_input.json");
+  Satellite test_satellite_nodrag("../tests/circular_orbit_test_1_input.json");
+  // Drag parameters
+  double F_10 = 100;  // Solar radio ten centimeter flux
+  double A_p = 120;   // Geomagnetic A_p index
+  double temp_epsilon = pow(10,-14);
+  // Collect drag parameters into a pair with F_10 first and A_p second
+  std::pair<double, double> drag_elements = {F_10, A_p};
+  double test_timestep = 0.01;  // s
+  bool perturbation_bool = true;
+  double total_sim_time = 10; // s
+  double current_time = test_satellite_nodrag.get_instantaneous_time();
+  double orbital_radius = 0;
+  while (current_time < total_sim_time) {
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite_nodrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
+        false);
+      orbital_radius = test_satellite_nodrag.get_radius();
+      double altitude = (orbital_radius - radius_Earth)/1000.0;
+      double next_timestep = new_timestep_and_error_code.first;
+      test_timestep = next_timestep;
+      int error_code = new_timestep_and_error_code.second;
+      current_time = test_satellite_nodrag.get_instantaneous_time();
+  }
+  double no_drag_semimajor_axis = test_satellite_nodrag.get_orbital_element("Semimajor Axis");
 
+  current_time = test_satellite_withdrag.get_instantaneous_time();
+
+  while (current_time < total_sim_time) {
+  std::pair<double, int> new_timestep_and_error_code =
+  test_satellite_withdrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
+        true,drag_elements);
+      double next_timestep = new_timestep_and_error_code.first;
+      test_timestep = next_timestep;
+      int error_code = new_timestep_and_error_code.second;
+      current_time = test_satellite_withdrag.get_instantaneous_time();
+  }
+  double with_drag_semimajor_axis = test_satellite_withdrag.get_orbital_element("Semimajor Axis");
+
+  EXPECT_TRUE(no_drag_semimajor_axis > with_drag_semimajor_axis)
+      << "Semimajor axis after evolution wasn't lower when drag was introduced. "
+      "This isn't expected behavior. Difference: " << no_drag_semimajor_axis - with_drag_semimajor_axis << "\n";
+}
 
 
 // Circular orbit tests

@@ -21,25 +21,6 @@ double Satellite::calculate_orbital_period() {
   return T;
 }
 
-// Objective: given an orbit's eccentricity, true anomaly, and semimajor axis,
-// compute its eccentric anomaly
-std::pair<double, double> Satellite::calculate_eccentric_anomaly(
-    const double input_eccentricity, const double input_true_anomaly,
-    const double input_semimajor_axis) {
-  // https://en.wikipedia.org/wiki/Eccentric_anomaly
-  double numerator =
-      std::sqrt(1 - pow(input_eccentricity, 2)) * sin(input_true_anomaly);
-  double denominator = input_eccentricity + cos(input_true_anomaly);
-  double eccentric_anomaly = atan2(numerator, denominator);
-
-  std::pair<double, double> output_pair;
-  output_pair.first = eccentric_anomaly;
-  double computed_distance_from_Earth =
-      input_semimajor_axis * (1 - input_eccentricity * cos(eccentric_anomaly));
-  output_pair.second = computed_distance_from_Earth;
-  return output_pair;
-}
-
 // Objective: calculate the perifocal position of the satellite
 std::array<double, 3> Satellite::calculate_perifocal_position() {
   // Using approach from Fundamentals of Astrodynamics
@@ -538,7 +519,11 @@ std::pair<double, int> Satellite::evolve_RK45(
   orbital_angular_acceleration_ =
       calculate_instantaneous_orbit_angular_acceleration();
   std::pair<double, int> evolve_RK45_output_pair;
-
+  // Orbital radius shouldn't be less than or equal to Earth's radius
+  double new_orbital_radius = get_radius();
+  if (new_orbital_radius <= radius_Earth){
+    orbit_elems_error_code = 2;
+  }
   evolve_RK45_output_pair.first = new_step_size;
   evolve_RK45_output_pair.second = orbit_elems_error_code;
 

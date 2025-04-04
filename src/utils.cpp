@@ -82,101 +82,52 @@ std::array<double, 3> convert_LVLH_to_ECI_manual(
   return output_ECI_arr;
 }
 
-std::array<double, 3> convert_ECI_to_LVLH_manual(
-    const std::array<double, 3> input_ECI_vec,
-    const std::array<double, 3> input_position_vec,
-    const std::array<double, 3> input_velocity_vec) {
-  // LVLH x-axis is defined as in the direction of motion
-  // LVLH z-axis is defined as pointing back towards Earth, so along the
-  // reversed direction of the position vector from the center of the Earth
-  // y-axis determined from a cross product
-
-  Vector3d ECI_unit_vec_x = {1.0, 0.0, 0.0};
-  Vector3d ECI_unit_vec_y = {0.0, 1.0, 0.0};
-  Vector3d ECI_unit_vec_z = {0.0, 0.0, 1.0};
-
-  std::array<double, 3> current_ECI_position_array = input_position_vec;
-  Vector3d current_ECI_position_unit_vec;
-  current_ECI_position_unit_vec << current_ECI_position_array.at(0),
-      current_ECI_position_array.at(1), current_ECI_position_array.at(2);
-  current_ECI_position_unit_vec
-      .normalize();  // to make it actually a unit vector
-
-  std::array<double, 3> current_ECI_velocity_array = input_velocity_vec;
-  Vector3d current_ECI_velocity_unit_vec;
-  current_ECI_velocity_unit_vec << current_ECI_velocity_array.at(0),
-      current_ECI_velocity_array.at(1), current_ECI_velocity_array.at(2);
-  current_ECI_velocity_unit_vec.normalize();
-
-  Vector3d LVLH_x_unit_vec = current_ECI_velocity_unit_vec;
-  Vector3d LVLH_z_unit_vec = (-1) * current_ECI_position_unit_vec;
-
-  Vector3d LVLH_y_unit_vec = LVLH_z_unit_vec.cross(LVLH_x_unit_vec);
-  // Should already be normalized, just in case though
-  LVLH_y_unit_vec.normalize();
-
-  double v_x_LVLH = input_ECI_vec.at(0) * LVLH_x_unit_vec.dot(ECI_unit_vec_x) +
-                    input_ECI_vec.at(1) * LVLH_x_unit_vec.dot(ECI_unit_vec_y) +
-                    input_ECI_vec.at(2) * LVLH_x_unit_vec.dot(ECI_unit_vec_z);
-
-  double v_y_LVLH = input_ECI_vec.at(0) * LVLH_y_unit_vec.dot(ECI_unit_vec_x) +
-                    input_ECI_vec.at(1) * LVLH_y_unit_vec.dot(ECI_unit_vec_y) +
-                    input_ECI_vec.at(2) * LVLH_y_unit_vec.dot(ECI_unit_vec_z);
-
-  double v_z_LVLH = input_ECI_vec.at(0) * LVLH_z_unit_vec.dot(ECI_unit_vec_x) +
-                    input_ECI_vec.at(1) * LVLH_z_unit_vec.dot(ECI_unit_vec_y) +
-                    input_ECI_vec.at(2) * LVLH_z_unit_vec.dot(ECI_unit_vec_z);
-
-  std::array<double, 3> output_LVLH_arr = {v_x_LVLH, v_y_LVLH, v_z_LVLH};
-  return output_LVLH_arr;
-}
-
 // baselining cartesian coordinates in ECI frame
 
-std::array<double, 3> calculate_orbital_acceleration(
-    const std::array<double, 3> input_r_vec, const double input_spacecraft_mass,
-    const std::vector<std::array<double, 3>>
-        input_vec_of_force_vectors_in_ECI) {
-  // Note: this is the version used in the RK4 solver
-  // orbital acceleration = -G m_Earth/distance^3 * r_vec (just based on
-  // rearranging F=ma with a the acceleration due to gravitational attraction
-  // between satellite and Earth
-  // https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation)
-  // going to be assuming Earth's position doesn't change for now
-  // also assuming Earth is spherical, can loosen this assumption in the future
-  // note: this is in ECI frame
+// std::array<double, 3> calculate_orbital_acceleration(
+//     const std::array<double, 3> input_r_vec, const double input_spacecraft_mass,
+//     const std::vector<std::array<double, 3>>
+//         input_vec_of_force_vectors_in_ECI) {
+//   // Note: this is the version used in the RK4 solver
+//   // orbital acceleration = -G m_Earth/distance^3 * r_vec (just based on
+//   // rearranging F=ma with a the acceleration due to gravitational attraction
+//   // between satellite and Earth
+//   // https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation)
+//   // going to be assuming Earth's position doesn't change for now
+//   // also assuming Earth is spherical, can loosen this assumption in the future
+//   // note: this is in ECI frame
 
-  std::array<double, 3> acceleration_vec_due_to_gravity =
-      input_r_vec;  // shouldn't need to explicitly call copy function because
-                    // input_r_vec is passed by value not ref
+//   std::array<double, 3> acceleration_vec_due_to_gravity =
+//       input_r_vec;  // shouldn't need to explicitly call copy function because
+//                     // input_r_vec is passed by value not ref
 
-  // F=ma
-  // a=F/m = (F_grav + F_ext)/m = (F_grav/m) + (F_ext/m) = -G*M_Earth/distance^3
-  // + ...
+//   // F=ma
+//   // a=F/m = (F_grav + F_ext)/m = (F_grav/m) + (F_ext/m) = -G*M_Earth/distance^3
+//   // + ...
 
-  const double distance = sqrt(input_r_vec.at(0) * input_r_vec.at(0) +
-                               input_r_vec.at(1) * input_r_vec.at(1) +
-                               input_r_vec.at(2) * input_r_vec.at(2));
-  const double overall_factor = -G * mass_Earth / pow(distance, 3);
+//   const double distance = sqrt(input_r_vec.at(0) * input_r_vec.at(0) +
+//                                input_r_vec.at(1) * input_r_vec.at(1) +
+//                                input_r_vec.at(2) * input_r_vec.at(2));
+//   const double overall_factor = -G * mass_Earth / pow(distance, 3);
 
-  for (size_t ind = 0; ind < input_r_vec.size(); ind++) {
-    acceleration_vec_due_to_gravity.at(ind) *= overall_factor;
-  }
+//   for (size_t ind = 0; ind < input_r_vec.size(); ind++) {
+//     acceleration_vec_due_to_gravity.at(ind) *= overall_factor;
+//   }
 
-  // now add effects from externally-applied forces, e.g., thrusters, if any
-  std::array<double, 3> acceleration_vec = acceleration_vec_due_to_gravity;
+//   // now add effects from externally-applied forces, e.g., thrusters, if any
+//   std::array<double, 3> acceleration_vec = acceleration_vec_due_to_gravity;
 
-  for (std::array<double, 3> external_force_vec_in_ECI :
-       input_vec_of_force_vectors_in_ECI) {
-    acceleration_vec.at(0) +=
-        (external_force_vec_in_ECI.at(0) / input_spacecraft_mass);
-    acceleration_vec.at(1) +=
-        (external_force_vec_in_ECI.at(1) / input_spacecraft_mass);
-    acceleration_vec.at(2) +=
-        (external_force_vec_in_ECI.at(2) / input_spacecraft_mass);
-  }
-  return acceleration_vec;
-}
+//   for (std::array<double, 3> external_force_vec_in_ECI :
+//        input_vec_of_force_vectors_in_ECI) {
+//     acceleration_vec.at(0) +=
+//         (external_force_vec_in_ECI.at(0) / input_spacecraft_mass);
+//     acceleration_vec.at(1) +=
+//         (external_force_vec_in_ECI.at(1) / input_spacecraft_mass);
+//     acceleration_vec.at(2) +=
+//         (external_force_vec_in_ECI.at(2) / input_spacecraft_mass);
+//   }
+//   return acceleration_vec;
+// }
 
 std::array<double, 3> convert_cylindrical_to_cartesian(
     const double input_r_comp, const double input_theta_comp,
@@ -311,8 +262,7 @@ std::array<double, 3> calculate_orbital_acceleration(
       acceleration_vec.at(ind) += cartesian_acceleration_components.at(ind);
     }
   }
-  double altitude = (distance - radius_Earth) / 1000;  // km
-
+  double altitude = (distance - radius_Earth) / 1000.0;  // km
   if ((atmospheric_drag) && (altitude >= 140) && (altitude <= 400)) {
     // Refs: https://angeo.copernicus.org/articles/39/397/2021/
     // https://www.spaceacademy.net.au/watch/debris/atmosmod.htm
@@ -370,29 +320,29 @@ std::array<double, 3> calculate_orbital_acceleration(
   return acceleration_vec;
 }
 
-std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
-    const std::array<double, 6> input_position_and_velocity,
-    const double input_spacecraft_mass,
-    const std::vector<std::array<double, 3>>
-        input_vec_of_force_vectors_in_ECI) {
-  std::array<double, 6> derivative_of_input_y = {};
-  std::array<double, 3> position_array = {};
+// std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
+//     const std::array<double, 6> input_position_and_velocity,
+//     const double input_spacecraft_mass,
+//     const std::vector<std::array<double, 3>>
+//         input_vec_of_force_vectors_in_ECI) {
+//   std::array<double, 6> derivative_of_input_y = {};
+//   std::array<double, 3> position_array = {};
 
-  for (size_t ind = 0; ind < 3; ind++) {
-    derivative_of_input_y.at(ind) = input_position_and_velocity.at(ind + 3);
-    position_array.at(ind) = input_position_and_velocity.at(ind);
-  }
+//   for (size_t ind = 0; ind < 3; ind++) {
+//     derivative_of_input_y.at(ind) = input_position_and_velocity.at(ind + 3);
+//     position_array.at(ind) = input_position_and_velocity.at(ind);
+//   }
 
-  std::array<double, 3> calculated_orbital_acceleration =
-      calculate_orbital_acceleration(position_array, input_spacecraft_mass,
-                                     input_vec_of_force_vectors_in_ECI);
+//   std::array<double, 3> calculated_orbital_acceleration =
+//       calculate_orbital_acceleration(position_array, input_spacecraft_mass,
+//                                      input_vec_of_force_vectors_in_ECI);
 
-  for (size_t ind = 3; ind < 6; ind++) {
-    derivative_of_input_y.at(ind) = calculated_orbital_acceleration.at(ind - 3);
-  }
+//   for (size_t ind = 3; ind < 6; ind++) {
+//     derivative_of_input_y.at(ind) = calculated_orbital_acceleration.at(ind - 3);
+//   }
 
-  return derivative_of_input_y;
-}
+//   return derivative_of_input_y;
+// }
 
 std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
     const std::array<double, 6> input_position_and_velocity,
@@ -436,14 +386,20 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
                                 const double input_epsilon,
                                 const bool perturbation,
                                 const bool atmospheric_drag,
-                                const std::pair<double, double> drag_elements) {
+                                const std::pair<double, double> drag_elements,
+                                const bool keep_plot_open) {
   if (input_satellite_vector.size() < 1) {
     std::cout << "No input Satellite objects\n";
     return;
   }
 
   // first, open "pipe" to gnuplot
-  FILE *gnuplot_pipe = popen("gnuplot -persist", "w");
+  std::string gnuplot_arg_string = "gnuplot";
+  if (keep_plot_open){
+    gnuplot_arg_string += " -persist";
+  }
+  FILE *gnuplot_pipe = popen(gnuplot_arg_string.c_str(), "w");
+
   // if it exists
   if (gnuplot_pipe) {
     fprintf(gnuplot_pipe, "set terminal qt size 900,700 font ',14'\n");
@@ -567,8 +523,9 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
       }
       fprintf(gnuplot_pipe, "e\n");
     }
-    fprintf(gnuplot_pipe, "pause mouse keypress\n");
-
+    if (keep_plot_open){
+      fprintf(gnuplot_pipe, "pause mouse keypress\n");
+    }
     fprintf(gnuplot_pipe, "exit \n");
     pclose(gnuplot_pipe);
 
@@ -598,7 +555,7 @@ void sim_and_plot_orbital_elem_gnuplot(
   FILE *gnuplot_pipe = popen("gnuplot", "w");
   // if it exists
   if (gnuplot_pipe) {
-    fprintf(gnuplot_pipe, "set terminal png size 600,400 font ',14'\n");
+    fprintf(gnuplot_pipe, "set terminal png size 800,500 font ',14' linewidth 2\n");
     // formatting
     fprintf(gnuplot_pipe, "set output '../%s.png'\n",file_name.c_str());
     fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
@@ -628,7 +585,7 @@ void sim_and_plot_orbital_elem_gnuplot(
                 current_satellite.get_name().c_str());
       } else {
         fprintf(gnuplot_pipe,
-                "pplot '-' using 1:2 with lines lw 1 title '%s' \n",
+                "plot '-' using 1:2 with lines lw 1 title '%s' \n",
                 current_satellite.get_name().c_str());
       }
 
@@ -753,32 +710,6 @@ Matrix3d x_rot_matrix(const double input_angle) {
   return x_rotation_matrix;
 }
 
-std::array<double, 4> bodyframe_quaternion_deriv(
-    const std::array<double, 4> input_bodyframe_quaternion,
-    const double input_w_1, const double input_w_2, const double input_w_3) {
-  // Assumes quaternions are input as [q_0, q_1, q_2, q_3] and omega is the
-  // spacecraft "body rate", represented in the body frame, w.r.t. a chosen
-  // reference frame Ref:
-  // https://ntrs.nasa.gov/api/citations/20240009554/downloads/Space%20Attitude%20Development%20Control.pdf
-
-  // Let's do this with Eigen so we can use matrix multiplication easily
-  Vector4d input_body_quaternion;
-  input_body_quaternion << input_bodyframe_quaternion.at(0),
-      input_bodyframe_quaternion.at(1), input_bodyframe_quaternion.at(2),
-      input_bodyframe_quaternion.at(3);
-
-  Matrix4d coeff_mat;
-  coeff_mat << 0, -input_w_1, -input_w_2, -input_w_3, input_w_1, 0, input_w_3,
-      -input_w_2, input_w_2, -input_w_3, 0, input_w_1, input_w_3, input_w_2,
-      -input_w_1, 0;
-
-  Vector4d quaternion_deriv_vec = 0.5 * coeff_mat * input_body_quaternion;
-  std::array<double, 4> quaternion_deriv_array;
-  for (size_t ind = 0; ind < quaternion_deriv_array.size(); ind++) {
-    quaternion_deriv_array.at(ind) = quaternion_deriv_vec(ind);
-  }
-  return quaternion_deriv_array;
-}
 
 // Objective: simulate the input satellites over the specified total sim time,
 // and plot a specific attitude-related value over time
@@ -799,7 +730,7 @@ void sim_and_plot_attitude_evolution_gnuplot(
   FILE *gnuplot_pipe = popen("gnuplot", "w");
   // if it exists
   if (gnuplot_pipe) {
-    fprintf(gnuplot_pipe, "set terminal png size 600,400 font ',14'\n");
+    fprintf(gnuplot_pipe, "set terminal png size 800,500 font ',14' linewidth 2\n");
     // formatting
     fprintf(gnuplot_pipe, "set output '../%s.png'\n",file_name.c_str());
     fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
@@ -833,7 +764,7 @@ void sim_and_plot_attitude_evolution_gnuplot(
                 current_satellite.get_name().c_str());
       } else {
         fprintf(gnuplot_pipe,
-                "pplot '-' using 1:2 with lines lw 1 title '%s' \n",
+                "plot '-' using 1:2 with lines lw 1 title '%s' \n",
                 current_satellite.get_name().c_str());
       }
 
