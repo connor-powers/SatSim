@@ -446,7 +446,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
   FILE *gnuplot_pipe = popen("gnuplot -persist", "w");
   // if it exists
   if (gnuplot_pipe) {
-    fprintf(gnuplot_pipe, "set terminal qt size 900,700 font 'Helvetica,14'\n");
+    fprintf(gnuplot_pipe, "set terminal qt size 900,700 font ',14'\n");
     // formatting
     fprintf(gnuplot_pipe, "set xlabel 'x [m]' offset 0,-2\n");
     fprintf(gnuplot_pipe, "set ylabel 'y [m]' offset -2,0\n");
@@ -584,7 +584,9 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
 void sim_and_plot_orbital_elem_gnuplot(
     std::vector<Satellite> input_satellite_vector, const double input_timestep,
     const double input_total_sim_time, const double input_epsilon,
-    const std::string input_orbital_element_name, const bool perturbation,
+    const std::string input_orbital_element_name, 
+    const std::string file_name,
+    const bool perturbation,
     const bool atmospheric_drag,
     const std::pair<double, double> drag_elements) {
   if (input_satellite_vector.size() < 1) {
@@ -596,8 +598,9 @@ void sim_and_plot_orbital_elem_gnuplot(
   FILE *gnuplot_pipe = popen("gnuplot", "w");
   // if it exists
   if (gnuplot_pipe) {
-    fprintf(gnuplot_pipe, "set terminal qt size 600,400 font 'Helvetica,14'\n");
+    fprintf(gnuplot_pipe, "set terminal png size 600,400 font ',14'\n");
     // formatting
+    fprintf(gnuplot_pipe, "set output '../%s.png'\n",file_name.c_str());
     fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
     if (input_orbital_element_name == "Semimajor Axis") {
       fprintf(gnuplot_pipe, "set ylabel '%s [m]'\n",
@@ -782,7 +785,9 @@ std::array<double, 4> bodyframe_quaternion_deriv(
 void sim_and_plot_attitude_evolution_gnuplot(
     std::vector<Satellite> input_satellite_vector, const double input_timestep,
     const double input_total_sim_time, const double input_epsilon,
-    const std::string input_plotted_val_name, const bool perturbation,
+    const std::string input_plotted_val_name, 
+    const std::string file_name,
+    const bool perturbation,
     const bool atmospheric_drag,
     const std::pair<double, double> drag_elements) {
   if (input_satellite_vector.size() < 1) {
@@ -794,8 +799,9 @@ void sim_and_plot_attitude_evolution_gnuplot(
   FILE *gnuplot_pipe = popen("gnuplot", "w");
   // if it exists
   if (gnuplot_pipe) {
-    fprintf(gnuplot_pipe, "set terminal qt size 600,400 font 'Helvetica,14'\n");
+    fprintf(gnuplot_pipe, "set terminal png size 600,400 font ',14'\n");
     // formatting
+    fprintf(gnuplot_pipe, "set output '../%s.png'\n",file_name.c_str());
     fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
     if ((input_plotted_val_name == "omega_x") ||
         (input_plotted_val_name == "omega_y") ||

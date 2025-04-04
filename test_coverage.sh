@@ -1,10 +1,10 @@
 rm -rf build
 mkdir build
 cd build/
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=DEBUG
 cmake --build .
-./elliptical_orbit_tests
-./circular_orbit_tests
-./attitude_tests
-./misc_tests
+./Satellite_tests
+./utils_tests
 gcovr -r .. --filter ../src/ --filter ../include/ --html-details output.html
+cd ..
+rm test_plot.png

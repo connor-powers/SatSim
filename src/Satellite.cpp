@@ -180,83 +180,83 @@ std::array<double, 3> Satellite::convert_ECI_to_perifocal(
 
 // Objective: evolve position and velocity (combined into one vector) one
 // timestep via RK4 method
-void Satellite::evolve_RK4(const double input_step_size) {
-  // format input position and velocity arrays into single array for RK4 step
-  std::array<double, 6> combined_initial_position_and_velocity_array = {};
-  std::pair<std::array<double, 3>, std::array<double, 3>>
-      output_position_velocity_pair = {};
+// void Satellite::evolve_RK4(const double input_step_size) {
+//   // format input position and velocity arrays into single array for RK4 step
+//   std::array<double, 6> combined_initial_position_and_velocity_array = {};
+//   std::pair<std::array<double, 3>, std::array<double, 3>>
+//       output_position_velocity_pair = {};
 
-  for (size_t ind = 0; ind < 3; ind++) {
-    combined_initial_position_and_velocity_array.at(ind) =
-        ECI_position_.at(ind);
-  }
-  for (size_t ind = 3; ind < 6; ind++) {
-    combined_initial_position_and_velocity_array.at(ind) =
-        ECI_velocity_.at(ind - 3);
-  }
+//   for (size_t ind = 0; ind < 3; ind++) {
+//     combined_initial_position_and_velocity_array.at(ind) =
+//         ECI_position_.at(ind);
+//   }
+//   for (size_t ind = 3; ind < 6; ind++) {
+//     combined_initial_position_and_velocity_array.at(ind) =
+//         ECI_velocity_.at(ind - 3);
+//   }
 
-  // populate list of thrust forces at half a timestep past, for RK4
-  // calculations
-  std::vector<std::array<double, 3>> list_of_LVLH_forces_at_half_timestep_past =
-      {};
-  std::vector<std::array<double, 3>> list_of_ECI_forces_at_half_timestep_past =
-      {};
+//   // populate list of thrust forces at half a timestep past, for RK4
+//   // calculations
+//   std::vector<std::array<double, 3>> list_of_LVLH_forces_at_half_timestep_past =
+//       {};
+//   std::vector<std::array<double, 3>> list_of_ECI_forces_at_half_timestep_past =
+//       {};
 
-  for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
-    if (((t_ + (input_step_size / 2.0)) >= thrust_profile.t_start_) &&
-        ((t_ + (input_step_size / 2.0)) <= thrust_profile.t_end_)) {
-      list_of_LVLH_forces_at_half_timestep_past.push_back(
-          thrust_profile.LVLH_force_vec_);
-      std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
-          thrust_profile.LVLH_force_vec_, ECI_position_, ECI_velocity_);
-      list_of_ECI_forces_at_half_timestep_past.push_back(ECI_thrust_vector);
-    }
-  }
+//   for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
+//     if (((t_ + (input_step_size / 2.0)) >= thrust_profile.t_start_) &&
+//         ((t_ + (input_step_size / 2.0)) <= thrust_profile.t_end_)) {
+//       list_of_LVLH_forces_at_half_timestep_past.push_back(
+//           thrust_profile.LVLH_force_vec_);
+//       std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
+//           thrust_profile.LVLH_force_vec_, ECI_position_, ECI_velocity_);
+//       list_of_ECI_forces_at_half_timestep_past.push_back(ECI_thrust_vector);
+//     }
+//   }
 
-  // populate list of thrust forces at a timestep past, for RK4 calculations
-  std::vector<std::array<double, 3>> list_of_LVLH_forces_at_one_timestep_past =
-      {};
-  std::vector<std::array<double, 3>> list_of_ECI_forces_at_one_timestep_past =
-      {};
+//   // populate list of thrust forces at a timestep past, for RK4 calculations
+//   std::vector<std::array<double, 3>> list_of_LVLH_forces_at_one_timestep_past =
+//       {};
+//   std::vector<std::array<double, 3>> list_of_ECI_forces_at_one_timestep_past =
+//       {};
 
-  for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
-    if (((t_ + input_step_size) >= thrust_profile.t_start_) &&
-        ((t_ + input_step_size) <= thrust_profile.t_end_)) {
-      list_of_LVLH_forces_at_one_timestep_past.push_back(
-          thrust_profile.LVLH_force_vec_);
-      std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
-          thrust_profile.LVLH_force_vec_, ECI_position_, ECI_velocity_);
-      list_of_ECI_forces_at_one_timestep_past.push_back(ECI_thrust_vector);
-    }
-  }
+//   for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
+//     if (((t_ + input_step_size) >= thrust_profile.t_start_) &&
+//         ((t_ + input_step_size) <= thrust_profile.t_end_)) {
+//       list_of_LVLH_forces_at_one_timestep_past.push_back(
+//           thrust_profile.LVLH_force_vec_);
+//       std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
+//           thrust_profile.LVLH_force_vec_, ECI_position_, ECI_velocity_);
+//       list_of_ECI_forces_at_one_timestep_past.push_back(ECI_thrust_vector);
+//     }
+//   }
 
-  std::array<double, 6> output_combined_position_and_velocity_array =
-      RK4_step<6>(combined_initial_position_and_velocity_array, input_step_size,
-                  RK4_deriv_function_orbit_position_and_velocity, m_,
-                  list_of_ECI_forces_at_this_time_,
-                  list_of_ECI_forces_at_half_timestep_past,
-                  list_of_ECI_forces_at_one_timestep_past);
-  // std::array<double,6> output_combined_angular_array=
-  // RK4_step<6>(combined_initial_angular_array,input_step_size,RK4_deriv_function_angular,I_,list_of_body_frame_torques_at_this_time_,list_of_body_frame_torques_at_half_timestep_past,list_of_body_frame_torques_at_one_timestep_past);
+//   std::array<double, 6> output_combined_position_and_velocity_array =
+//       RK4_step<6>(combined_initial_position_and_velocity_array, input_step_size,
+//                   RK4_deriv_function_orbit_position_and_velocity, m_,
+//                   list_of_ECI_forces_at_this_time_,
+//                   list_of_ECI_forces_at_half_timestep_past,
+//                   list_of_ECI_forces_at_one_timestep_past);
+//   // std::array<double,6> output_combined_angular_array=
+//   // RK4_step<6>(combined_initial_angular_array,input_step_size,RK4_deriv_function_angular,I_,list_of_body_frame_torques_at_this_time_,list_of_body_frame_torques_at_half_timestep_past,list_of_body_frame_torques_at_one_timestep_past);
 
-  for (size_t ind = 0; ind < 3; ind++) {
-    ECI_position_.at(ind) = output_combined_position_and_velocity_array.at(ind);
-    ECI_velocity_.at(ind) =
-        output_combined_position_and_velocity_array.at(ind + 3);
-    // also update the perifocal versions
-    perifocal_position_ = convert_ECI_to_perifocal(ECI_position_);
-    perifocal_velocity_ = convert_ECI_to_perifocal(ECI_velocity_);
-  }
-  t_ += input_step_size;
+//   for (size_t ind = 0; ind < 3; ind++) {
+//     ECI_position_.at(ind) = output_combined_position_and_velocity_array.at(ind);
+//     ECI_velocity_.at(ind) =
+//         output_combined_position_and_velocity_array.at(ind + 3);
+//     // also update the perifocal versions
+//     perifocal_position_ = convert_ECI_to_perifocal(ECI_position_);
+//     perifocal_velocity_ = convert_ECI_to_perifocal(ECI_velocity_);
+//   }
+//   t_ += input_step_size;
 
-  list_of_LVLH_forces_at_this_time_ = list_of_LVLH_forces_at_one_timestep_past;
-  list_of_ECI_forces_at_this_time_ = list_of_ECI_forces_at_one_timestep_past;
+//   list_of_LVLH_forces_at_this_time_ = list_of_LVLH_forces_at_one_timestep_past;
+//   list_of_ECI_forces_at_this_time_ = list_of_ECI_forces_at_one_timestep_past;
 
-  // Update orbital parameters
-  update_orbital_elements_from_position_and_velocity();
+//   // Update orbital parameters
+//   update_orbital_elements_from_position_and_velocity();
 
-  return;
-}
+//   return;
+// }
 
 // Objective: add a LVLH frame thrust profile to the satellite
 void Satellite::add_LVLH_thrust_profile(

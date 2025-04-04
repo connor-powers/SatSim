@@ -302,7 +302,7 @@ class Satellite {
 
   double get_instantaneous_time() { return t_; }
   std::string get_name() { return name_; }
-  void evolve_RK4(const double input_timestep);
+  // void evolve_RK4(const double input_timestep);
 
   std::array<double, 3> body_frame_to_ECI(
       const std::array<double, 3> input_vector);

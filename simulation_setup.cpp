@@ -31,8 +31,8 @@ int main() {
   double timestep = 2;
   double total_sim_time = 25000;
   double epsilon = pow(10, -12);
-  sim_and_draw_orbit_gnuplot(satellite_vector_1, timestep, total_sim_time,
-                             epsilon);
+  // sim_and_draw_orbit_gnuplot(satellite_vector_1, timestep, total_sim_time,
+  //                            epsilon);
 
   // Now some demonstrations of plotting orbital parameters
   Satellite test_sat_4("../input_4.json");
@@ -42,9 +42,10 @@ int main() {
   std::vector<Satellite> satellite_vector_2 = {test_sat_4, test_sat_5,
                                                test_sat_6};
   total_sim_time = 9952;
+  std::string file_name = "Arg pf Periapsis Plot";
   sim_and_plot_orbital_elem_gnuplot(satellite_vector_2, timestep,
                                     total_sim_time, epsilon,
-                                    "Argument of Periapsis", true);
+                                    "Argument of Periapsis", file_name, true);
   Satellite test_sat_7("../input_7.json");
   std::array<double, 3> torque_direction = {0, -1, 0};
   double torque_magnitude = 0.0005;  // N
@@ -53,9 +54,9 @@ int main() {
   test_sat_7.add_bodyframe_torque_profile(torque_direction, torque_magnitude,
                                           t_torque_start, t_torque_end);
   std::vector<Satellite> satellite_vector_3 = {test_sat_7};
-
+  file_name = "Pitch Plot";
   sim_and_plot_attitude_evolution_gnuplot(
-      satellite_vector_3, timestep, total_sim_time, epsilon, "Pitch", false);
+      satellite_vector_3, timestep, total_sim_time, epsilon, "Pitch", file_name, false);
 
   // Now let's demonstrate effect of atmospheric drag approximation
   Satellite test_sat_8("../input_8.json");
@@ -70,11 +71,13 @@ int main() {
   std::pair<double, double> drag_elements = {F_10, A_p};
   total_sim_time = 10000;
   epsilon = pow(10,-14);
+  file_name = "Eccentricity Plot";
   sim_and_plot_orbital_elem_gnuplot(satellite_vector_4, timestep,
                                     total_sim_time, epsilon, "Eccentricity",
-                                    false, true, drag_elements);
+                                    file_name, false, true, drag_elements);
+  file_name = "Semimajor Axis";
   sim_and_plot_orbital_elem_gnuplot(satellite_vector_4, timestep,
                                     total_sim_time, epsilon, "Semimajor Axis",
-                                    false, true, drag_elements);
+                                    file_name, false, true, drag_elements);
   return 0;
 }

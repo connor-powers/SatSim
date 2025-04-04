@@ -9,7 +9,11 @@
   "Name": "Satellite 9",
   "Plotting Color": "forest-green",
   "Initial Roll Angle": 0,
+  "Initial Pitch Angle": 0,
+  "Initial Yaw Angle": 0,
+  "Initial omega_x": 0,
   "Initial omega_y": 0,
+  "Initial omega_z": 0,
   "A_s": 10
 
 }
