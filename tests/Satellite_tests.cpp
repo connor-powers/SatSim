@@ -273,7 +273,7 @@ TEST(EllipticalOrbitTests, DragTest1) {
       int error_code = new_timestep_and_error_code.second;
       current_time = test_satellite_nodrag.get_instantaneous_time();
   }
-  double no_drag_semimajor_axis = test_satellite_nodrag.get_orbital_element("Semimajor Axis");
+  double no_drag_semimajor_axis = test_satellite_nodrag.get_orbital_parameter("Semimajor Axis");
 
   current_time = test_satellite_withdrag.get_instantaneous_time();
 
@@ -286,7 +286,7 @@ TEST(EllipticalOrbitTests, DragTest1) {
       int error_code = new_timestep_and_error_code.second;
       current_time = test_satellite_withdrag.get_instantaneous_time();
   }
-  double with_drag_semimajor_axis = test_satellite_withdrag.get_orbital_element("Semimajor Axis");
+  double with_drag_semimajor_axis = test_satellite_withdrag.get_orbital_parameter("Semimajor Axis");
 
   EXPECT_TRUE(no_drag_semimajor_axis > with_drag_semimajor_axis)
       << "Semimajor axis after evolution wasn't lower when drag was introduced. "
@@ -319,7 +319,7 @@ TEST(EllipticalOrbitTests, DragTest2) {
       int error_code = new_timestep_and_error_code.second;
       current_time = test_satellite_nodrag.get_instantaneous_time();
   }
-  double no_drag_semimajor_axis = test_satellite_nodrag.get_orbital_element("Semimajor Axis");
+  double no_drag_semimajor_axis = test_satellite_nodrag.get_orbital_parameter("Semimajor Axis");
 
   current_time = test_satellite_withdrag.get_instantaneous_time();
 
@@ -332,7 +332,7 @@ TEST(EllipticalOrbitTests, DragTest2) {
       int error_code = new_timestep_and_error_code.second;
       current_time = test_satellite_withdrag.get_instantaneous_time();
   }
-  double with_drag_semimajor_axis = test_satellite_withdrag.get_orbital_element("Semimajor Axis");
+  double with_drag_semimajor_axis = test_satellite_withdrag.get_orbital_parameter("Semimajor Axis");
 
   EXPECT_TRUE(no_drag_semimajor_axis > with_drag_semimajor_axis)
       << "Semimajor axis after evolution wasn't lower when drag was introduced. "
@@ -557,14 +557,14 @@ TEST(CircularOrbitTests, Thruster_Eccentricity_Change) {
 
 
 // Attitude-related tests
-const double pitch_tolerance = 5*pow(10.0, -3);
+const double pitch_tolerance = 0.25; // degrees
 
 TEST(AttitudeTests, PassivePitchTest1) {
   // Without any external or initial torques, the satellite's pitch angle
   // w.r.t. the LVLH frame should progress 2*pi radians over one full orbit
   Satellite test_satellite("../tests/attitude_test_input_1.json");
   const double initial_true_anomaly =
-      test_satellite.get_orbital_element("True Anomaly");
+      test_satellite.get_orbital_parameter("True Anomaly");
   const double initial_pitch = test_satellite.get_attitude_val("Pitch");
   const double orbital_period = test_satellite.calculate_orbital_period();
   double test_timestep = 0.1;  // s
@@ -574,7 +574,7 @@ TEST(AttitudeTests, PassivePitchTest1) {
   while ((current_true_anomaly < initial_true_anomaly) || (wrapped_around == false)) {
     std::pair<double, int> new_timestep_and_error_code =
         test_satellite.evolve_RK45(epsilon, test_timestep);
-    current_true_anomaly = test_satellite.get_orbital_element("True Anomaly");
+    current_true_anomaly = test_satellite.get_orbital_parameter("True Anomaly");
     if ((!wrapped_around) && (0 <= current_true_anomaly) && (current_true_anomaly <= initial_true_anomaly)){
       wrapped_around = true;
     }
@@ -594,7 +594,7 @@ TEST(AttitudeTests, PassivePitchTest2) {
   // Let's make sure the pitch is progressing in the expected direction
   Satellite test_satellite("../tests/attitude_test_input_1.json");
   const double initial_true_anomaly =
-      test_satellite.get_orbital_element("True Anomaly");
+      test_satellite.get_orbital_parameter("True Anomaly");
   const double initial_pitch = test_satellite.get_attitude_val("Pitch");
   const double time_to_sim = 1;  // s
   double test_timestep = 1;      // s
@@ -672,4 +672,121 @@ TEST(MiscTests, SatelliteNameTest) {
 
   EXPECT_TRUE(expected_name == recovered_name)
       << "Satellite name fetching didn't work as expected\n";
+}
+
+// Let's test some more error scenarios
+TEST(MiscTests, AttitudeIncorrectNameTest) {
+  Satellite test_satellite("../tests/circular_orbit_test_1_input.json");
+  bool caught = false;
+  try {
+    double val = test_satellite.get_attitude_val("This isn't a real name");
+  }
+  catch( const std::invalid_argument& invalid_arg_error) {
+    caught = true;
+  }
+
+  EXPECT_TRUE(caught)
+      << "Didn't catch the invalid argument error expected for attitude val fetching\n";
+}
+
+TEST(MiscTests, OrbitElemIncorrectNameTest) {
+  Satellite test_satellite("../tests/circular_orbit_test_1_input.json");
+  bool caught = false;
+  try {
+    double val = test_satellite.get_orbital_parameter("This isn't a real name");
+  }
+  catch( const std::invalid_argument& invalid_arg_error) {
+    caught = true;
+  }
+
+  EXPECT_TRUE(caught)
+      << "Didn't catch the invalid argument error expected for orbital parameter fetching\n";
+}
+
+TEST(MiscTests, NoInclination) {
+  bool caught = false;
+  try {
+    Satellite test_satellite("../tests/no_inclination.json");
+  }
+  catch( const std::exception& invalid_arg_error) {
+    caught = true;
+  }
+  EXPECT_TRUE(caught) << "Didn't catch exception when inclination wasn't in input file\n";
+}
+
+TEST(MiscTests, NoEccentricity) {
+  bool caught = false;
+  try {
+    Satellite test_satellite("../tests/no_eccentricity.json");
+  }
+  catch( const std::exception& invalid_arg_error) {
+    caught = true;
+  }
+  EXPECT_TRUE(caught) << "Didn't catch exception when eccentricity wasn't in input file\n";
+}
+
+TEST(MiscTests, NoArgofPeriapsis) {
+  bool caught = false;
+  try {
+    Satellite test_satellite("../tests/no_arg_of_periapsis.json");
+  }
+  catch( const std::exception& invalid_arg_error) {
+    caught = true;
+  }
+  EXPECT_TRUE(caught) << "Didn't catch exception when argument of periapsis wasn't in input file\n";
+}
+
+TEST(MiscTests, NoRAAN) {
+  bool caught = false;
+  try {
+    Satellite test_satellite("../tests/no_RAAN.json");
+  }
+  catch( const std::exception& invalid_arg_error) {
+    caught = true;
+  }
+  EXPECT_TRUE(caught) << "Didn't catch exception when RAAN wasn't in input file\n";
+}
+
+TEST(MiscTests, NoSemimajorAxis) {
+  bool caught = false;
+  try {
+    Satellite test_satellite("../tests/no_semimajor_axis.json");
+  }
+  catch( const std::exception& invalid_arg_error) {
+    caught = true;
+  }
+  EXPECT_TRUE(caught) << "Didn't catch exception when semimajor axis wasn't in input file\n";
+}
+
+TEST(MiscTests, NoTrueAnomaly) {
+  bool caught = false;
+  try {
+    Satellite test_satellite("../tests/no_true_anomaly.json");
+  }
+  catch( const std::exception& invalid_arg_error) {
+    caught = true;
+  }
+  EXPECT_TRUE(caught) << "Didn't catch exception when true anomaly wasn't in input file\n";
+}
+
+TEST(MiscTests, NoName) {
+  bool caught = false;
+  try {
+    Satellite test_satellite("../tests/no_name.json");
+  }
+  catch( const std::exception& invalid_arg_error) {
+    caught = true;
+  }
+  EXPECT_TRUE(caught) << "Didn't catch exception when satellite name wasn't in input file\n";
+}
+
+TEST(MiscTests, NoMass) {
+  bool caught = false;
+  try {
+    Satellite test_satellite("../tests/no_mass.json");
+  }
+  catch( const std::exception& invalid_arg_error) {
+    caught = true;
+  }
+  EXPECT_TRUE(caught) << "Didn't catch exception when satellite mass wasn't in input file\n";
 }

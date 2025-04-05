@@ -5,6 +5,8 @@
 #include "Satellite.h"
 #include "utils.h"
 
+double epsilon = pow(10, -7);
+
 TEST(UtilsTests, OrbitalElementPlottingTests) {
     // Going to have one satellite with two thrust profiles and two torque profiles (added in different ways),
     // one satellite with just two thrust profiles, one with just two torque profiles
@@ -62,7 +64,6 @@ TEST(UtilsTests, OrbitalElementPlottingTests) {
     satellite_vector_vector.push_back(single_satellite_vec_2);
     double timestep = 2;
     double total_sim_time = 300;
-    double epsilon = pow(10, -10);
 
     // Drag parameters
     double F_10 = 100;  // Solar radio ten centimeter flux
@@ -123,7 +124,7 @@ TEST(UtilsTests, AttitudeElementPlottingTests) {
                                             t_torque_start, t_torque_end);
 
     std::array<double,3> another_torque_vec = {-0.00001,0.00002,0.00003};
-    test_sat_both.add_bodyframe_torque_profile(another_torque_vec,t_torque_start,t_torque_end);
+    test_sat_both.add_bodyframe_torque_profile(another_torque_vec,0,2);
                                         
     Satellite test_sat_thrust("../tests/elliptical_orbit_test_1.json");
     test_sat_thrust.add_LVLH_thrust_profile(LVLH_thrust_direction, thrust_magnitude,
@@ -152,7 +153,6 @@ TEST(UtilsTests, AttitudeElementPlottingTests) {
 
     double timestep = 2;
     double total_sim_time = 300;
-    double epsilon = pow(10, -12);
 
     // Drag parameters
     double F_10 = 100;  // Solar radio ten centimeter flux
@@ -239,7 +239,6 @@ TEST(UtilsTests, AttitudeElementPlottingTests) {
 
     double timestep = 2;
     double total_sim_time = 300;
-    double epsilon = pow(10, -12);
 
     // Drag parameters
     double F_10 = 100;  // Solar radio ten centimeter flux

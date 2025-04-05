@@ -639,7 +639,7 @@ void sim_and_plot_orbital_elem_gnuplot(
          satellite_index < input_satellite_vector.size(); satellite_index++) {
       Satellite current_satellite = input_satellite_vector.at(satellite_index);
       double val =
-          current_satellite.get_orbital_element(input_orbital_element_name);
+          current_satellite.get_orbital_parameter(input_orbital_element_name);
       double current_satellite_time =
           current_satellite.get_instantaneous_time();
       fprintf(gnuplot_pipe, "%.17g %.17g\n", current_satellite_time, val);
@@ -665,7 +665,7 @@ void sim_and_plot_orbital_elem_gnuplot(
         }
         timestep_to_use = new_timestep;
         evolved_val =
-            current_satellite.get_orbital_element(input_orbital_element_name);
+            current_satellite.get_orbital_parameter(input_orbital_element_name);
         current_satellite_time = current_satellite.get_instantaneous_time();
         // printf("%.17g %.17g\n", current_satellite_time,
         //   evolved_val);

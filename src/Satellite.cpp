@@ -510,28 +510,27 @@ std::pair<double, int> Satellite::evolve_RK45(
 }
 
 // Returns a specific orbital element
-double Satellite::get_orbital_element(const std::string orbital_element_name) {
-  if (orbital_element_name == "Semimajor Axis") {
+double Satellite::get_orbital_parameter(const std::string orbital_parameter_name) {
+  if (orbital_parameter_name == "Semimajor Axis") {
     return a_;
-  } else if (orbital_element_name == "Eccentricity") {
+  } else if (orbital_parameter_name == "Eccentricity") {
     return eccentricity_;
-  } else if (orbital_element_name == "Inclination") {
+  } else if (orbital_parameter_name == "Inclination") {
     return inclination_*(180/M_PI); // Returns val in degrees
-  } else if (orbital_element_name == "RAAN") {
+  } else if (orbital_parameter_name == "RAAN") {
     return raan_ * (180.0 / M_PI); // Returns val in degrees
-  } else if (orbital_element_name == "Argument of Periapsis") {
+  } else if (orbital_parameter_name == "Argument of Periapsis") {
     return arg_of_periapsis_ * (180.0 / M_PI); // Returns val in degrees
-  } else if (orbital_element_name == "True Anomaly") {
+  } else if (orbital_parameter_name == "True Anomaly") {
     return true_anomaly_ * (180.0 / M_PI); // Returns val in degrees
-  } else if (orbital_element_name == "Orbital Rate") {
+  } else if (orbital_parameter_name == "Orbital Rate") {
     return orbital_rate_;
-  } else if (orbital_element_name == "Orbital Angular Acceleration") {
+  } else if (orbital_parameter_name == "Orbital Angular Acceleration") {
     return orbital_angular_acceleration_;
-  } else if (orbital_element_name == "Total Energy") {
+  } else if (orbital_parameter_name == "Total Energy") {
     return get_total_energy();
   } else {
-    std::cout << "Unrecognized argument, returning -1";
-    return -1;
+    throw std::invalid_argument("Value name not recognized");
   }
 }
 
@@ -649,9 +648,7 @@ double Satellite::get_attitude_val(std::string input_attitude_val_name) {
   } else if (input_attitude_val_name == "q_3") {
     return quaternion_satellite_bodyframe_wrt_LVLH_.at(3);
   } else {
-    std::cout << "Invalid attitude val choice " << input_attitude_val_name
-              << ", returning -1\n";
-    return -1.0;
+    throw std::invalid_argument("Value name not recognized");
   }
 }
 

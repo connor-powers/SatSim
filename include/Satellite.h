@@ -349,7 +349,7 @@ class Satellite {
       const bool perturbation = true, const bool atmospheric_drag = false,
       std::pair<double, double> drag_elements = {});
 
-  double get_orbital_element(const std::string orbital_element_name);
+  double get_orbital_parameter(const std::string orbital_parameter_name);
   double calculate_instantaneous_orbit_rate();
   double calculate_instantaneous_orbit_angular_acceleration();
   void initialize_and_normalize_body_quaternion(const double roll_angle,
