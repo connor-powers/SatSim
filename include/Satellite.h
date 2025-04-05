@@ -239,6 +239,8 @@ class Satellite {
     if (input_data.find("Initial omega_x") != input_data.end()) {
       double initial_omega_x_wrt_LVLH_in_body_frame =
           input_data.at("Initial omega_x");
+      // convert to radians/s
+      initial_omega_x_wrt_LVLH_in_body_frame *= (M_PI / 180.0);
       body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0) +=
           initial_omega_x_wrt_LVLH_in_body_frame;
     }
@@ -246,6 +248,8 @@ class Satellite {
     if (input_data.find("Initial omega_y") != input_data.end()) {
       double initial_omega_y_wrt_LVLH_in_body_frame =
           input_data.at("Initial omega_y");
+      // convert to radians/s
+      initial_omega_y_wrt_LVLH_in_body_frame *= (M_PI / 180.0);
       body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1) +=
           initial_omega_y_wrt_LVLH_in_body_frame;
     }
@@ -254,6 +258,8 @@ class Satellite {
     if (input_data.find("Initial omega_z") != input_data.end()) {
       double initial_omega_z_wrt_LVLH_in_body_frame =
           input_data.at("Initial omega_z");
+      // convert to radians/s
+      initial_omega_z_wrt_LVLH_in_body_frame *= (M_PI / 180.0);
       body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2) +=
           initial_omega_z_wrt_LVLH_in_body_frame;
     }

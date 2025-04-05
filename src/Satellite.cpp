@@ -316,13 +316,6 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
   if (n_vector(1) < 0) {
     calculated_RAAN = 2 * M_PI - calculated_RAAN;
   }
-  if (std::isnan(calculated_RAAN)) {
-    std::cout
-        << "Calculated RAAN was undefined. One possible cause of this is an "
-           "orbit with zero inclination. Current magnitude of line of nodes: "
-        << n << "\n";
-    error_code = 1;
-  }
 
   // Need to treat the e \approx 0 case (circular orbits) specially
   double calculated_arg_of_periapsis;
@@ -340,13 +333,6 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
       calculated_true_anomaly = 2 * M_PI - calculated_true_anomaly;
     }
 
-    if (std::isnan(calculated_arg_of_periapsis)) {
-      std::cout << "Calculated argument of periapsis was undefined. One "
-                   "possible cause of this is an orbit with zero inclination. "
-                   "Current magnitude of line of nodes: "
-                << n << "\n";
-      error_code = 1;
-    }
   } else {
     // Approximately circular orbits
     // For this case, I'll set the true anomaly to be the argument of latitude
@@ -358,13 +344,6 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
 
     double calculated_arg_of_latitude =
         acos(n_vector.dot(position_vector) / (n * r_magnitude));
-    if (std::isnan(calculated_arg_of_latitude)) {
-      std::cout << "Calculated argument of latitude was undefined. One "
-                   "possible cause of this is an orbit with zero inclination. "
-                   "Current magnitude of line of nodes: "
-                << n << "\n";
-      error_code = 1;
-    }
     if (position_vector(2) < 0) {
       calculated_arg_of_latitude = (2 * M_PI - calculated_arg_of_latitude);
     }
@@ -537,13 +516,13 @@ double Satellite::get_orbital_element(const std::string orbital_element_name) {
   } else if (orbital_element_name == "Eccentricity") {
     return eccentricity_;
   } else if (orbital_element_name == "Inclination") {
-    return inclination_;
+    return inclination_*(180/M_PI); // Returns val in degrees
   } else if (orbital_element_name == "RAAN") {
-    return raan_;
+    return raan_ * (180.0 / M_PI); // Returns val in degrees
   } else if (orbital_element_name == "Argument of Periapsis") {
-    return arg_of_periapsis_;
+    return arg_of_periapsis_ * (180.0 / M_PI); // Returns val in degrees
   } else if (orbital_element_name == "True Anomaly") {
-    return true_anomaly_;
+    return true_anomaly_ * (180.0 / M_PI); // Returns val in degrees
   } else if (orbital_element_name == "Orbital Rate") {
     return orbital_rate_;
   } else if (orbital_element_name == "Orbital Angular Acceleration") {
@@ -650,17 +629,17 @@ void Satellite::initialize_and_normalize_body_quaternion(
 // Return a specific attitude-related value
 double Satellite::get_attitude_val(std::string input_attitude_val_name) {
   if (input_attitude_val_name == "Roll") {
-    return roll_angle_;
+    return roll_angle_ * (180.0 / M_PI); // Returns val in degrees
   } else if (input_attitude_val_name == "Pitch") {
-    return pitch_angle_;
+    return pitch_angle_ * (180.0 / M_PI); // Returns val in degrees
   } else if (input_attitude_val_name == "Yaw") {
-    return yaw_angle_;
+    return yaw_angle_ * (180.0 / M_PI); // Returns val in degrees
   } else if (input_attitude_val_name == "omega_x") {
-    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0);
+    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0) * (180.0 / M_PI); // Returns val in degrees/s
   } else if (input_attitude_val_name == "omega_y") {
-    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1);
+    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1) * (180.0 / M_PI); // Returns val in degrees/s
   } else if (input_attitude_val_name == "omega_z") {
-    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2);
+    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2) * (180.0 / M_PI); // Returns val in degrees/s
   } else if (input_attitude_val_name == "q_0") {
     return quaternion_satellite_bodyframe_wrt_LVLH_.at(0);
   } else if (input_attitude_val_name == "q_1") {
