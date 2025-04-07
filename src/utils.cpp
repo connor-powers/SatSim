@@ -280,14 +280,11 @@ std::array<double, 3> calculate_orbital_acceleration(
       double a5 = 1.904383 * pow(10, -8);
       double a6 = -7.189421 * pow(10, -11);
       double a7 = 1.060067 * pow(10, -13);
-      double fit_val =
-          ((((((a7 * altitude + a6) * altitude + a4) * altitude + a3) *
-             altitude) +
-            a2) *
-               altitude +
-           a1) *
-              altitude +
-          a0;
+      double fit_val = a0 + a1*altitude + a2*pow(altitude,2)
+                      + a3*pow(altitude,3) + a4*pow(altitude,4)
+                      + a5*pow(altitude,5) + a6*pow(altitude,6)
+                      + a7*pow(altitude,7); 
+
       rho = pow(10, fit_val);
     } else {
       double T = 900 + 2.5 * (input_F_10 - 70) + 1.5 * input_A_p;

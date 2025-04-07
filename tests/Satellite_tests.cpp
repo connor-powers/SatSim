@@ -306,9 +306,9 @@ TEST(EllipticalOrbitTests, DragTest2) {
   double test_timestep = 0.01;  // s
   bool perturbation_bool = true;
   double total_sim_time = 10; // s
-  double current_time = test_satellite_nodrag.get_instantaneous_time();
+  double current_time_nodrag = test_satellite_nodrag.get_instantaneous_time();
   double orbital_radius = 0;
-  while (current_time < total_sim_time) {
+  while (current_time_nodrag < total_sim_time) {
   std::pair<double, int> new_timestep_and_error_code =
       test_satellite_nodrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
         false);
@@ -317,26 +317,27 @@ TEST(EllipticalOrbitTests, DragTest2) {
       double next_timestep = new_timestep_and_error_code.first;
       test_timestep = next_timestep;
       int error_code = new_timestep_and_error_code.second;
-      current_time = test_satellite_nodrag.get_instantaneous_time();
+      current_time_nodrag = test_satellite_nodrag.get_instantaneous_time();
   }
   double no_drag_semimajor_axis = test_satellite_nodrag.get_orbital_parameter("Semimajor Axis");
 
-  current_time = test_satellite_withdrag.get_instantaneous_time();
+  double current_time_withdrag = test_satellite_withdrag.get_instantaneous_time();
 
-  while (current_time < total_sim_time) {
+  while (current_time_withdrag < total_sim_time) {
   std::pair<double, int> new_timestep_and_error_code =
   test_satellite_withdrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
         true,drag_elements);
       double next_timestep = new_timestep_and_error_code.first;
       test_timestep = next_timestep;
       int error_code = new_timestep_and_error_code.second;
-      current_time = test_satellite_withdrag.get_instantaneous_time();
+      current_time_withdrag = test_satellite_withdrag.get_instantaneous_time();
   }
   double with_drag_semimajor_axis = test_satellite_withdrag.get_orbital_parameter("Semimajor Axis");
 
   EXPECT_TRUE(no_drag_semimajor_axis > with_drag_semimajor_axis)
       << "Semimajor axis after evolution wasn't lower when drag was introduced. "
-      "This isn't expected behavior. Difference: " << no_drag_semimajor_axis - with_drag_semimajor_axis << "\n";
+      "This isn't expected behavior. Difference: " << no_drag_semimajor_axis - with_drag_semimajor_axis << "\n"
+      " After-loop time without drag: " << current_time_nodrag << " and with drag: " << current_time_withdrag << "\n";
 }
 
 
