@@ -145,9 +145,6 @@ class Satellite {
   double drag_surface_area = {0};  // Surface area of satellite used for
   // atmospheric drag calculations
 
-  std::pair<double, double> calculate_eccentric_anomaly(
-      const double input_eccentricity, const double input_true_anomaly,
-      const double input_semimajor_axis);
   void initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame();
 
  public:
@@ -242,6 +239,8 @@ class Satellite {
     if (input_data.find("Initial omega_x") != input_data.end()) {
       double initial_omega_x_wrt_LVLH_in_body_frame =
           input_data.at("Initial omega_x");
+      // convert to radians/s
+      initial_omega_x_wrt_LVLH_in_body_frame *= (M_PI / 180.0);
       body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0) +=
           initial_omega_x_wrt_LVLH_in_body_frame;
     }
@@ -249,6 +248,8 @@ class Satellite {
     if (input_data.find("Initial omega_y") != input_data.end()) {
       double initial_omega_y_wrt_LVLH_in_body_frame =
           input_data.at("Initial omega_y");
+      // convert to radians/s
+      initial_omega_y_wrt_LVLH_in_body_frame *= (M_PI / 180.0);
       body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1) +=
           initial_omega_y_wrt_LVLH_in_body_frame;
     }
@@ -257,6 +258,8 @@ class Satellite {
     if (input_data.find("Initial omega_z") != input_data.end()) {
       double initial_omega_z_wrt_LVLH_in_body_frame =
           input_data.at("Initial omega_z");
+      // convert to radians/s
+      initial_omega_z_wrt_LVLH_in_body_frame *= (M_PI / 180.0);
       body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2) +=
           initial_omega_z_wrt_LVLH_in_body_frame;
     }
@@ -302,7 +305,7 @@ class Satellite {
 
   double get_instantaneous_time() { return t_; }
   std::string get_name() { return name_; }
-  void evolve_RK4(const double input_timestep);
+  // void evolve_RK4(const double input_timestep);
 
   std::array<double, 3> body_frame_to_ECI(
       const std::array<double, 3> input_vector);
@@ -346,7 +349,7 @@ class Satellite {
       const bool perturbation = true, const bool atmospheric_drag = false,
       std::pair<double, double> drag_elements = {});
 
-  double get_orbital_element(const std::string orbital_element_name);
+  double get_orbital_parameter(const std::string orbital_parameter_name);
   double calculate_instantaneous_orbit_rate();
   double calculate_instantaneous_orbit_angular_acceleration();
   void initialize_and_normalize_body_quaternion(const double roll_angle,

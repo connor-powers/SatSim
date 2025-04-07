@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "--coverage -g -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "--coverage -g -O0")
+IF(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE RELEASE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 include_directories(include)
 
 project(orbital_sim)
@@ -23,13 +28,9 @@ FetchContent_MakeAvailable(json googletest Eigen)
 
 
 add_executable(run simulation_setup.cpp src/utils.cpp src/Satellite.cpp)
-add_executable(circular_orbit_tests tests/circular_orbit_tests.cpp src/Satellite.cpp src/utils.cpp)
-add_executable(elliptical_orbit_tests tests/elliptical_orbit_tests.cpp src/Satellite.cpp src/utils.cpp)
-add_executable(attitude_tests tests/attitude_tests.cpp src/Satellite.cpp src/utils.cpp)
-add_executable(misc_tests tests/misc_tests.cpp src/Satellite.cpp src/utils.cpp)
+add_executable(Satellite_tests tests/Satellite_tests.cpp src/Satellite.cpp src/utils.cpp)
+add_executable(utils_tests tests/utils_tests.cpp src/Satellite.cpp src/utils.cpp)
 
 target_link_libraries(run PRIVATE nlohmann_json::nlohmann_json Eigen3::Eigen)
-target_link_libraries(circular_orbit_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)
-target_link_libraries(elliptical_orbit_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)
-target_link_libraries(attitude_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)
-target_link_libraries(misc_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)
+target_link_libraries(Satellite_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)
+target_link_libraries(utils_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)

@@ -21,25 +21,6 @@ double Satellite::calculate_orbital_period() {
   return T;
 }
 
-// Objective: given an orbit's eccentricity, true anomaly, and semimajor axis,
-// compute its eccentric anomaly
-std::pair<double, double> Satellite::calculate_eccentric_anomaly(
-    const double input_eccentricity, const double input_true_anomaly,
-    const double input_semimajor_axis) {
-  // https://en.wikipedia.org/wiki/Eccentric_anomaly
-  double numerator =
-      std::sqrt(1 - pow(input_eccentricity, 2)) * sin(input_true_anomaly);
-  double denominator = input_eccentricity + cos(input_true_anomaly);
-  double eccentric_anomaly = atan2(numerator, denominator);
-
-  std::pair<double, double> output_pair;
-  output_pair.first = eccentric_anomaly;
-  double computed_distance_from_Earth =
-      input_semimajor_axis * (1 - input_eccentricity * cos(eccentric_anomaly));
-  output_pair.second = computed_distance_from_Earth;
-  return output_pair;
-}
-
 // Objective: calculate the perifocal position of the satellite
 std::array<double, 3> Satellite::calculate_perifocal_position() {
   // Using approach from Fundamentals of Astrodynamics
@@ -180,83 +161,83 @@ std::array<double, 3> Satellite::convert_ECI_to_perifocal(
 
 // Objective: evolve position and velocity (combined into one vector) one
 // timestep via RK4 method
-void Satellite::evolve_RK4(const double input_step_size) {
-  // format input position and velocity arrays into single array for RK4 step
-  std::array<double, 6> combined_initial_position_and_velocity_array = {};
-  std::pair<std::array<double, 3>, std::array<double, 3>>
-      output_position_velocity_pair = {};
+// void Satellite::evolve_RK4(const double input_step_size) {
+//   // format input position and velocity arrays into single array for RK4 step
+//   std::array<double, 6> combined_initial_position_and_velocity_array = {};
+//   std::pair<std::array<double, 3>, std::array<double, 3>>
+//       output_position_velocity_pair = {};
 
-  for (size_t ind = 0; ind < 3; ind++) {
-    combined_initial_position_and_velocity_array.at(ind) =
-        ECI_position_.at(ind);
-  }
-  for (size_t ind = 3; ind < 6; ind++) {
-    combined_initial_position_and_velocity_array.at(ind) =
-        ECI_velocity_.at(ind - 3);
-  }
+//   for (size_t ind = 0; ind < 3; ind++) {
+//     combined_initial_position_and_velocity_array.at(ind) =
+//         ECI_position_.at(ind);
+//   }
+//   for (size_t ind = 3; ind < 6; ind++) {
+//     combined_initial_position_and_velocity_array.at(ind) =
+//         ECI_velocity_.at(ind - 3);
+//   }
 
-  // populate list of thrust forces at half a timestep past, for RK4
-  // calculations
-  std::vector<std::array<double, 3>> list_of_LVLH_forces_at_half_timestep_past =
-      {};
-  std::vector<std::array<double, 3>> list_of_ECI_forces_at_half_timestep_past =
-      {};
+//   // populate list of thrust forces at half a timestep past, for RK4
+//   // calculations
+//   std::vector<std::array<double, 3>> list_of_LVLH_forces_at_half_timestep_past =
+//       {};
+//   std::vector<std::array<double, 3>> list_of_ECI_forces_at_half_timestep_past =
+//       {};
 
-  for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
-    if (((t_ + (input_step_size / 2.0)) >= thrust_profile.t_start_) &&
-        ((t_ + (input_step_size / 2.0)) <= thrust_profile.t_end_)) {
-      list_of_LVLH_forces_at_half_timestep_past.push_back(
-          thrust_profile.LVLH_force_vec_);
-      std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
-          thrust_profile.LVLH_force_vec_, ECI_position_, ECI_velocity_);
-      list_of_ECI_forces_at_half_timestep_past.push_back(ECI_thrust_vector);
-    }
-  }
+//   for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
+//     if (((t_ + (input_step_size / 2.0)) >= thrust_profile.t_start_) &&
+//         ((t_ + (input_step_size / 2.0)) <= thrust_profile.t_end_)) {
+//       list_of_LVLH_forces_at_half_timestep_past.push_back(
+//           thrust_profile.LVLH_force_vec_);
+//       std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
+//           thrust_profile.LVLH_force_vec_, ECI_position_, ECI_velocity_);
+//       list_of_ECI_forces_at_half_timestep_past.push_back(ECI_thrust_vector);
+//     }
+//   }
 
-  // populate list of thrust forces at a timestep past, for RK4 calculations
-  std::vector<std::array<double, 3>> list_of_LVLH_forces_at_one_timestep_past =
-      {};
-  std::vector<std::array<double, 3>> list_of_ECI_forces_at_one_timestep_past =
-      {};
+//   // populate list of thrust forces at a timestep past, for RK4 calculations
+//   std::vector<std::array<double, 3>> list_of_LVLH_forces_at_one_timestep_past =
+//       {};
+//   std::vector<std::array<double, 3>> list_of_ECI_forces_at_one_timestep_past =
+//       {};
 
-  for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
-    if (((t_ + input_step_size) >= thrust_profile.t_start_) &&
-        ((t_ + input_step_size) <= thrust_profile.t_end_)) {
-      list_of_LVLH_forces_at_one_timestep_past.push_back(
-          thrust_profile.LVLH_force_vec_);
-      std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
-          thrust_profile.LVLH_force_vec_, ECI_position_, ECI_velocity_);
-      list_of_ECI_forces_at_one_timestep_past.push_back(ECI_thrust_vector);
-    }
-  }
+//   for (const ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
+//     if (((t_ + input_step_size) >= thrust_profile.t_start_) &&
+//         ((t_ + input_step_size) <= thrust_profile.t_end_)) {
+//       list_of_LVLH_forces_at_one_timestep_past.push_back(
+//           thrust_profile.LVLH_force_vec_);
+//       std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
+//           thrust_profile.LVLH_force_vec_, ECI_position_, ECI_velocity_);
+//       list_of_ECI_forces_at_one_timestep_past.push_back(ECI_thrust_vector);
+//     }
+//   }
 
-  std::array<double, 6> output_combined_position_and_velocity_array =
-      RK4_step<6>(combined_initial_position_and_velocity_array, input_step_size,
-                  RK4_deriv_function_orbit_position_and_velocity, m_,
-                  list_of_ECI_forces_at_this_time_,
-                  list_of_ECI_forces_at_half_timestep_past,
-                  list_of_ECI_forces_at_one_timestep_past);
-  // std::array<double,6> output_combined_angular_array=
-  // RK4_step<6>(combined_initial_angular_array,input_step_size,RK4_deriv_function_angular,I_,list_of_body_frame_torques_at_this_time_,list_of_body_frame_torques_at_half_timestep_past,list_of_body_frame_torques_at_one_timestep_past);
+//   std::array<double, 6> output_combined_position_and_velocity_array =
+//       RK4_step<6>(combined_initial_position_and_velocity_array, input_step_size,
+//                   RK4_deriv_function_orbit_position_and_velocity, m_,
+//                   list_of_ECI_forces_at_this_time_,
+//                   list_of_ECI_forces_at_half_timestep_past,
+//                   list_of_ECI_forces_at_one_timestep_past);
+//   // std::array<double,6> output_combined_angular_array=
+//   // RK4_step<6>(combined_initial_angular_array,input_step_size,RK4_deriv_function_angular,I_,list_of_body_frame_torques_at_this_time_,list_of_body_frame_torques_at_half_timestep_past,list_of_body_frame_torques_at_one_timestep_past);
 
-  for (size_t ind = 0; ind < 3; ind++) {
-    ECI_position_.at(ind) = output_combined_position_and_velocity_array.at(ind);
-    ECI_velocity_.at(ind) =
-        output_combined_position_and_velocity_array.at(ind + 3);
-    // also update the perifocal versions
-    perifocal_position_ = convert_ECI_to_perifocal(ECI_position_);
-    perifocal_velocity_ = convert_ECI_to_perifocal(ECI_velocity_);
-  }
-  t_ += input_step_size;
+//   for (size_t ind = 0; ind < 3; ind++) {
+//     ECI_position_.at(ind) = output_combined_position_and_velocity_array.at(ind);
+//     ECI_velocity_.at(ind) =
+//         output_combined_position_and_velocity_array.at(ind + 3);
+//     // also update the perifocal versions
+//     perifocal_position_ = convert_ECI_to_perifocal(ECI_position_);
+//     perifocal_velocity_ = convert_ECI_to_perifocal(ECI_velocity_);
+//   }
+//   t_ += input_step_size;
 
-  list_of_LVLH_forces_at_this_time_ = list_of_LVLH_forces_at_one_timestep_past;
-  list_of_ECI_forces_at_this_time_ = list_of_ECI_forces_at_one_timestep_past;
+//   list_of_LVLH_forces_at_this_time_ = list_of_LVLH_forces_at_one_timestep_past;
+//   list_of_ECI_forces_at_this_time_ = list_of_ECI_forces_at_one_timestep_past;
 
-  // Update orbital parameters
-  update_orbital_elements_from_position_and_velocity();
+//   // Update orbital parameters
+//   update_orbital_elements_from_position_and_velocity();
 
-  return;
-}
+//   return;
+// }
 
 // Objective: add a LVLH frame thrust profile to the satellite
 void Satellite::add_LVLH_thrust_profile(
@@ -335,13 +316,6 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
   if (n_vector(1) < 0) {
     calculated_RAAN = 2 * M_PI - calculated_RAAN;
   }
-  if (std::isnan(calculated_RAAN)) {
-    std::cout
-        << "Calculated RAAN was undefined. One possible cause of this is an "
-           "orbit with zero inclination. Current magnitude of line of nodes: "
-        << n << "\n";
-    error_code = 1;
-  }
 
   // Need to treat the e \approx 0 case (circular orbits) specially
   double calculated_arg_of_periapsis;
@@ -359,13 +333,6 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
       calculated_true_anomaly = 2 * M_PI - calculated_true_anomaly;
     }
 
-    if (std::isnan(calculated_arg_of_periapsis)) {
-      std::cout << "Calculated argument of periapsis was undefined. One "
-                   "possible cause of this is an orbit with zero inclination. "
-                   "Current magnitude of line of nodes: "
-                << n << "\n";
-      error_code = 1;
-    }
   } else {
     // Approximately circular orbits
     // For this case, I'll set the true anomaly to be the argument of latitude
@@ -377,13 +344,6 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
 
     double calculated_arg_of_latitude =
         acos(n_vector.dot(position_vector) / (n * r_magnitude));
-    if (std::isnan(calculated_arg_of_latitude)) {
-      std::cout << "Calculated argument of latitude was undefined. One "
-                   "possible cause of this is an orbit with zero inclination. "
-                   "Current magnitude of line of nodes: "
-                << n << "\n";
-      error_code = 1;
-    }
     if (position_vector(2) < 0) {
       calculated_arg_of_latitude = (2 * M_PI - calculated_arg_of_latitude);
     }
@@ -538,7 +498,11 @@ std::pair<double, int> Satellite::evolve_RK45(
   orbital_angular_acceleration_ =
       calculate_instantaneous_orbit_angular_acceleration();
   std::pair<double, int> evolve_RK45_output_pair;
-
+  // Orbital radius shouldn't be less than or equal to Earth's radius
+  double new_orbital_radius = get_radius();
+  if (new_orbital_radius <= radius_Earth){
+    orbit_elems_error_code = 2;
+  }
   evolve_RK45_output_pair.first = new_step_size;
   evolve_RK45_output_pair.second = orbit_elems_error_code;
 
@@ -546,28 +510,27 @@ std::pair<double, int> Satellite::evolve_RK45(
 }
 
 // Returns a specific orbital element
-double Satellite::get_orbital_element(const std::string orbital_element_name) {
-  if (orbital_element_name == "Semimajor Axis") {
+double Satellite::get_orbital_parameter(const std::string orbital_parameter_name) {
+  if (orbital_parameter_name == "Semimajor Axis") {
     return a_;
-  } else if (orbital_element_name == "Eccentricity") {
+  } else if (orbital_parameter_name == "Eccentricity") {
     return eccentricity_;
-  } else if (orbital_element_name == "Inclination") {
-    return inclination_;
-  } else if (orbital_element_name == "RAAN") {
-    return raan_;
-  } else if (orbital_element_name == "Argument of Periapsis") {
-    return arg_of_periapsis_;
-  } else if (orbital_element_name == "True Anomaly") {
-    return true_anomaly_;
-  } else if (orbital_element_name == "Orbital Rate") {
+  } else if (orbital_parameter_name == "Inclination") {
+    return inclination_*(180/M_PI); // Returns val in degrees
+  } else if (orbital_parameter_name == "RAAN") {
+    return raan_ * (180.0 / M_PI); // Returns val in degrees
+  } else if (orbital_parameter_name == "Argument of Periapsis") {
+    return arg_of_periapsis_ * (180.0 / M_PI); // Returns val in degrees
+  } else if (orbital_parameter_name == "True Anomaly") {
+    return true_anomaly_ * (180.0 / M_PI); // Returns val in degrees
+  } else if (orbital_parameter_name == "Orbital Rate") {
     return orbital_rate_;
-  } else if (orbital_element_name == "Orbital Angular Acceleration") {
+  } else if (orbital_parameter_name == "Orbital Angular Acceleration") {
     return orbital_angular_acceleration_;
-  } else if (orbital_element_name == "Total Energy") {
+  } else if (orbital_parameter_name == "Total Energy") {
     return get_total_energy();
   } else {
-    std::cout << "Unrecognized argument, returning -1";
-    return -1;
+    throw std::invalid_argument("Value name not recognized");
   }
 }
 
@@ -665,17 +628,17 @@ void Satellite::initialize_and_normalize_body_quaternion(
 // Return a specific attitude-related value
 double Satellite::get_attitude_val(std::string input_attitude_val_name) {
   if (input_attitude_val_name == "Roll") {
-    return roll_angle_;
+    return roll_angle_ * (180.0 / M_PI); // Returns val in degrees
   } else if (input_attitude_val_name == "Pitch") {
-    return pitch_angle_;
+    return pitch_angle_ * (180.0 / M_PI); // Returns val in degrees
   } else if (input_attitude_val_name == "Yaw") {
-    return yaw_angle_;
+    return yaw_angle_ * (180.0 / M_PI); // Returns val in degrees
   } else if (input_attitude_val_name == "omega_x") {
-    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0);
+    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(0) * (180.0 / M_PI); // Returns val in degrees/s
   } else if (input_attitude_val_name == "omega_y") {
-    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1);
+    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(1) * (180.0 / M_PI); // Returns val in degrees/s
   } else if (input_attitude_val_name == "omega_z") {
-    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2);
+    return body_angular_velocity_vec_wrt_LVLH_in_body_frame_.at(2) * (180.0 / M_PI); // Returns val in degrees/s
   } else if (input_attitude_val_name == "q_0") {
     return quaternion_satellite_bodyframe_wrt_LVLH_.at(0);
   } else if (input_attitude_val_name == "q_1") {
@@ -685,9 +648,7 @@ double Satellite::get_attitude_val(std::string input_attitude_val_name) {
   } else if (input_attitude_val_name == "q_3") {
     return quaternion_satellite_bodyframe_wrt_LVLH_.at(3);
   } else {
-    std::cout << "Invalid attitude val choice " << input_attitude_val_name
-              << ", returning -1\n";
-    return -1.0;
+    throw std::invalid_argument("Value name not recognized");
   }
 }
 
