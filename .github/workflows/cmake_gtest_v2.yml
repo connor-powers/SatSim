@@ -25,4 +25,4 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         ls
-        ./test_coverage
+        ./test_coverage.sh
