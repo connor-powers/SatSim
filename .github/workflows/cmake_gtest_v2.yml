@@ -23,7 +23,7 @@ jobs:
     
     - name: Install gnuplot
       run: | 
-        sudo apt-get gnuplot
+        sudo apt-get install gnuplot
     
     - name: Run test suites and generate code coverage report
       working-directory: ${{github.workspace}}
