@@ -23,6 +23,6 @@ jobs:
     
     - name: Run test suites and generate code coverage report
       working-directory: ${{github.workspace}}
-      run: ls
-      run: ./test_coverage
-
+      run: |
+        ls
+        ./test_coverage
