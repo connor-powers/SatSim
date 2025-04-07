@@ -244,18 +244,17 @@ TEST(UtilsTests, AttitudeElementPlottingTests) {
     double F_10 = 100;  // Solar radio ten centimeter flux
     double A_p = 120;   // Geomagnetic A_p index
 
-    const bool keep_plot_open = false; // To make resulting 3D plot quickly close after being created,
-    // instead of being open until the plot is manually closed by the user (default behavior)
-
+    const std::string plotting_term = "png"; // qt terminal opens window, probably not suited to running on a remote Github actions runner
+    const std::string output_file_name = "test_plot";
     // Collect drag parameters into a tuple with F_10 first and A_p second
     std::pair<double, double> drag_elements = {F_10, A_p};
     for (std::vector<Satellite> satellite_vector : satellite_vector_vector){
         sim_and_draw_orbit_gnuplot(satellite_vector, timestep, total_sim_time,
-            epsilon,false,false,drag_elements,keep_plot_open);
+            epsilon,false,false,drag_elements,plotting_term,output_file_name);
         sim_and_draw_orbit_gnuplot(satellite_vector, timestep, total_sim_time,
-                    epsilon,true,false,drag_elements,keep_plot_open);
+                    epsilon,true,false,drag_elements,plotting_term,output_file_name);
         sim_and_draw_orbit_gnuplot(satellite_vector, timestep, total_sim_time,
-                        epsilon,true,true,drag_elements,keep_plot_open);
+                        epsilon,true,true,drag_elements,plotting_term,output_file_name);
     }
 
   }

@@ -387,7 +387,8 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
                                 const bool perturbation,
                                 const bool atmospheric_drag,
                                 const std::pair<double, double> drag_elements,
-                                const bool keep_plot_open) {
+                                const std::string input_terminal,
+                                const std::string output_file_name) {
   if (input_satellite_vector.size() < 1) {
     std::cout << "No input Satellite objects\n";
     return;
@@ -395,14 +396,17 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
 
   // first, open "pipe" to gnuplot
   std::string gnuplot_arg_string = "gnuplot";
-  if (keep_plot_open){
+  if (input_terminal == "qt"){
     gnuplot_arg_string += " -persist";
   }
   FILE *gnuplot_pipe = popen(gnuplot_arg_string.c_str(), "w");
 
   // if it exists
   if (gnuplot_pipe) {
-    fprintf(gnuplot_pipe, "set terminal qt size 900,700 font ',14'\n");
+    fprintf(gnuplot_pipe, "set terminal '%s' size 900,700 font ',14'\n",input_terminal.c_str());
+    if (input_terminal == "png") {
+      fprintf(gnuplot_pipe, "set output '../%s.png'\n",output_file_name.c_str());
+    }
     // formatting
     fprintf(gnuplot_pipe, "set xlabel 'x [m]' offset 0,-2\n");
     fprintf(gnuplot_pipe, "set ylabel 'y [m]' offset -2,0\n");
@@ -523,7 +527,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
       }
       fprintf(gnuplot_pipe, "e\n");
     }
-    if (keep_plot_open){
+    if (input_terminal == "qt"){
       fprintf(gnuplot_pipe, "pause mouse keypress\n");
     }
     fprintf(gnuplot_pipe, "exit \n");

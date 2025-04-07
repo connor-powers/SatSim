@@ -101,7 +101,8 @@ void sim_and_draw_orbit_gnuplot(
     const double input_total_sim_time, const double input_epsilon,
     const bool perturbation = true, const bool atmospheric_drag = false,
     const std::pair<double, double> drag_elements = {},
-    const bool keep_plot_open = true);
+    const std::string input_terminal = "qt", //Currently, "qt" and "png" are supported
+    const std::string output_file_name = "output");
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
