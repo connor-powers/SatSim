@@ -23,13 +23,7 @@ jobs:
     
     - name: Install gnuplot
       run: | 
-        sudo apt build-dep gnuplot
-        git clone https://git.code.sf.net/p/gnuplot/gnuplot-main gnuplot-gnuplot-main
-        cd gnuplot-gnuplot-main
-        ./configure
-        make
-        make check
-        make install
+        sudo apt-get gnuplot
     
     - name: Run test suites and generate code coverage report
       working-directory: ${{github.workspace}}
