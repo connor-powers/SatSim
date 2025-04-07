@@ -14,20 +14,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
 
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build
-
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build 
-
-    - name: Satellite tests
-      working-directory: ${{github.workspace}}/build
-
-      run: ./Satellite_tests
-
-    - name: Utils tests
-      working-directory: ${{github.workspace}}/build
-
-      run: ./utils_tests
+    - name: Install gcovr
+      run: pip install gcovr
+    
+    - name: Install gnuplot
+      run: sudo apt-get install gnuplot
+        
+    - name: Run test suites and generate code coverage report
+      working-directory: ${{github.workspace}}
+      run: |
+        rm -rf build
+        mkdir build
+        cd build/
+        cmake .. -DCMAKE_BUILD_TYPE=DEBUG
+        cmake --build .
+        ./Satellite_tests
+        ./utils_tests
+        gcovr -r .. --filter ../src/ --filter ../include/ --json-summary ../test_coverage_summary_actions_generated.json
+        cd ..
+        rm test_plot.png
+    - uses: actions/upload-artifact@v4
+      with:
+        name: test_coverage_artifact
+        path: ${{github.workspace}}/test_coverage_summary_actions_generated.json
 
