@@ -52,7 +52,7 @@ Note: this tool requires gnuplot to be installed.
        - e.g., sim_and_draw_orbit_gnuplot for a 3D visualization of the orbit(s)
        - Make sure all satellites you want to simulate are contained in the vector passed into the simulation+plotting function call(s)
 3. Re-run `cmake --build .` in the build directory to build the updated executables
-4. Run `./run`
+4. Run `./run`in the build directory
 
 Note: You can click and drag the resulting 3D plot to adjust camera angle as desired.
 
