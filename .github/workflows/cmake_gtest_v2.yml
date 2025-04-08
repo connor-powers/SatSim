@@ -1,5 +1,5 @@
 
-name: Build and run simple unit test(s) on pull request v2
+name: Build and run tests on pull request v2
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ jobs:
     - name: Install gnuplot
       run: sudo apt-get install gnuplot
         
-    - name: Run test suites and generate code coverage report
+    - name: Run test suites
       working-directory: ${{github.workspace}}
       run: |
         rm -rf build
