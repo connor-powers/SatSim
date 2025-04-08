@@ -5,14 +5,14 @@
 #include "Satellite.h"
 #include "utils.h"
 
-const double tolerance = pow(10.0, -7);
+const double tolerance = pow(10.0, -10);
 // Setting a different tolerance for semimajor axis and orbital radius than the other orbital
 // parameters since there appears to be a minimum error associated with
 // converting position and velocity to semimajor axis, best guess is this has to
 // do with the scale of distances and/or velocities being dealt with here
-const double length_tolerance = pow(10.0, -6);
+const double length_tolerance = pow(10.0, -10);
 const double epsilon = pow(10.0, -12);
-const double energy_cons_relative_tolerance = pow(10.0, -5);
+const double energy_cons_relative_tolerance = pow(10.0, -10);
 
 // Elliptical orbit tests
 

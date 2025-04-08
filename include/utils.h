@@ -155,8 +155,7 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
     std::array<double, T> k_vec_at_this_s;
     for (size_t s_ind = 0; s_ind < k_ind; s_ind++) {
       for (size_t y_val_ind = 0; y_val_ind < y_n.size(); y_val_ind++) {
-        y_n_evaluated_value.at(y_val_ind) += input_step_size *
-                                             RK_matrix(k_ind, s_ind) *
+        y_n_evaluated_value.at(y_val_ind) += RK_matrix(k_ind, s_ind) *
                                              k_vec_vec.at(s_ind).at(y_val_ind);
       }
     }
