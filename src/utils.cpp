@@ -530,6 +530,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
     }
     fprintf(gnuplot_pipe, "exit \n");
     pclose(gnuplot_pipe);
+    std::cout << "Done\n";
 
   } else {
     std::cout << "gnuplot not found";
@@ -681,6 +682,7 @@ void sim_and_plot_orbital_elem_gnuplot(
 
     fprintf(gnuplot_pipe, "exit \n");
     pclose(gnuplot_pipe);
+    std::cout << "Done\n";
 
   } else {
     std::cout << "gnuplot not found";
@@ -858,6 +860,8 @@ void sim_and_plot_attitude_evolution_gnuplot(
 
     fprintf(gnuplot_pipe, "exit \n");
     pclose(gnuplot_pipe);
+    std::cout << "Done\n";
+
 
   } else {
     std::cout << "gnuplot not found";
