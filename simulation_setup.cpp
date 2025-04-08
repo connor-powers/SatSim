@@ -4,6 +4,9 @@
 #include "utils.h"
 
 int main() {
+  // This file demonstrates a few different ways you can run and
+  // visualize data from satellite simulations.
+
   // Initialize satellite object from an input JSON file
   Satellite test_sat_1("../input.json");
   // Define parameters for an LVLH frame thrust profile
@@ -31,8 +34,8 @@ int main() {
   double timestep = 2;
   double total_sim_time = 25000;
   double epsilon = pow(10, -12);
-  // sim_and_draw_orbit_gnuplot(satellite_vector_1, timestep, total_sim_time,
-  //                            epsilon);
+  sim_and_draw_orbit_gnuplot(satellite_vector_1, timestep, total_sim_time,
+                             epsilon);
 
   // Now some demonstrations of plotting orbital parameters
   Satellite test_sat_4("../input_4.json");
