@@ -489,6 +489,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
             "notitle with pm3d fillcolor rgbcolor 'navy'\n");
 
     // now the orbit data, inline, one satellite at a time
+    std::cout << "Running simulation...\n";
     for (size_t satellite_index = 0;
          satellite_index < input_satellite_vector.size(); satellite_index++) {
       Satellite current_satellite = input_satellite_vector.at(satellite_index);
@@ -636,6 +637,7 @@ void sim_and_plot_orbital_elem_gnuplot(
     }
 
     // now the orbit data, inline, one satellite at a time
+    std::cout << "Running simulation...\n";
     for (size_t satellite_index = 0;
          satellite_index < input_satellite_vector.size(); satellite_index++) {
       Satellite current_satellite = input_satellite_vector.at(satellite_index);
@@ -815,6 +817,7 @@ void sim_and_plot_attitude_evolution_gnuplot(
     }
 
     // now the orbit data, inline, one satellite at a time
+    std::cout << "Running simulation...\n";
     for (size_t satellite_index = 0;
          satellite_index < input_satellite_vector.size(); satellite_index++) {
       Satellite current_satellite = input_satellite_vector.at(satellite_index);
