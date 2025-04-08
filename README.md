@@ -1,6 +1,8 @@
 # Simulation of customizable satellites in Earth's orbit. 
+![CodeLineCoverage](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fconnor-powers%2FSatSim%2Frefs%2Fheads%2Fmain%2Ftests%2Ftest_coverage_summary.json&query=%24.line_percent&suffix=%25&label=Line%20Coverage&color=g)
 
-Features so far:
+
+## Current Features:
 
 - RK4(5) method for time evolution
 
@@ -22,15 +24,17 @@ Features so far:
 
 - Plotting of spacecraft attitude values (e.g., Tait-Bryan angles and angular velocities of spacecraft body frame) over time
 
+## TO DO
+- Automate code coverage badge updating via Github Actions
+- Change thrust profiles to be input in the satellite body-frame
+- Implement an energy-conserving solver
 
-# Build Instructions
+## Build Instructions
 Note: this tool requires gnuplot to be installed.
 
-1. Create empty "build" directory inside Satellite_Orbit_Sim directory
-2. Run "cmake .."
-3. Run "cmake --build ."
+1. From the project root directory: `./build.sh`
 
-# Example workflow
+## Example workflow
 1. Make an input json file for each satellite you'd like to simulate. All angles are entered as degrees. Currently, each satellite is defined by:
    -  Its 6 initial orbital parameters (semimajor axis, inclination, RAAN, argument of periapsis, eccentricity, and true anomaly)
        - Note: zero-inclination orbits are not currently supported.
@@ -47,12 +51,12 @@ Note: this tool requires gnuplot to be installed.
    - Calling the simulation+plotting functions you're interested in
        - e.g., sim_and_draw_orbit_gnuplot for a 3D visualization of the orbit(s)
        - Make sure all satellites you want to simulate are contained in the vector passed into the simulation+plotting function call(s)
-3. Re-run "cmake --build ." to build the updated executables
-4. Run the "run" executable in the build directory to simulate and visualize the satellite orbit(s)
+3. Re-run `cmake --build .` in the build directory to build the updated executables
+4. Run `./run`in the build directory
 
 Note: You can click and drag the resulting 3D plot to adjust camera angle as desired.
 
-# Misc
+## Notes
 Simulation of zero-inclination orbits isn't currently supported, as the magnitude of the line of nodes is currently used in the denominator of calculations updating orbital elements over the course of time evolution. The line of nodes has zero magnitude during zero-inclination orbits, causing NaNs in several calculations of orbital elements (specifically the RAAN, argument of periapsis, and argument of latitude). It's also not recommended to simulate orbits with eccentricities too close to 0, as eccentricity isn't exactly preserved (it's calculated numerically from orbital position and velocity), which can cause unexpected orbital behavior.
 
 Calculation of instantaneous orbital angular acceleration does not currently include any contribution from the time derivative of the magnitude of the orbital angular momentum vector.
