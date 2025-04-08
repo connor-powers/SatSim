@@ -510,7 +510,7 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
         double new_timestep = new_timestep_and_error_code.first;
         int error_code = new_timestep_and_error_code.second;
         if (error_code != 0) {
-          std::cout << "Error detected, halting visualization\n";
+          std::cout << "Error code " << error_code << " detected, halting visualization\n";
           fprintf(gnuplot_pipe, "e\n");
           fprintf(gnuplot_pipe, "exit \n");
           pclose(gnuplot_pipe);
@@ -658,7 +658,7 @@ void sim_and_plot_orbital_elem_gnuplot(
         int error_code = new_timestep_and_error_code.second;
 
         if (error_code != 0) {
-          std::cout << "Error detected, halting visualization\n";
+          std::cout << "Error code " << error_code << " detected, halting visualization\n";
           fprintf(gnuplot_pipe, "e\n");
           fprintf(gnuplot_pipe, "exit \n");
           pclose(gnuplot_pipe);
@@ -836,7 +836,7 @@ void sim_and_plot_attitude_evolution_gnuplot(
         int error_code = new_timestep_and_error_code.second;
 
         if (error_code != 0) {
-          std::cout << "Error detected, halting visualization\n";
+          std::cout << "Error code " << error_code << " detected, halting visualization\n";
           fprintf(gnuplot_pipe, "e\n");
           fprintf(gnuplot_pipe, "exit \n");
           pclose(gnuplot_pipe);
