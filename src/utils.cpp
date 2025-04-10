@@ -569,7 +569,7 @@ void sim_and_plot_orbital_elem_gnuplot(
       fprintf(gnuplot_pipe, "set ylabel '%s'\n",
               input_orbital_element_name.c_str());
     } else {
-      fprintf(gnuplot_pipe, "set ylabel '%s [rad]'\n",
+      fprintf(gnuplot_pipe, "set ylabel '%s [deg]'\n",
               input_orbital_element_name.c_str());
     }
     fprintf(gnuplot_pipe, "set title '%s simulated up to time %.2f s'\n",
@@ -742,12 +742,12 @@ void sim_and_plot_attitude_evolution_gnuplot(
     if ((input_plotted_val_name == "omega_x") ||
         (input_plotted_val_name == "omega_y") ||
         (input_plotted_val_name == "omega_z")) {
-      fprintf(gnuplot_pipe, "set ylabel '%s [rad/s]'\n",
+      fprintf(gnuplot_pipe, "set ylabel '%s [deg/s]'\n",
               input_plotted_val_name.c_str());
     } else if ((input_plotted_val_name == "Roll") ||
                (input_plotted_val_name == "Pitch") ||
                (input_plotted_val_name == "Yaw")) {
-      fprintf(gnuplot_pipe, "set ylabel '%s [rad]'\n",
+      fprintf(gnuplot_pipe, "set ylabel '%s [deg]'\n",
               input_plotted_val_name.c_str());
     } else {
       fprintf(gnuplot_pipe, "set ylabel '%s'\n",
