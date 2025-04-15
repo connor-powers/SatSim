@@ -6,7 +6,7 @@
 
 - RK4(5) method for time evolution
 
-- Simulation and plotting of multiple satellite objects simultaneously
+- Simulation and plotting of multiple satellite objects
   
 - Optionally includes calculation of accelerations due to J2 perturbation
 
