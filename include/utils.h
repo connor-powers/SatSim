@@ -454,4 +454,7 @@ std::array<double, 3> convert_array_from_LVLH_to_bodyframe(
     const std::array<double, 3> input_LVLH_frame_array, const double input_roll,
     const double input_yaw, const double input_pitch);
 
+
+std::array<double,3>  convert_lat_long_to_ECEF(double latitude, double longitude, double height);
+std::array<double,3>  convert_ECEF_to_ECI(std::array<double,3> input_ECEF_position);
 #endif

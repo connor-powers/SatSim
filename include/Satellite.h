@@ -81,6 +81,27 @@ class BodyframeTorqueProfile {
   }
 };
 
+class PA_ground_station {
+  // Phased array ground station class
+  public:
+    double latitude = {0};
+    double longitude = {0};
+    double height = {0};
+    std::array<double,3> ECEF_position_;
+    std::array<double,3> ECI_position_;
+    double max_angle_from_vertical_ = {0};
+    int num_beams_ = {0};
+
+    PA_ground_station(double latitude, double longitude, double height, int num_beams = 1) {
+      ECEF_position_ = convert_lat_long_to_ECEF(latitude, longitude, height);
+      num_beams_ = num_beams;
+    }
+
+    void update_ECI_position(double input_time) {
+      ECI_position_ = convert_ECEF_to_ECI(ECEF_position_, input_time);
+    }
+};
+
 class Satellite {
  private:
   double inclination_ = {0};

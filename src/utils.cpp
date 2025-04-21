@@ -1201,3 +1201,36 @@ std::array<double, 3> convert_array_from_LVLH_to_bodyframe(
                                          bodyframe_vec(2)};
   return bodyframe_arr;
 }
+
+
+
+std::array<double,3>  convert_lat_long_to_ECEF(double latitude, double longitude, double height) {
+  double a = 6378137; // Equatorial radius [m]
+  double b = 6356752; // Polar radius [m]
+
+  // Refs: https://en.wikipedia.org/wiki/Geographic_coordinate_conversion#From_geodetic_to_ECEF_coordinates
+  // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
+  double e = 1 - ((b * b)/(a * a));
+  double N = a / (sqrt(1 - ((e * e) / (1 + pow(cos(latitude)/sin(latitude),2)) )));
+  double x = (N + height)*cos(latitude)*cos(longitude);
+  double y = (N + height)*cos(latitude)*sin(longitude);
+  double z = ((1 - e * e)*N + height) * sin(latitude);
+  std::array<double,3> output_ECEF_array = {x,y,z};
+  return output_ECEF_array;
+}
+
+std::array<double,3>  convert_ECEF_to_ECI(std::array<double,3> input_ECEF_position, double input_time) {
+  // Simple rotation-based conversion, not yet accounting for higher-fidelity effects like changes to Earth axes
+  // Ref: https://x-lumin.com/wp-content/uploads/2020/09/Coordinate_Transforms.pdf
+  // https://space.stackexchange.com/questions/43187/is-this-commonly-attributed-eci-earth-centered-inertial-to-ecef-earth-centere
+  // https://space.stackexchange.com/questions/38807/transform-eci-to-ecef
+  double omega_Earth = 0.261799387799149 * (1/3600); // [radians / second]
+  double ERA_at_J200 = 280.46;
+  // Going to be assuming, for simplicity, that satellites start orbiting at the J200 epoch
+  double theta_g = ERA_at_J200 + omega_Earth*input_time;
+  std::array<double,3> ECI_array;
+  ECI_array.at(0) = cos(theta_g) * input_ECEF_position.at(0)  - sin(theta_g) * input_ECEF_position.at(1);
+  ECI_array.at(1) = sin(theta_g) * input_ECEF_position.at(0)  + cos(theta_g) * input_ECEF_position.at(1);
+  ECI_array.at(2) = input_ECEF_position.at(2);
+  return ECI_array;
+}
