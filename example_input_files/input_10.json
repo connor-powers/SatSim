@@ -1,0 +1,11 @@
+{
+  "Inclination": 22,
+  "RAAN": 1,
+  "Argument of Periapsis": 100,
+  "Eccentricity": 0.3,
+  "Semimajor Axis": 15000,
+  "True Anomaly": 20,
+  "Mass": 100,
+  "Name": "Satellite 4",
+  "Plotting Color": "black"
+}

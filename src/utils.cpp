@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "Satellite.h"
+#include "PhasedArrayGroundStation.h"
 
 using Eigen::Matrix3d;
 using Eigen::Matrix4d;
@@ -693,8 +694,9 @@ void sim_and_plot_orbital_elem_gnuplot(
 
 Matrix3d z_rot_matrix(const double input_angle) {
   Matrix3d z_rotation_matrix;
-  z_rotation_matrix << cos(input_angle), -sin(input_angle), 0, sin(input_angle),
-      cos(input_angle), 0, 0, 0, 1;
+  z_rotation_matrix << cos(input_angle), -sin(input_angle), 0, 
+  sin(input_angle),cos(input_angle), 0, 
+  0, 0, 1;
 
   return z_rotation_matrix;
 }
@@ -1200,4 +1202,364 @@ std::array<double, 3> convert_array_from_LVLH_to_bodyframe(
   std::array<double, 3> bodyframe_arr = {bodyframe_vec(0), bodyframe_vec(1),
                                          bodyframe_vec(2)};
   return bodyframe_arr;
+}
+
+
+
+Vector3d  convert_lat_long_to_ECEF(const double latitude, const double longitude, const double height) {
+  double a = 6378137; // Equatorial radius [m]
+  double b = 6356752; // Polar radius [m]
+
+  // Refs: https://en.wikipedia.org/wiki/Geographic_coordinate_conversion#From_geodetic_to_ECEF_coordinates
+  // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
+  double e = 1 - ((b * b)/(a * a));
+  double N = a / (sqrt(1 - ((e * e) / (1 + pow(cos(latitude)/sin(latitude),2)) )));
+  double x = (N + height)*cos(latitude)*cos(longitude);
+  double y = (N + height)*cos(latitude)*sin(longitude);
+  double z = ((1 - e * e)*N + height) * sin(latitude);
+  Vector3d output_ECEF_array = {x,y,z};
+  return output_ECEF_array;
+}
+
+Vector3d  convert_ECEF_to_ECI(const Vector3d input_ECEF_position, const double input_time) {
+  // Simple rotation-based conversion, not yet accounting for higher-fidelity effects like changes to Earth axes
+  // Ref: https://x-lumin.com/wp-content/uploads/2020/09/Coordinate_Transforms.pdf
+  // https://space.stackexchange.com/questions/43187/is-this-commonly-attributed-eci-earth-centered-inertial-to-ecef-earth-centere
+  // https://space.stackexchange.com/questions/38807/transform-eci-to-ecef
+  double omega_Earth = 0.261799387799149 * (1.0/3600.0); // [radians / second]
+  double ERA_at_J200 = 280.46 * (M_PI/180); //radians
+  // Going to be assuming, for simplicity, that satellites start orbiting at the J200 epoch
+  double theta_g = ERA_at_J200 + omega_Earth*input_time;
+  Matrix3d rotation_matrix = z_rot_matrix(theta_g);
+  Vector3d ECI_array = rotation_matrix*input_ECEF_position;
+  return ECI_array;
+}
+
+
+
+
+void sim_and_plot_gs_connectivity_distance_gnuplot(
+  PhasedArrayGroundStation input_ground_station,
+  std::vector<Satellite> input_satellite_vector, const double input_timestep,
+  const double input_total_sim_time, const double input_epsilon,
+  const std::string file_name = "output",
+  const bool perturbation = true, const bool atmospheric_drag = false,
+  const std::pair<double, double> drag_elements = {}) {
+
+  // Objective: given an input ground station and satellite vector,
+  // plot contact distances between ground station and satellites over time
+
+  if (input_satellite_vector.size() < 1) {
+    std::cout << "No input Satellite objects\n";
+    return;
+  }
+
+  // first, open "pipe" to gnuplot
+  FILE *gnuplot_pipe = popen("gnuplot", "w");
+  // if it exists
+  if (gnuplot_pipe) {
+    fprintf(gnuplot_pipe, "set terminal png size 800,500 font ',14' linewidth 2\n");
+    // formatting
+    fprintf(gnuplot_pipe, "set output '../%s.png'\n",file_name.c_str());
+    fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
+    fprintf(gnuplot_pipe, "set ylabel 'Distance [m]'\n");
+
+    fprintf(gnuplot_pipe, "set title 'Phased array ground station connectivity "
+      "with %d beams'\n",input_ground_station.num_beams_);
+    fprintf(gnuplot_pipe, "set key outside\n");
+    int x_max_plot_window = std::floor(input_total_sim_time*1.05);
+    fprintf(gnuplot_pipe, "set xrange[0:%d]\n",x_max_plot_window);
+    // plotting
+
+    // first satellite
+    Satellite current_satellite = input_satellite_vector.at(0);
+    if (input_satellite_vector.size() == 1) {
+      if (current_satellite.plotting_color_.size() > 0) {
+        fprintf(gnuplot_pipe,
+                "plot '-' using 1:2 with lines lw 1 lc rgb '%s' title '%s' \n",
+                current_satellite.plotting_color_.c_str(),
+                current_satellite.get_name().c_str());
+      } else {
+        fprintf(gnuplot_pipe,
+                "plot '-' using 1:2 with lines lw 1 title '%s' \n",
+                current_satellite.get_name().c_str());
+      }
+
+    }
+
+    else {
+      if (current_satellite.plotting_color_.size() > 0) {
+        fprintf(gnuplot_pipe,
+                "plot '-' using 1:2 with lines lw 1 lc rgb '%s' title '%s'\\\n",
+                current_satellite.plotting_color_.c_str(),
+                current_satellite.get_name().c_str());
+      } else {
+        fprintf(gnuplot_pipe,
+                "plot '-' using 1:2 with lines lw 1 title '%s'\\\n",
+                current_satellite.get_name().c_str());
+      }
+    }
+
+    for (size_t satellite_index = 1;
+         satellite_index < input_satellite_vector.size(); satellite_index++) {
+      current_satellite = input_satellite_vector.at(satellite_index);
+      if (satellite_index < input_satellite_vector.size() - 1) {
+        if (current_satellite.plotting_color_.size() > 0) {
+          fprintf(gnuplot_pipe,
+                  ",'-' using 1:2 with lines lw 1 lc rgb '%s' title '%s' \\\n",
+                  current_satellite.plotting_color_.c_str(),
+                  current_satellite.get_name().c_str());
+        } else {
+          fprintf(gnuplot_pipe,
+                  ",'-' using 1:2 with lines lw 1 title '%s' \\\n",
+                  current_satellite.get_name().c_str());
+        }
+
+      }
+
+      else {
+        if (current_satellite.plotting_color_.size() > 0) {
+          fprintf(gnuplot_pipe,
+                  ",'-' using 1:2 with lines lw 1 lc rgb '%s' title '%s'\n",
+                  current_satellite.plotting_color_.c_str(),
+                  current_satellite.get_name().c_str());
+        } else {
+          fprintf(gnuplot_pipe, ",'-' using 1:2 with lines lw 1 title '%s'\n",
+                  current_satellite.get_name().c_str());
+        }
+      }
+    }
+
+    // now the orbit data, inline, one satellite at a time
+    std::cout << "Running simulation...\n";
+    for (size_t satellite_index = 0;
+         satellite_index < input_satellite_vector.size(); satellite_index++) {
+      Satellite current_satellite = input_satellite_vector.at(satellite_index);
+      double current_satellite_time =
+          current_satellite.get_instantaneous_time();
+      double previous_time = current_satellite_time - 1;
+      double ground_station_beam_angle = input_ground_station.angle_to_satellite_from_normal(current_satellite);
+      double initial_distance;
+      if (ground_station_beam_angle > input_ground_station.max_beam_angle_from_normal_) {
+        fprintf(gnuplot_pipe, "%.17g NaN\n", current_satellite_time);
+      }
+      else {
+        initial_distance = input_ground_station.distance_to_satellite(current_satellite);
+        fprintf(gnuplot_pipe, "%.17g %.17g\n", current_satellite_time, initial_distance);
+      }
+      
+      double evolved_distance = {0};
+
+      double timestep_to_use = input_timestep;
+      current_satellite_time = current_satellite.get_instantaneous_time();
+      while (current_satellite_time < input_total_sim_time) {
+        std::pair<double, int> new_timestep_and_error_code =
+            current_satellite.evolve_RK45(input_epsilon, timestep_to_use,
+                                          perturbation, atmospheric_drag,
+                                          drag_elements);
+        double new_timestep = new_timestep_and_error_code.first;
+        int error_code = new_timestep_and_error_code.second;
+
+        if (error_code != 0) {
+          std::cout << "Error code " << error_code << " detected, halting visualization\n";
+          fprintf(gnuplot_pipe, "e\n");
+          fprintf(gnuplot_pipe, "exit \n");
+          pclose(gnuplot_pipe);
+          return;
+        }
+        timestep_to_use = new_timestep;
+        evolved_distance = input_ground_station.distance_to_satellite(current_satellite);
+        previous_time = current_satellite_time;
+        current_satellite_time = current_satellite.get_instantaneous_time();
+        ground_station_beam_angle = input_ground_station.angle_to_satellite_from_normal(current_satellite);
+        // Check number of existing connections to ground station at this point
+        int num_sats_at_this_time = input_ground_station.num_sats_connected_at_this_time(current_satellite_time);
+        if ( (ground_station_beam_angle > input_ground_station.max_beam_angle_from_normal_) || (num_sats_at_this_time == input_ground_station.num_beams_)) {
+          fprintf(gnuplot_pipe, "%.17g NaN\n", current_satellite_time);
+        }
+        else {
+          evolved_distance = input_ground_station.distance_to_satellite(current_satellite);
+          fprintf(gnuplot_pipe, "%.17g %.17g\n", current_satellite_time, evolved_distance);
+          input_ground_station.update_linked_sats_map(satellite_index, current_satellite_time, previous_time);        
+        }
+      }
+      fprintf(gnuplot_pipe, "e\n");
+    }
+    fprintf(gnuplot_pipe, "pause mouse keypress\n");
+
+    fprintf(gnuplot_pipe, "exit \n");
+    pclose(gnuplot_pipe);
+    std::cout << "Done\n";
+
+  } else {
+    std::cout << "gnuplot not found";
+  }
+
+  return;
+
+}
+
+void sim_and_plot_gs_connectivity_gnuplot(
+  PhasedArrayGroundStation input_ground_station,
+  std::vector<Satellite> input_satellite_vector, const double input_timestep,
+  const double input_total_sim_time, const double input_epsilon,
+  const std::string file_name = "output",
+  const bool perturbation = true, const bool atmospheric_drag = false,
+  const std::pair<double, double> drag_elements = {}) {
+
+  // Objective: given an input ground station and satellite vector,
+  // plot contact distances between ground station and satellites over time
+
+  if (input_satellite_vector.size() < 1) {
+    std::cout << "No input Satellite objects\n";
+    return;
+  }
+
+  // first, open "pipe" to gnuplot
+  FILE *gnuplot_pipe = popen("gnuplot", "w");
+  // if it exists
+  if (gnuplot_pipe) {
+    fprintf(gnuplot_pipe, "set terminal png size 800,500 font ',14' linewidth 2\n");
+    // formatting
+    fprintf(gnuplot_pipe, "set output '../%s.png'\n",file_name.c_str());
+    fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
+    fprintf(gnuplot_pipe, "set ylabel 'Satellite Index'\n");
+
+    fprintf(gnuplot_pipe, "set title 'Phased array ground station connectivity "
+      "with %d beams'\n",input_ground_station.num_beams_);
+    fprintf(gnuplot_pipe, "set key outside\n");
+    int x_max_plot_window = std::floor(input_total_sim_time*1.05);
+    fprintf(gnuplot_pipe, "set xrange[0:%d]\n",x_max_plot_window);
+    fprintf(gnuplot_pipe, "set yrange[-0.5:%lu]\n",input_satellite_vector.size());
+
+    // plotting
+
+    // first satellite
+    Satellite current_satellite = input_satellite_vector.at(0);
+    if (input_satellite_vector.size() == 1) {
+      if (current_satellite.plotting_color_.size() > 0) {
+        fprintf(gnuplot_pipe,
+                "plot '-' using 1:2 with lines lw 1 lc rgb '%s' title '%s' \n",
+                current_satellite.plotting_color_.c_str(),
+                current_satellite.get_name().c_str());
+      } else {
+        fprintf(gnuplot_pipe,
+                "plot '-' using 1:2 with lines lw 1 title '%s' \n",
+                current_satellite.get_name().c_str());
+      }
+
+    }
+
+    else {
+      if (current_satellite.plotting_color_.size() > 0) {
+        fprintf(gnuplot_pipe,
+                "plot '-' using 1:2 with lines lw 1 lc rgb '%s' title '%s'\\\n",
+                current_satellite.plotting_color_.c_str(),
+                current_satellite.get_name().c_str());
+      } else {
+        fprintf(gnuplot_pipe,
+                "plot '-' using 1:2 with lines lw 1 title '%s'\\\n",
+                current_satellite.get_name().c_str());
+      }
+    }
+
+    for (size_t satellite_index = 1;
+          satellite_index < input_satellite_vector.size(); satellite_index++) {
+      current_satellite = input_satellite_vector.at(satellite_index);
+      if (satellite_index < input_satellite_vector.size() - 1) {
+        if (current_satellite.plotting_color_.size() > 0) {
+          fprintf(gnuplot_pipe,
+                  ",'-' using 1:2 with lines lw 1 lc rgb '%s' title '%s' \\\n",
+                  current_satellite.plotting_color_.c_str(),
+                  current_satellite.get_name().c_str());
+        } else {
+          fprintf(gnuplot_pipe,
+                  ",'-' using 1:2 with lines lw 1 title '%s' \\\n",
+                  current_satellite.get_name().c_str());
+        }
+
+      }
+
+      else {
+        if (current_satellite.plotting_color_.size() > 0) {
+          fprintf(gnuplot_pipe,
+                  ",'-' using 1:2 with lines lw 1 lc rgb '%s' title '%s'\n",
+                  current_satellite.plotting_color_.c_str(),
+                  current_satellite.get_name().c_str());
+        } else {
+          fprintf(gnuplot_pipe, ",'-' using 1:2 with lines lw 1 title '%s'\n",
+                  current_satellite.get_name().c_str());
+        }
+      }
+    }
+
+    // now the orbit data, inline, one satellite at a time
+    std::cout << "Running simulation...\n";
+    for (size_t satellite_index = 0;
+          satellite_index < input_satellite_vector.size(); satellite_index++) {
+      Satellite current_satellite = input_satellite_vector.at(satellite_index);
+      double current_satellite_time =
+          current_satellite.get_instantaneous_time();
+      double previous_time = current_satellite_time - 1;
+      double ground_station_beam_angle = input_ground_station.angle_to_satellite_from_normal(current_satellite);
+
+      if (ground_station_beam_angle > input_ground_station.max_beam_angle_from_normal_) {
+        fprintf(gnuplot_pipe, "%.17g NaN\n", current_satellite_time);
+      }
+      else {
+        fprintf(gnuplot_pipe, "%.17g %lu\n", current_satellite_time, satellite_index);
+      }
+      
+      double timestep_to_use = input_timestep;
+      current_satellite_time = current_satellite.get_instantaneous_time();
+      while (current_satellite_time < input_total_sim_time) {
+        std::pair<double, int> new_timestep_and_error_code =
+            current_satellite.evolve_RK45(input_epsilon, timestep_to_use,
+                                          perturbation, atmospheric_drag,
+                                          drag_elements);
+        double new_timestep = new_timestep_and_error_code.first;
+        int error_code = new_timestep_and_error_code.second;
+
+        if (error_code != 0) {
+          std::cout << "Error code " << error_code << " detected, halting visualization\n";
+          fprintf(gnuplot_pipe, "e\n");
+          fprintf(gnuplot_pipe, "exit \n");
+          pclose(gnuplot_pipe);
+          return;
+        }
+        timestep_to_use = new_timestep;
+        previous_time = current_satellite_time;
+        current_satellite_time = current_satellite.get_instantaneous_time();
+        ground_station_beam_angle = input_ground_station.angle_to_satellite_from_normal(current_satellite);
+        // Check number of existing connections to ground station at this point
+        int num_sats_at_this_time = input_ground_station.num_sats_connected_at_this_time(current_satellite_time);
+        if ( (ground_station_beam_angle > input_ground_station.max_beam_angle_from_normal_) || (num_sats_at_this_time == input_ground_station.num_beams_)) {
+          fprintf(gnuplot_pipe, "%.17g NaN\n", current_satellite_time);
+        }
+        else {
+          fprintf(gnuplot_pipe, "%.17g %lu\n", current_satellite_time, satellite_index);
+          input_ground_station.update_linked_sats_map(satellite_index, current_satellite_time, previous_time);        
+        }
+      }
+      fprintf(gnuplot_pipe, "e\n");
+    }
+    // for (auto key_val_pair : input_ground_station.linked_sats_map_) {
+    //   std::cout << "==========================================\n";
+    //   std::cout << "Satellite index " << key_val_pair.first << "\n";
+    //   for (std::pair<double,double> range : key_val_pair.second) {
+    //     std::cout << "{" << range.first << "," << range.second << "}\n";
+    //   }
+    // }
+    fprintf(gnuplot_pipe, "pause mouse keypress\n");
+
+    fprintf(gnuplot_pipe, "exit \n");
+    pclose(gnuplot_pipe);
+    std::cout << "Done\n";
+
+  } else {
+    std::cout << "gnuplot not found";
+  }
+
+  return;
+
 }
