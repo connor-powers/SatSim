@@ -264,7 +264,7 @@ TEST(UtilsTests, GroundStationConnectivityDistancePlotTests) {
     // Going to have one satellite with two thrust profiles and two torque profiles (added in different ways),
     // one satellite with just two thrust profiles, one with just two torque profiles
     // and one with none
-    Satellite test_sat_both("../tests/elliptical_orbit_test_1.json");
+    Satellite test_sat_both("../tests/input_2.json");
     // Define parameters for an LVLH frame thrust profile
     std::array<double, 3> LVLH_thrust_direction = {1, 0, 0};
     double thrust_magnitude = 100;  // N
@@ -291,19 +291,19 @@ TEST(UtilsTests, GroundStationConnectivityDistancePlotTests) {
     std::array<double,3> another_torque_vec = {-0.00001,0.00002,0.00003};
     test_sat_both.add_bodyframe_torque_profile(another_torque_vec,t_torque_start,t_torque_end);
                                         
-    Satellite test_sat_thrust("../tests/elliptical_orbit_test_1.json");
+    Satellite test_sat_thrust("../tests/input_2.json");
     test_sat_thrust.add_LVLH_thrust_profile(LVLH_thrust_direction, thrust_magnitude,
         t_thrust_start, t_thrust_end);
     test_sat_thrust.add_LVLH_thrust_profile(LVLH_thrust_vec_2, t_thrust_2_start,
         t_thrust_2_end);
 
-    Satellite test_sat_torque("../tests/elliptical_orbit_test_4.json");
+    Satellite test_sat_torque("../tests/input_3.json");
     test_sat_torque.add_bodyframe_torque_profile(torque_direction, torque_magnitude,
         t_torque_start, t_torque_end);
     test_sat_torque.add_bodyframe_torque_profile(another_torque_vec,t_torque_start,t_torque_end);
 
-    Satellite test_sat_none_1("../tests/elliptical_orbit_test_1.json");
-    Satellite test_sat_none_2("../tests/elliptical_orbit_test_4.json");
+    Satellite test_sat_none_1("../tests/input_2.json");
+    Satellite test_sat_none_2("../tests/input_3.json");
 
     std::vector<Satellite> satellite_vector_1 = {test_sat_none_1,test_sat_none_2,test_sat_thrust,test_sat_torque,test_sat_both};
     std::vector<Satellite> satellite_vector_2 = {test_sat_none_1,test_sat_none_2,test_sat_thrust,test_sat_torque,test_sat_both,test_sat_none_2};
@@ -362,7 +362,7 @@ TEST(UtilsTests, GroundStationConnectivityPlotTests) {
     // Going to have one satellite with two thrust profiles and two torque profiles (added in different ways),
     // one satellite with just two thrust profiles, one with just two torque profiles
     // and one with none
-    Satellite test_sat_both("../tests/elliptical_orbit_test_1.json");
+    Satellite test_sat_both("../tests/input_2.json");
     // Define parameters for an LVLH frame thrust profile
     std::array<double, 3> LVLH_thrust_direction = {1, 0, 0};
     double thrust_magnitude = 100;  // N
@@ -389,19 +389,19 @@ TEST(UtilsTests, GroundStationConnectivityPlotTests) {
     std::array<double,3> another_torque_vec = {-0.00001,0.00002,0.00003};
     test_sat_both.add_bodyframe_torque_profile(another_torque_vec,t_torque_start,t_torque_end);
                                         
-    Satellite test_sat_thrust("../tests/elliptical_orbit_test_1.json");
+    Satellite test_sat_thrust("../tests/input_2.json");
     test_sat_thrust.add_LVLH_thrust_profile(LVLH_thrust_direction, thrust_magnitude,
         t_thrust_start, t_thrust_end);
     test_sat_thrust.add_LVLH_thrust_profile(LVLH_thrust_vec_2, t_thrust_2_start,
         t_thrust_2_end);
 
-    Satellite test_sat_torque("../tests/elliptical_orbit_test_4.json");
+    Satellite test_sat_torque("../tests/input_3.json");
     test_sat_torque.add_bodyframe_torque_profile(torque_direction, torque_magnitude,
         t_torque_start, t_torque_end);
     test_sat_torque.add_bodyframe_torque_profile(another_torque_vec,t_torque_start,t_torque_end);
 
-    Satellite test_sat_none_1("../tests/elliptical_orbit_test_1.json");
-    Satellite test_sat_none_2("../tests/elliptical_orbit_test_4.json");
+    Satellite test_sat_none_1("../tests/input_2.json");
+    Satellite test_sat_none_2("../tests/input_3.json");
 
     std::vector<Satellite> satellite_vector_1 = {test_sat_none_1,test_sat_none_2,test_sat_thrust,test_sat_torque,test_sat_both};
     std::vector<Satellite> satellite_vector_2 = {test_sat_none_1,test_sat_none_2,test_sat_thrust,test_sat_torque,test_sat_both,test_sat_none_2};
