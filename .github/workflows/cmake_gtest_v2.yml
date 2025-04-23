@@ -28,6 +28,7 @@ jobs:
         cmake --build .
         ./Satellite_tests
         ./utils_tests
+        ./gs_tests
         cd ..
         rm test_plot.png
 

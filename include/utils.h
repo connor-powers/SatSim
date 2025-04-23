@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "Satellite.h"
+#include "PhasedArrayGroundStation.h"
 
 using Eigen::Matrix3d;
 using Eigen::MatrixXd;
@@ -455,6 +456,14 @@ std::array<double, 3> convert_array_from_LVLH_to_bodyframe(
     const double input_yaw, const double input_pitch);
 
 
-std::array<double,3>  convert_lat_long_to_ECEF(double latitude, double longitude, double height);
-std::array<double,3>  convert_ECEF_to_ECI(std::array<double,3> input_ECEF_position);
+Vector3d  convert_lat_long_to_ECEF(const double latitude, const double longitude, const double height);
+Vector3d  convert_ECEF_to_ECI(const Vector3d input_ECEF_position, const double input_time);
+
+void sim_and_plot_gs_connectivity_gnuplot(PhasedArrayGroundStation input_ground_station,
+  std::vector<Satellite> input_satellite_vector, const double input_timestep,
+  const double input_total_sim_time, const double input_epsilon,
+  const std::string file_name = "output",
+  const bool perturbation = true, const bool atmospheric_drag = false,
+  const std::pair<double, double> drag_elements = {});
+
 #endif

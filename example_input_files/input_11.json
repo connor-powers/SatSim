@@ -1,0 +1,11 @@
+{
+  "Inclination": 29,
+  "RAAN": 140,
+  "Argument of Periapsis": 200,
+  "Eccentricity": 0.25,
+  "Semimajor Axis": 14000,
+  "True Anomaly": 100,
+  "Mass": 100,
+  "Name": "Satellite 5",
+  "Plotting Color": "blue"
+}

@@ -80,6 +80,7 @@
         "numbers": "cpp",
         "regex": "cpp",
         "semaphore": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "dense": "cpp"
     }
 }

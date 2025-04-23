@@ -27,10 +27,12 @@ FetchContent_MakeAvailable(json googletest Eigen)
 
 
 
-add_executable(run simulation_setup.cpp src/utils.cpp src/Satellite.cpp)
-add_executable(Satellite_tests tests/Satellite_tests.cpp src/Satellite.cpp src/utils.cpp)
-add_executable(utils_tests tests/utils_tests.cpp src/Satellite.cpp src/utils.cpp)
+add_executable(run simulation_setup.cpp src/utils.cpp src/Satellite.cpp src/PhasedArrayGroundStation.cpp)
+add_executable(Satellite_tests tests/Satellite_tests.cpp src/Satellite.cpp src/utils.cpp src/PhasedArrayGroundStation.cpp)
+add_executable(utils_tests tests/utils_tests.cpp src/Satellite.cpp src/utils.cpp src/PhasedArrayGroundStation.cpp)
+add_executable(gs_tests tests/PhasedArrayGroundStation_tests.cpp src/Satellite.cpp src/utils.cpp src/PhasedArrayGroundStation.cpp)
 
 target_link_libraries(run PRIVATE nlohmann_json::nlohmann_json Eigen3::Eigen)
 target_link_libraries(Satellite_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)
 target_link_libraries(utils_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)
+target_link_libraries(gs_tests PRIVATE nlohmann_json::nlohmann_json gtest_main Eigen3::Eigen)
