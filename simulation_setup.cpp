@@ -94,11 +94,11 @@ int main() {
   double gs_altitude = 10;
   double max_beam_angle_from_normal = 65; //deg
   int num_beams = 5;
-  total_sim_time = 25000;
+  total_sim_time = 40000;
   PhasedArrayGroundStation example_ground_station_1(gs_latitude,gs_longitude,
     gs_altitude,max_beam_angle_from_normal,num_beams);
   std::vector<Satellite> long_sat_vec = {test_sat_1,test_sat_2,test_sat_3,test_sat_10,test_sat_11,test_sat_12};
-  std::string coverage_file_name = "Ground station coverage of satellites with " + std::to_string(num_beams) + " beams";
+  std::string coverage_file_name = "Ground station connectivity with " + std::to_string(num_beams) + " beams";
   sim_and_plot_gs_connectivity_gnuplot(example_ground_station_1,
     long_sat_vec, timestep,
     total_sim_time, epsilon,
@@ -107,7 +107,7 @@ int main() {
   num_beams = 2;
   PhasedArrayGroundStation example_ground_station_2(gs_latitude,gs_longitude,
     gs_altitude,max_beam_angle_from_normal,num_beams);
-  coverage_file_name = "Ground station coverage of satellites with " + std::to_string(num_beams) + " beams";
+  coverage_file_name = "Ground station connectivity with " + std::to_string(num_beams) + " beams";
   sim_and_plot_gs_connectivity_gnuplot(example_ground_station_2,
     long_sat_vec, timestep,
     total_sim_time, epsilon,
