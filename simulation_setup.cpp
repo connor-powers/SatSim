@@ -89,6 +89,7 @@ int main() {
   Satellite test_sat_10("../example_input_files/input_10.json");
   Satellite test_sat_11("../example_input_files/input_11.json");
   Satellite test_sat_12("../example_input_files/input_12.json");
+  Satellite test_sat_13("../example_input_files/input_13.json");
   double gs_latitude = 2;
   double gs_longitude = 5;
   double gs_altitude = 10;
@@ -97,7 +98,7 @@ int main() {
   total_sim_time = 40000;
   PhasedArrayGroundStation example_ground_station_1(gs_latitude,gs_longitude,
     gs_altitude,max_beam_angle_from_normal,num_beams);
-  std::vector<Satellite> long_sat_vec = {test_sat_1,test_sat_2,test_sat_3,test_sat_10,test_sat_11,test_sat_12};
+  std::vector<Satellite> long_sat_vec = {test_sat_1,test_sat_2,test_sat_3,test_sat_10,test_sat_11,test_sat_12,test_sat_13};
   std::string coverage_file_name = "Ground station connectivity with " + std::to_string(num_beams) + " beams";
   sim_and_plot_gs_connectivity_gnuplot(example_ground_station_1,
     long_sat_vec, timestep,

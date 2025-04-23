@@ -1543,6 +1543,13 @@ void sim_and_plot_gs_connectivity_gnuplot(
       }
       fprintf(gnuplot_pipe, "e\n");
     }
+    // for (auto key_val_pair : input_ground_station.linked_sats_map_) {
+    //   std::cout << "==========================================\n";
+    //   std::cout << "Satellite index " << key_val_pair.first << "\n";
+    //   for (std::pair<double,double> range : key_val_pair.second) {
+    //     std::cout << "{" << range.first << "," << range.second << "}\n";
+    //   }
+    // }
     fprintf(gnuplot_pipe, "pause mouse keypress\n");
 
     fprintf(gnuplot_pipe, "exit \n");
