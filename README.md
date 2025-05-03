@@ -23,6 +23,8 @@
 - Plotting of orbital elements over time
 
 - Plotting of spacecraft attitude values (e.g., Tait-Bryan angles and angular velocities of spacecraft body frame) over time
+  
+- Simple customizable phased array ground stations
 
 ## TO DO
 - Automate code coverage badge updating via Github Actions
