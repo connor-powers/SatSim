@@ -1,0 +1,7 @@
+{
+  "Simulation end time": 25000,
+  "epsilon": 0.000000000001,
+  "Initial timestep guess": 1,
+  "Perturbation": true,
+  "Drag": false
+}

@@ -302,7 +302,7 @@ class Satellite {
 
     return (gravitational_potential_energy + kinetic_energy);
   }
-
+  double get_mass() { return m_; }
   double get_instantaneous_time() { return t_; }
   std::string get_name() { return name_; }
   // void evolve_RK4(const double input_timestep);
