@@ -23,6 +23,9 @@ class ThrustProfileLVLH {
  public:
   double t_start_ = {0};
   double t_end_ = {0};
+  bool arg_of_periapsis_change_thrust_profile = false;
+  double sign_of_delta_omega = {1};
+  double thrust_magnitude_ = {0}; // Only used for argument of periapsis change thrust profiles
   std::array<double, 3> LVLH_force_vec_ = {0, 0, 0};
   ThrustProfileLVLH(const double t_start, const double t_end,
                     const std::array<double, 3> LVLH_force_vec) {
@@ -41,7 +44,26 @@ class ThrustProfileLVLH {
           input_force_magnitude * LVLH_normalized_force_direction_vec.at(ind);
     }
   }
-
+  ThrustProfileLVLH(const double t_start, const double final_arg_of_periapsis,
+                  const  double thrust_magnitude, const double initial_arg_of_periapsis,
+                  const double satellite_eccentricity, const double satellite_a,
+                  const double satellite_mass) {
+    // Thrust profile for continuous-thrust argument of periapsis change
+    // Main ref: https://apps.dtic.mil/sti/tr/pdf/ADA384536.pdf
+    // 
+    // Used Eq. 67 in https://link.springer.com/article/10.1007/s10569-021-10033-9#Sec15 to determine burn angles
+    arg_of_periapsis_change_thrust_profile = true;
+    t_start_ = t_start;
+    const double alpha = M_PI/2.0; // continous thrust
+    (final_arg_of_periapsis > initial_arg_of_periapsis) ? sign_of_delta_omega = 1.0 : sign_of_delta_omega = -1.0;
+    thrust_magnitude_ = thrust_magnitude;
+    const double mu_Earth = G*mass_Earth;
+    const double delta_omega_mag = abs(final_arg_of_periapsis - initial_arg_of_periapsis); // = delta_omega / sgn(delta_omega)
+    const double delta_V = (2.0/3.0)*sqrt(mu_Earth/satellite_a)*satellite_eccentricity*delta_omega_mag/sqrt(1-satellite_eccentricity*satellite_eccentricity);
+    const double acceleration = thrust_magnitude/satellite_mass;
+    t_end_ = t_start + delta_V/acceleration;
+    std::cout << "Transfer time: " << t_end_ << "\n";
+  }
   bool operator==(const ThrustProfileLVLH& input_profile) {
     return ((t_start_ == input_profile.t_start_) &&
             (t_end_ == input_profile.t_end_) &&
@@ -332,7 +354,8 @@ class Satellite {
   void add_LVLH_thrust_profile(
       const std::array<double, 3> input_LVLH_thrust_vector,
       const double input_thrust_start_time, const double input_thrust_end_time);
-
+  void add_LVLH_thrust_profile(const double input_thrust_start_time, const double final_arg_of_periapsis,
+                                const double input_thrust_magnitude);
   void add_bodyframe_torque_profile(
       const std::array<double, 3> input_bodyframe_direction_unit_vec,
       const double input_bodyframe_torque_magnitude,
@@ -357,6 +380,7 @@ class Satellite {
                                                 const double yaw_angle);
   double get_attitude_val(const std::string input_attitude_val_name);
   double calculate_orbital_period();
+  int add_arg_of_periapsis_change_thrust();
 };
 
 #endif

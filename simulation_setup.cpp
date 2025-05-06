@@ -134,9 +134,41 @@ int main() {
   sim_parameters.x_increment = pow(10,7);
   sim_parameters.y_increment = pow(10,7);
   sim_parameters.z_increment = 5*pow(10,6);
-  file_name = "Semimajor axis transfer";
-  sim_and_plot_orbital_elem_gnuplot(orbit_transfer_demo_vec, sim_parameters, "Semimajor Axis", file_name);
-
+  // file_name = "Semimajor axis transfer";
+  // sim_and_plot_orbital_elem_gnuplot(orbit_transfer_demo_vec, sim_parameters, "Semimajor Axis", file_name);
   sim_and_draw_orbit_gnuplot(orbit_transfer_demo_vec,sim_parameters);
-return 0;
+
+
+  // Now let's demonstrate changing the argument of periapsis
+  // Calibration strategy: there are some inherent oscillations in, e.g., arg of periapsis, even in absence of external forces or perturbations
+  // This oscillation magnitude can be different in initial and final orbits, so current strategy is to find the mean val of these oscillations
+  // at initial and final orbits, use those to get an offset, which can be applied to the final argument of periapsis to try to make the
+  // oscillations at the final orbit be close to the target value
+
+  Satellite arg_periapsis_change_sat("../example_satellite_input_files/arg_of_periapsis_test_input.json");
+  Satellite arg_periapsis_change_calibration_sat("../example_satellite_input_files/arg_of_periapsis_calibration_input.json");
+  sim_parameters.epsilon = pow(10,-12);
+  sim_parameters.total_sim_time = 250000; 
+  sim_parameters.perturbation_bool = false;
+  sim_parameters.drag_bool = false;
+  double set_initial_arg_of_periapsis = arg_periapsis_change_sat.get_orbital_parameter("Argument of Periapsis");
+  double mean_val_final = calibrate_mean_val(arg_periapsis_change_calibration_sat,sim_parameters,"Argument of Periapsis");
+  t_thrust_start = 25000;
+  double mean_val_initial = calibrate_mean_val(arg_periapsis_change_sat,sim_parameters,"Argument of Periapsis");
+  // NOTE: Make sure the below value matches the argument of periapsis of your calibration satellite.
+  double final_arg_of_periapsis_deg = 20;
+  if (final_arg_of_periapsis_deg != arg_periapsis_change_calibration_sat.get_orbital_parameter("Argument of Periapsis")) {
+    std::cout << "Warning: Entered final argument of periapsis differs from value in calibration satellite object. "
+    "This will skew the applied offset from the nominal value. Make sure these two argument of periapsis values are equal.\n";
+  }
+  double offset = (final_arg_of_periapsis_deg - mean_val_final) + (set_initial_arg_of_periapsis - mean_val_initial);
+  double final_arg_of_periapsis = final_arg_of_periapsis_deg * (M_PI/180.0); // rad
+  thrust_magnitude = 0.1; // N
+  arg_periapsis_change_sat.add_LVLH_thrust_profile(t_thrust_start,final_arg_of_periapsis+(offset*M_PI/180.0),thrust_magnitude);
+  file_name = "Arg of periapsis transfer";
+  std::vector<Satellite> arg_of_periapsis_transfer_vec = {arg_periapsis_change_sat};
+  sim_and_plot_orbital_elem_gnuplot(arg_of_periapsis_transfer_vec, sim_parameters, "Argument of Periapsis", file_name);
+  std::cout << "Offset: " << offset << "\n";
+
+  return 0;
 }
