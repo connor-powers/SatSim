@@ -1634,8 +1634,6 @@ double calibrate_mean_val(Satellite satellite_object, const SimParameters& input
   double timestep_to_use = input_sim_parameters.initial_timestep_guess;
   current_satellite_time = satellite_object.get_instantaneous_time();
   while (current_satellite_time < input_sim_parameters.total_sim_time) {
-  // std::cout << "========================================================\n";
-  // std::cout << "Running an evolve step at satellite time " << current_satellite_time << "\n";
   std::pair<double, double> drag_elements = {input_sim_parameters.F_10, input_sim_parameters.A_p};
   std::pair<double, int> new_timestep_and_error_code =
   satellite_object.evolve_RK45(input_sim_parameters.epsilon, timestep_to_use,
