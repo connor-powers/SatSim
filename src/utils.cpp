@@ -387,14 +387,6 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
     std::cout << "No input Satellite objects\n";
     return;
   }
-  const size_t num_axis_ticks = 4;
-  // For neater plot axes
-  double max_observed_x = 0;
-  double min_observed_x = 0;
-  double max_observed_y = 0;
-  double min_observed_y = 0;
-  double max_observed_z = 0;
-  double min_observed_z = 0;
   // first, open "pipe" to gnuplot
   std::string gnuplot_arg_string = "gnuplot";
   if (input_sim_parameters.terminal_name_3D == "qt"){
@@ -512,24 +504,6 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
       Satellite current_satellite = input_satellite_vector.at(satellite_index);
       std::array<double, 3> initial_position =
           current_satellite.get_ECI_position();
-      if (initial_position.at(0) > max_observed_x) {
-        max_observed_x = initial_position.at(0);
-      }
-      if (initial_position.at(0) < min_observed_x) {
-        min_observed_x = initial_position.at(0);
-      }
-      if (initial_position.at(1) > max_observed_y) {
-        max_observed_y = initial_position.at(1);
-      }
-      if (initial_position.at(1) < min_observed_y) {
-        min_observed_y = initial_position.at(1);
-      }
-      if (initial_position.at(2) > max_observed_z) {
-        max_observed_z = initial_position.at(2);
-      }
-      if (initial_position.at(2) < min_observed_z) {
-        min_observed_z = initial_position.at(2);
-      }
       fprintf(gnuplot_pipe, "%.17g %.17g %.17g\n", initial_position.at(0),
               initial_position.at(1), initial_position.at(2));
 
@@ -555,24 +529,6 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
         }
         timestep_to_use = new_timestep;
         evolved_position = current_satellite.get_ECI_position();
-        if (evolved_position.at(0) > max_observed_x) {
-          max_observed_x = evolved_position.at(0);
-        }
-        if (evolved_position.at(0) < min_observed_x) {
-          min_observed_x = evolved_position.at(0);
-        }
-        if (evolved_position.at(1) > max_observed_y) {
-          max_observed_y = evolved_position.at(1);
-        }
-        if (evolved_position.at(1) < min_observed_y) {
-          min_observed_y = evolved_position.at(1);
-        }
-        if (evolved_position.at(2) > max_observed_z) {
-          max_observed_z = evolved_position.at(2);
-        }
-        if (evolved_position.at(2) < min_observed_z) {
-          min_observed_z = evolved_position.at(2);
-        }
         current_satellite_time = current_satellite.get_instantaneous_time();
         fprintf(gnuplot_pipe, "%.17g %.17g %.17g\n", evolved_position.at(0),
                 evolved_position.at(1), evolved_position.at(2));
