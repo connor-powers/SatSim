@@ -2,7 +2,6 @@
 #include <Eigen/Geometry>
 #include <cmath>
 #include <iostream>
-#include <cassert>
 
 #include "Satellite.h"
 #include "PhasedArrayGroundStation.h"
