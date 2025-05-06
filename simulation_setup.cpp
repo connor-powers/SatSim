@@ -168,7 +168,6 @@ int main() {
   file_name = "Arg of periapsis transfer";
   std::vector<Satellite> arg_of_periapsis_transfer_vec = {arg_periapsis_change_sat};
   sim_and_plot_orbital_elem_gnuplot(arg_of_periapsis_transfer_vec, sim_parameters, "Argument of Periapsis", file_name);
-  std::cout << "Offset: " << offset << "\n";
 
   return 0;
 }
