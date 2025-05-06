@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <functional>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 #include "Satellite.h"
 #include "PhasedArrayGroundStation.h"
@@ -12,6 +13,56 @@ using Eigen::Matrix3d;
 using Eigen::MatrixXd;
 using Eigen::Vector3d;
 using Eigen::Vector4d;
+
+using json = nlohmann::json;
+
+
+struct SimParameters {
+  double initial_timestep_guess = 1;
+  double total_sim_time = 10;
+  double epsilon = pow(10, -8);
+  bool perturbation_bool = true;
+  bool drag_bool = false;
+  double x_increment = 0;
+  double y_increment = 0;
+  double z_increment = 0;
+  double F_10 = 0;  // Solar radio ten centimeter flux
+  double A_p = 0;   // Geomagnetic A_p index
+  std::string terminal_name_3D = "qt";
+
+  SimParameters(const std::string parameter_json_file_name) {
+    std::ifstream input_filestream(parameter_json_file_name);
+    json input_data = json::parse(input_filestream);
+
+    if (input_data.find("Initial timestep guess") != input_data.end()) {
+      initial_timestep_guess = input_data.at("Initial timestep guess");
+    }
+    if (input_data.find("Simulation duration") != input_data.end()) {
+      total_sim_time = input_data.at("Simulation duration");
+    }
+    if (input_data.find("epsilon") != input_data.end()) {
+      epsilon = input_data.at("epsilon");
+    }
+    if (input_data.find("Perturbation") != input_data.end()) {
+      perturbation_bool = input_data.at("Perturbation");
+    }
+    if (input_data.find("Drag") != input_data.end()) {
+      drag_bool = input_data.at("Drag");
+    }
+    if (input_data.find("X increment") != input_data.end()) {
+      x_increment = input_data.at("X increment");
+    }
+    if (input_data.find("Y increment") != input_data.end()) {
+      y_increment = input_data.at("Y increment");
+    }
+    if (input_data.find("Z increment") != input_data.end()) {
+      z_increment = input_data.at("Z increment");
+    }
+    if (input_data.find("3D plotting terminal") != input_data.end()) {
+      terminal_name_3D = input_data.at("3D plotting terminal");
+    }
+  }
+};
 
 std::array<double, 3> calculate_orbital_acceleration(
     const std::array<double, 3> input_r_vec, const double input_spacecraft_mass,
@@ -98,12 +149,10 @@ std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
 // }
 
 void sim_and_draw_orbit_gnuplot(
-    std::vector<Satellite> input_satellite_vector, const double input_timestep,
-    const double input_total_sim_time, const double input_epsilon,
-    const bool perturbation = true, const bool atmospheric_drag = false,
-    const std::pair<double, double> drag_elements = {},
-    const std::string input_terminal = "qt", //Currently, "qt" and "png" are supported
-    const std::string output_file_name = "output");
+    std::vector<Satellite> input_satellite_vector, 
+    const SimParameters& input_sim_parameters,
+    const std::string output_file_name = "output"
+);
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
@@ -241,20 +290,15 @@ std::array<double, 3> convert_cylindrical_to_cartesian(
     const double input_r_comp, const double input_theta_comp,
     const double input_z_comp, const double input_theta);
 void sim_and_plot_orbital_elem_gnuplot(
-    std::vector<Satellite> input_satellite_vector, const double input_timestep,
-    const double input_total_sim_time, const double input_epsilon,
+    std::vector<Satellite> input_satellite_vector, 
+    const SimParameters& input_sim_parameters,
     const std::string input_orbital_element_name,
-    const std::string file_name = "output",
-    const bool perturbation = true, const bool atmospheric_drag = false,
-    const std::pair<double, double> drag_elements = {});
+    const std::string file_name = "output");
 void sim_and_plot_attitude_evolution_gnuplot(
-    std::vector<Satellite> input_satellite_vector, const double input_timestep,
-    const double input_total_sim_time, const double input_epsilon,
+    std::vector<Satellite> input_satellite_vector,
+    const SimParameters& input_sim_parameters,
     const std::string input_plotted_val_name, 
-    const std::string file_name = "output",
-    const bool perturbation = true,
-    const bool atmospheric_drag = false,
-    const std::pair<double, double> drag_elements = {});
+    const std::string file_name = "output");
 
 Matrix3d rollyawpitch_bodyframe_to_LVLH(
     const std::array<double, 3> input_bodyframe_vec, const double input_roll,
@@ -460,16 +504,15 @@ Vector3d  convert_lat_long_to_ECEF(const double latitude, const double longitude
 Vector3d  convert_ECEF_to_ECI(const Vector3d input_ECEF_position, const double input_time);
 
 void sim_and_plot_gs_connectivity_distance_gnuplot(PhasedArrayGroundStation input_ground_station,
-  std::vector<Satellite> input_satellite_vector, const double input_timestep,
-  const double input_total_sim_time, const double input_epsilon,
-  const std::string file_name = "output",
-  const bool perturbation = true, const bool atmospheric_drag = false,
-  const std::pair<double, double> drag_elements = {});
+  std::vector<Satellite> input_satellite_vector, 
+  const SimParameters& input_sim_parameters,
+  const std::string file_name = "output");
 
 void sim_and_plot_gs_connectivity_gnuplot(PhasedArrayGroundStation input_ground_station,
-  std::vector<Satellite> input_satellite_vector, const double input_timestep,
-  const double input_total_sim_time, const double input_epsilon,
-  const std::string file_name = "output",
-  const bool perturbation = true, const bool atmospheric_drag = false,
-  const std::pair<double, double> drag_elements = {});
+  std::vector<Satellite> input_satellite_vector, 
+  const SimParameters& input_sim_parameters,
+  const std::string file_name = "output");
+
+int add_lowthrust_orbit_transfer(Satellite& input_satellite_object, const double final_orbit_semimajor_axis_km, 
+  const double thrust_magnitude, const double transfer_initiation_time = 0);
 #endif

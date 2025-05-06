@@ -81,6 +81,7 @@
         "regex": "cpp",
         "semaphore": "cpp",
         "typeindex": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "mprealsupport": "cpp"
     }
 }
