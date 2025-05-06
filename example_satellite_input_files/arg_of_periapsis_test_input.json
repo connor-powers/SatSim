@@ -1,0 +1,10 @@
+{
+  "Inclination": 5,
+  "RAAN": 0,
+  "Argument of Periapsis": 5,
+  "Eccentricity": 0.1,
+  "Semimajor Axis": 15000,
+  "True Anomaly": 0,
+  "Mass": 100,
+  "Name": "Arg of Periapsis Test"
+}

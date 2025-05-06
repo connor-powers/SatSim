@@ -515,4 +515,6 @@ void sim_and_plot_gs_connectivity_gnuplot(PhasedArrayGroundStation input_ground_
 
 int add_lowthrust_orbit_transfer(Satellite& input_satellite_object, const double final_orbit_semimajor_axis_km, 
   const double thrust_magnitude, const double transfer_initiation_time = 0);
+
+double calibrate_mean_val(Satellite satellite_object, const SimParameters& input_sim_parameters, const std::string input_parameter_name);
 #endif

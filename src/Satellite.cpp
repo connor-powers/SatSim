@@ -25,8 +25,6 @@ double Satellite::calculate_orbital_period() {
 std::array<double, 3> Satellite::calculate_perifocal_position() {
   // Using approach from Fundamentals of Astrodynamics
   std::array<double, 3> calculated_perifocal_position;
-  double mu = G * mass_Earth;
-
   double p =
       a_ * (1 - eccentricity_) * (1 + eccentricity_);  // rearranging eq. 1-47
 
@@ -46,12 +44,11 @@ std::array<double, 3> Satellite::calculate_perifocal_position() {
 std::array<double, 3> Satellite::calculate_perifocal_velocity() {
   // Using approach from Fundamentals of Astrodynamics
   std::array<double, 3> calculated_perifocal_velocity;
-  double mu = G * mass_Earth;
   double p =
       a_ * (1 - eccentricity_) * (1 + eccentricity_);  // rearranging eq. 1-47
-
-  double v_perifocal_P = sqrt(mu / p) * (-sin(true_anomaly_));
-  double v_perifocal_Q = sqrt(mu / p) * (eccentricity_ + cos(true_anomaly_));
+  const double mu_Earth = G*mass_Earth;
+  double v_perifocal_P = sqrt(mu_Earth / p) * (-sin(true_anomaly_));
+  double v_perifocal_Q = sqrt(mu_Earth / p) * (eccentricity_ + cos(true_anomaly_));
 
   calculated_perifocal_velocity.at(0) = v_perifocal_P;
   calculated_perifocal_velocity.at(1) = v_perifocal_Q;
@@ -246,7 +243,7 @@ void Satellite::add_LVLH_thrust_profile(
   ThrustProfileLVLH new_thrust_profile(
       input_thrust_start_time, input_thrust_end_time, input_LVLH_thrust_vector);
   thrust_profile_list_.push_back(new_thrust_profile);
-  if (input_thrust_start_time == 0) {
+  if (input_thrust_start_time == t_) {
     list_of_LVLH_forces_at_this_time_.push_back(input_LVLH_thrust_vector);
     std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
         input_LVLH_thrust_vector, ECI_position_, ECI_velocity_);
@@ -271,7 +268,7 @@ void Satellite::add_LVLH_thrust_profile(
                               input_LVLH_normalized_thrust_direction.at(ind);
   }
 
-  if (input_thrust_start_time == 0) {
+  if (input_thrust_start_time == t_) {
     list_of_LVLH_forces_at_this_time_.push_back(LVLH_thrust_vec);
     std::array<double, 3> ECI_thrust_vector = convert_LVLH_to_ECI_manual(
         LVLH_thrust_vec, ECI_position_, ECI_velocity_);
@@ -279,14 +276,21 @@ void Satellite::add_LVLH_thrust_profile(
   }
 }
 
+  // Now the version for argument of periapsis change maneuvers
+  void Satellite::add_LVLH_thrust_profile(const double input_thrust_start_time, const double final_arg_of_periapsis,
+    const double input_thrust_magnitude) {
+      ThrustProfileLVLH thrust_profile(input_thrust_start_time,final_arg_of_periapsis,input_thrust_magnitude,
+                                        arg_of_periapsis_, eccentricity_, a_, m_);
+      thrust_profile_list_.push_back(thrust_profile);
+    }
+
 int Satellite::update_orbital_elements_from_position_and_velocity() {
   // Anytime the orbit is changed via external forces, need to update the
   // orbital parameters of the satellite. True anomaly should change over time
   // even in absence of external forces Using approach from Fundamentals of
   // Astrodynamics
   int error_code = 0;  // 0 represents nominal operation
-  double mu = G * mass_Earth;
-
+  double mu_Earth = G*mass_Earth;
   Vector3d position_vector = {ECI_position_.at(0), ECI_position_.at(1),
                               ECI_position_.at(2)};
   Vector3d velocity_vector = {ECI_velocity_.at(0), ECI_velocity_.at(1),
@@ -301,14 +305,14 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
   double r_magnitude = get_radius();
 
   Vector3d e_vec_component_1 =
-      (1.0 / mu) * (v_magnitude * v_magnitude - (mu / r_magnitude)) *
+      (1.0 / mu_Earth) * (v_magnitude * v_magnitude - (mu_Earth / r_magnitude)) *
       position_vector;
   Vector3d e_vec_component_2 =
-      (1.0 / mu) * (position_vector.dot(velocity_vector)) * velocity_vector;
+      (1.0 / mu_Earth) * (position_vector.dot(velocity_vector)) * velocity_vector;
   Vector3d e_vec = e_vec_component_1 - e_vec_component_2;
   double calculated_eccentricity = e_vec.norm();
 
-  double calculated_p = h * h / mu;
+  double calculated_p = h * h / mu_Earth;
 
   double calculated_i = acos(h_vector(2) / h);
 
@@ -326,9 +330,20 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
     if (e_vec(2) < 0) {
       calculated_arg_of_periapsis = 2 * M_PI - calculated_arg_of_periapsis;
     }
-
     calculated_true_anomaly = acos(e_vec.dot(position_vector) /
-                                   (calculated_eccentricity * r_magnitude));
+    (calculated_eccentricity * r_magnitude));
+    if (std::isnan(calculated_true_anomaly)) {
+      // First try arg of the following acos call to a float to avoid bug
+      // where it ended up being represented by a value with magnitude 
+      // slightly larger than one, causing NaN in output of acos
+      float true_anomaly_acos_arg_float = e_vec.dot(position_vector) /
+      (calculated_eccentricity * r_magnitude);
+      calculated_true_anomaly = acos(true_anomaly_acos_arg_float);
+      if (std::isnan(calculated_true_anomaly)) {
+        std::cout << "NaN true anomaly encountered.\n";
+        error_code = 10;
+      }
+    }
     if (position_vector.dot(velocity_vector) < 0) {
       calculated_true_anomaly = 2 * M_PI - calculated_true_anomaly;
     }
@@ -397,6 +412,9 @@ std::pair<double, int> Satellite::evolve_RK45(
   // F_10 is the first element, A_p is the second element
   double input_F_10 = drag_elements.first;
   double input_A_p = drag_elements.second;
+
+  // Add any thrusts from an argument of periapsis change maneuver, if applicable
+  int arg_of_periapsis_code = add_arg_of_periapsis_change_thrust();
 
   std::array<double, 13>
       combined_initial_position_velocity_quaternion_angular_velocity_array = {};
@@ -506,6 +524,11 @@ std::pair<double, int> Satellite::evolve_RK45(
   evolve_RK45_output_pair.first = new_step_size;
   evolve_RK45_output_pair.second = orbit_elems_error_code;
 
+  // If you just added a temporally localized thrust profile stemming from an argument of periapsis change thrust profile,
+  // remove it now that it's no longer needed to avoid bloat of the thrust profile list
+  if (arg_of_periapsis_code == 1) {
+    thrust_profile_list_.pop_back();
+  }
   return evolve_RK45_output_pair;
 }
 
@@ -660,4 +683,20 @@ void Satellite::initialize_body_angular_velocity_vec_wrt_LVLH_in_body_frame() {
           initial_body_angular_velocity_in_LVLH_frame, roll_angle_, yaw_angle_,
           pitch_angle_);  // Because LVLH is always rotating around y axis to
                           // keep z pointed towards Earth
+}
+int Satellite::add_arg_of_periapsis_change_thrust() {
+  // Returning 0 means didn't find any arg of periapsis change thrust profiles
+  // Returning 1 means it did find one and added a temporally localized thrust at this time
+  for (ThrustProfileLVLH thrust_profile : thrust_profile_list_) {
+    if ((thrust_profile.arg_of_periapsis_change_thrust_profile) && (thrust_profile.t_start_ <= t_) && (thrust_profile.t_end_ >= t_)) {
+      std::array<double,3> thrust_direction_vec = {sin(true_anomaly_), 0, cos(true_anomaly_)};
+
+      add_LVLH_thrust_profile(thrust_direction_vec, thrust_profile.sign_of_delta_omega*thrust_profile.thrust_magnitude_,t_,thrust_profile.t_end_); 
+      // can add one with t_end stretching all the way to the t_end of the total arg of periapsis change maneuver because this temporary thrust profile will
+      // be deleted after this RK45 step. This end time is given so that whatever timestep is chosen for this step, all intermediate calculated steps will
+      // also see this thrust.
+      return 1;
+    }
+  }
+  return 0;
 }
