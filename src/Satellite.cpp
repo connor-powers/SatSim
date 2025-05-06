@@ -332,7 +332,7 @@ int Satellite::update_orbital_elements_from_position_and_velocity() {
     }
     calculated_true_anomaly = acos(e_vec.dot(position_vector) /
     (calculated_eccentricity * r_magnitude));
-    if (isnan(calculated_true_anomaly)) {
+    if (std::isnan(calculated_true_anomaly)) {
       // First try arg of the following acos call to a float to avoid bug
       // where it ended up being represented by a value with magnitude 
       // slightly larger than one, causing NaN in output of acos
