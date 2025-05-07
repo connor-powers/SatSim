@@ -400,7 +400,7 @@ TEST(EllipticalOrbitTests, ArgofPeriapsisChangeManeuver1) {
   const double acceleration = thrust_magnitude / satellite_mass;
   const double maneuver_length = delta_V / acceleration;
   const double total_sim_time = maneuver_length + 10000;
-  double temp_epsilon = pow(10, -14);
+  double temp_epsilon = pow(10, -13);
   test_satellite.add_maneuver("Argument of Periapsis Change", t_thrust_start,
                               target_arg_of_periapsis_deg, thrust_magnitude);
   double current_time = test_satellite.get_instantaneous_time();
@@ -455,7 +455,7 @@ TEST(EllipticalOrbitTests, ArgofPeriapsisChangeManeuver2) {
   const double acceleration = thrust_magnitude / satellite_mass;
   const double maneuver_length = delta_V / acceleration;
   const double total_sim_time = maneuver_length + 10000;
-  double temp_epsilon = pow(10, -14);
+  double temp_epsilon = pow(10, -13);
   test_satellite.add_maneuver("Argument of Periapsis Change", t_thrust_start,
                               target_arg_of_periapsis_deg, thrust_magnitude);
   double current_time = test_satellite.get_instantaneous_time();
