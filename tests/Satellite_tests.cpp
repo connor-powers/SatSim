@@ -6,10 +6,10 @@
 #include "utils.h"
 
 const double tolerance = pow(10.0, -7);
-// Setting a different tolerance for semimajor axis and orbital radius than the other orbital
-// parameters since there appears to be a minimum error associated with
-// converting position and velocity to semimajor axis, best guess is this has to
-// do with the scale of distances and/or velocities being dealt with here
+// Setting a different tolerance for semimajor axis and orbital radius than the
+// other orbital parameters since there appears to be a minimum error associated
+// with converting position and velocity to semimajor axis, best guess is this
+// has to do with the scale of distances and/or velocities being dealt with here
 const double length_tolerance = pow(10.0, -6);
 const double epsilon = pow(10.0, -12);
 const double energy_cons_relative_tolerance = pow(10.0, -10);
@@ -89,7 +89,7 @@ TEST(EllipticalOrbitTests, ConstantEvolvedOrbitalElementsTest) {
     if (orbital_elem_index == 0) {
       EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index) -
                       evolved_orbit_elements.at(orbital_elem_index)) <
-                      length_tolerance)
+                  length_tolerance)
           << orbital_element_name_array.at(orbital_elem_index)
           << " was not constant within tolerance. Diff:"
           << initial_orbit_elements.at(orbital_elem_index) -
@@ -130,7 +130,7 @@ TEST(EllipticalOrbitTests, BasicOrbitalElementsTest) {
     if (orbital_elem_index == 0) {
       EXPECT_TRUE(abs(initial_orbit_elements.at(orbital_elem_index) -
                       recalculated_orbit_elements.at(orbital_elem_index)) <
-                      length_tolerance)
+                  length_tolerance)
           << orbital_element_name_array.at(orbital_elem_index)
           << " was not constant within tolerance. Diff:"
           << initial_orbit_elements.at(orbital_elem_index) -
@@ -149,17 +149,18 @@ TEST(EllipticalOrbitTests, BasicOrbitalElementsTest) {
   }
 }
 
-TEST(EllipticalOrbitTests,OrbitalRadiusCalcs1) {
+TEST(EllipticalOrbitTests, OrbitalRadiusCalcs1) {
   Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
-  double orbital_radius_perifocal=test_satellite.get_radius();
-  double orbital_radius_ECI=test_satellite.get_radius_ECI();
-  EXPECT_TRUE(abs(orbital_radius_perifocal - orbital_radius_ECI) < length_tolerance)
+  double orbital_radius_perifocal = test_satellite.get_radius();
+  double orbital_radius_ECI = test_satellite.get_radius_ECI();
+  EXPECT_TRUE(abs(orbital_radius_perifocal - orbital_radius_ECI) <
+              length_tolerance)
       << "Difference between orbital radii calculated with "
-      " perifocal and ECI coordinates: "
-      << orbital_radius_perifocal - orbital_radius_ECI <<"\n";
+         " perifocal and ECI coordinates: "
+      << orbital_radius_perifocal - orbital_radius_ECI << "\n";
 }
 
-TEST(EllipticalOrbitTests,OrbitalRadiusCalcs2) {
+TEST(EllipticalOrbitTests, OrbitalRadiusCalcs2) {
   Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
   double test_timestep = 0.1;  // s
   bool perturbation_bool = false;
@@ -167,26 +168,27 @@ TEST(EllipticalOrbitTests,OrbitalRadiusCalcs2) {
       test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
   double next_timestep = new_timestep_and_error_code.first;
   int error_code = new_timestep_and_error_code.second;
-  double orbital_radius_perifocal=test_satellite.get_radius();
-  double orbital_radius_ECI=test_satellite.get_radius_ECI();
+  double orbital_radius_perifocal = test_satellite.get_radius();
+  double orbital_radius_ECI = test_satellite.get_radius_ECI();
 
-  EXPECT_TRUE(abs(orbital_radius_perifocal - orbital_radius_ECI) < length_tolerance)
+  EXPECT_TRUE(abs(orbital_radius_perifocal - orbital_radius_ECI) <
+              length_tolerance)
       << "Difference between evolved orbital radii calculated with "
-      " perifocal and ECI coordinates: "
-      << orbital_radius_perifocal - orbital_radius_ECI <<"\n";
+         " perifocal and ECI coordinates: "
+      << orbital_radius_perifocal - orbital_radius_ECI << "\n";
 }
 
-TEST(EllipticalOrbitTests,OrbitalSpeedCalcs1) {
+TEST(EllipticalOrbitTests, OrbitalSpeedCalcs1) {
   Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
-  double orbital_speed_perifocal=test_satellite.get_speed();
-  double orbital_speed_ECI=test_satellite.get_speed_ECI();
+  double orbital_speed_perifocal = test_satellite.get_speed();
+  double orbital_speed_ECI = test_satellite.get_speed_ECI();
   EXPECT_TRUE(abs(orbital_speed_ECI - orbital_speed_perifocal) < tolerance)
       << "Difference between orbital speeds calculated with "
-      " perifocal and ECI coordinates: "
-      << orbital_speed_ECI - orbital_speed_perifocal <<"\n";
+         " perifocal and ECI coordinates: "
+      << orbital_speed_ECI - orbital_speed_perifocal << "\n";
 }
 
-TEST(EllipticalOrbitTests,OrbitalSpeedCalcs2) {
+TEST(EllipticalOrbitTests, OrbitalSpeedCalcs2) {
   Satellite test_satellite("../tests/elliptical_orbit_test_2.json");
   double test_timestep = 0.1;  // s
   bool perturbation_bool = false;
@@ -194,13 +196,13 @@ TEST(EllipticalOrbitTests,OrbitalSpeedCalcs2) {
       test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
   double next_timestep = new_timestep_and_error_code.first;
   int error_code = new_timestep_and_error_code.second;
-  double orbital_speed_perifocal=test_satellite.get_speed();
-  double orbital_speed_ECI=test_satellite.get_speed_ECI();
+  double orbital_speed_perifocal = test_satellite.get_speed();
+  double orbital_speed_ECI = test_satellite.get_speed_ECI();
 
   EXPECT_TRUE(abs(orbital_speed_ECI - orbital_speed_perifocal) < tolerance)
       << "Difference between evolved orbital speeds calculated with "
-      " perifocal and ECI coordinates: "
-      << orbital_speed_ECI - orbital_speed_perifocal <<"\n";
+         " perifocal and ECI coordinates: "
+      << orbital_speed_ECI - orbital_speed_perifocal << "\n";
 }
 
 TEST(EllipticalOrbitTests, TotalEnergyTimestep1) {
@@ -213,9 +215,11 @@ TEST(EllipticalOrbitTests, TotalEnergyTimestep1) {
   double next_timestep = new_timestep_and_error_code.first;
   int error_code = new_timestep_and_error_code.second;
   double evolved_energy = test_satellite.get_total_energy();
-  EXPECT_TRUE(abs(initial_energy - evolved_energy)/initial_energy < energy_cons_relative_tolerance)
-      << "Total energy not preserved within relative tolerance. Relative difference: "
-      << abs(initial_energy - evolved_energy)/initial_energy << "\n";
+  EXPECT_TRUE(abs(initial_energy - evolved_energy) / initial_energy <
+              energy_cons_relative_tolerance)
+      << "Total energy not preserved within relative tolerance. Relative "
+         "difference: "
+      << abs(initial_energy - evolved_energy) / initial_energy << "\n";
 }
 
 TEST(EllipticalOrbitTests, TotalEnergyTimestep2) {
@@ -228,9 +232,11 @@ TEST(EllipticalOrbitTests, TotalEnergyTimestep2) {
   double next_timestep = new_timestep_and_error_code.first;
   int error_code = new_timestep_and_error_code.second;
   double evolved_energy = test_satellite.get_total_energy();
-  EXPECT_TRUE(abs(initial_energy - evolved_energy)/initial_energy < energy_cons_relative_tolerance)
-      << "Total energy not preserved within relative tolerance. Relative difference: "
-      << abs(initial_energy - evolved_energy)/initial_energy << "\n";
+  EXPECT_TRUE(abs(initial_energy - evolved_energy) / initial_energy <
+              energy_cons_relative_tolerance)
+      << "Total energy not preserved within relative tolerance. Relative "
+         "difference: "
+      << abs(initial_energy - evolved_energy) / initial_energy << "\n";
 }
 
 TEST(EllipticalOrbitTests, TotalEnergyTimestep3) {
@@ -243,9 +249,11 @@ TEST(EllipticalOrbitTests, TotalEnergyTimestep3) {
   double next_timestep = new_timestep_and_error_code.first;
   int error_code = new_timestep_and_error_code.second;
   double evolved_energy = test_satellite.get_total_energy();
-  EXPECT_TRUE(abs(initial_energy - evolved_energy)/initial_energy < energy_cons_relative_tolerance)
-      << "Total energy not preserved within relative tolerance. Relative difference: "
-      << abs(initial_energy - evolved_energy)/initial_energy << "\n";
+  EXPECT_TRUE(abs(initial_energy - evolved_energy) / initial_energy <
+              energy_cons_relative_tolerance)
+      << "Total energy not preserved within relative tolerance. Relative "
+         "difference: "
+      << abs(initial_energy - evolved_energy) / initial_energy << "\n";
 }
 
 TEST(EllipticalOrbitTests, DragTest1) {
@@ -254,92 +262,216 @@ TEST(EllipticalOrbitTests, DragTest1) {
   // Drag parameters
   double F_10 = 100;  // Solar radio ten centimeter flux
   double A_p = 120;   // Geomagnetic A_p index
-  double temp_epsilon = pow(10,-14);
+  double temp_epsilon = pow(10, -14);
   // Collect drag parameters into a pair with F_10 first and A_p second
   std::pair<double, double> drag_elements = {F_10, A_p};
   double test_timestep = 0.01;  // s
   bool perturbation_bool = true;
-  double total_sim_time = 10; // s
+  double total_sim_time = 10;  // s
   double current_time = test_satellite_nodrag.get_instantaneous_time();
   double orbital_radius = 0;
   while (current_time < total_sim_time) {
-  std::pair<double, int> new_timestep_and_error_code =
-      test_satellite_nodrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
-        false);
-      orbital_radius = test_satellite_nodrag.get_radius();
-      double altitude = (orbital_radius - radius_Earth)/1000.0;
-      double next_timestep = new_timestep_and_error_code.first;
-      test_timestep = next_timestep;
-      int error_code = new_timestep_and_error_code.second;
-      current_time = test_satellite_nodrag.get_instantaneous_time();
+    std::pair<double, int> new_timestep_and_error_code =
+        test_satellite_nodrag.evolve_RK45(temp_epsilon, test_timestep,
+                                          perturbation_bool, false);
+    orbital_radius = test_satellite_nodrag.get_radius();
+    double altitude = (orbital_radius - radius_Earth) / 1000.0;
+    double next_timestep = new_timestep_and_error_code.first;
+    test_timestep = next_timestep;
+    int error_code = new_timestep_and_error_code.second;
+    current_time = test_satellite_nodrag.get_instantaneous_time();
   }
-  double no_drag_semimajor_axis = test_satellite_nodrag.get_orbital_parameter("Semimajor Axis");
+  double no_drag_semimajor_axis =
+      test_satellite_nodrag.get_orbital_parameter("Semimajor Axis");
 
   current_time = test_satellite_withdrag.get_instantaneous_time();
 
   while (current_time < total_sim_time) {
-  std::pair<double, int> new_timestep_and_error_code =
-  test_satellite_withdrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
-        true,drag_elements);
-      double next_timestep = new_timestep_and_error_code.first;
-      test_timestep = next_timestep;
-      int error_code = new_timestep_and_error_code.second;
-      current_time = test_satellite_withdrag.get_instantaneous_time();
+    std::pair<double, int> new_timestep_and_error_code =
+        test_satellite_withdrag.evolve_RK45(temp_epsilon, test_timestep,
+                                            perturbation_bool, true,
+                                            drag_elements);
+    double next_timestep = new_timestep_and_error_code.first;
+    test_timestep = next_timestep;
+    int error_code = new_timestep_and_error_code.second;
+    current_time = test_satellite_withdrag.get_instantaneous_time();
   }
-  double with_drag_semimajor_axis = test_satellite_withdrag.get_orbital_parameter("Semimajor Axis");
+  double with_drag_semimajor_axis =
+      test_satellite_withdrag.get_orbital_parameter("Semimajor Axis");
 
   EXPECT_TRUE(no_drag_semimajor_axis > with_drag_semimajor_axis)
-      << "Semimajor axis after evolution wasn't lower when drag was introduced. "
-      "This isn't expected behavior. Difference: " << no_drag_semimajor_axis - with_drag_semimajor_axis << "\n";
+      << "Semimajor axis after evolution wasn't lower when drag was "
+         "introduced. "
+         "This isn't expected behavior. Difference: "
+      << no_drag_semimajor_axis - with_drag_semimajor_axis << "\n";
 }
 
 // Now trying to test the 140 < altitude < 180 km altitude section
 TEST(EllipticalOrbitTests, DragTest2) {
-  Satellite test_satellite_withdrag("../tests/circular_orbit_test_1_input.json");
+  Satellite test_satellite_withdrag(
+      "../tests/circular_orbit_test_1_input.json");
   Satellite test_satellite_nodrag("../tests/circular_orbit_test_1_input.json");
   // Drag parameters
   double F_10 = 100;  // Solar radio ten centimeter flux
   double A_p = 120;   // Geomagnetic A_p index
-  double temp_epsilon = pow(10,-14);
+  double temp_epsilon = pow(10, -14);
   // Collect drag parameters into a pair with F_10 first and A_p second
   std::pair<double, double> drag_elements = {F_10, A_p};
   double test_timestep = 0.01;  // s
   bool perturbation_bool = true;
-  double total_sim_time = 10; // s
+  double total_sim_time = 10;  // s
   double current_time_nodrag = test_satellite_nodrag.get_instantaneous_time();
   double orbital_radius = 0;
   while (current_time_nodrag < total_sim_time) {
-  std::pair<double, int> new_timestep_and_error_code =
-      test_satellite_nodrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
-        false);
-      orbital_radius = test_satellite_nodrag.get_radius();
-      double altitude = (orbital_radius - radius_Earth)/1000.0;
-      double next_timestep = new_timestep_and_error_code.first;
-      test_timestep = next_timestep;
-      int error_code = new_timestep_and_error_code.second;
-      current_time_nodrag = test_satellite_nodrag.get_instantaneous_time();
+    std::pair<double, int> new_timestep_and_error_code =
+        test_satellite_nodrag.evolve_RK45(temp_epsilon, test_timestep,
+                                          perturbation_bool, false);
+    orbital_radius = test_satellite_nodrag.get_radius();
+    double altitude = (orbital_radius - radius_Earth) / 1000.0;
+    double next_timestep = new_timestep_and_error_code.first;
+    test_timestep = next_timestep;
+    int error_code = new_timestep_and_error_code.second;
+    current_time_nodrag = test_satellite_nodrag.get_instantaneous_time();
   }
-  double no_drag_semimajor_axis = test_satellite_nodrag.get_orbital_parameter("Semimajor Axis");
+  double no_drag_semimajor_axis =
+      test_satellite_nodrag.get_orbital_parameter("Semimajor Axis");
 
-  double current_time_withdrag = test_satellite_withdrag.get_instantaneous_time();
+  double current_time_withdrag =
+      test_satellite_withdrag.get_instantaneous_time();
 
   while (current_time_withdrag < total_sim_time) {
-  std::pair<double, int> new_timestep_and_error_code =
-  test_satellite_withdrag.evolve_RK45(temp_epsilon, test_timestep, perturbation_bool,
-        true,drag_elements);
-      double next_timestep = new_timestep_and_error_code.first;
-      test_timestep = next_timestep;
-      int error_code = new_timestep_and_error_code.second;
-      current_time_withdrag = test_satellite_withdrag.get_instantaneous_time();
+    std::pair<double, int> new_timestep_and_error_code =
+        test_satellite_withdrag.evolve_RK45(temp_epsilon, test_timestep,
+                                            perturbation_bool, true,
+                                            drag_elements);
+    double next_timestep = new_timestep_and_error_code.first;
+    test_timestep = next_timestep;
+    int error_code = new_timestep_and_error_code.second;
+    current_time_withdrag = test_satellite_withdrag.get_instantaneous_time();
   }
-  double with_drag_semimajor_axis = test_satellite_withdrag.get_orbital_parameter("Semimajor Axis");
+  double with_drag_semimajor_axis =
+      test_satellite_withdrag.get_orbital_parameter("Semimajor Axis");
 
   EXPECT_TRUE(no_drag_semimajor_axis > with_drag_semimajor_axis)
-      << "Semimajor axis after evolution wasn't lower when drag was introduced. "
-      "This isn't expected behavior. Difference: " << no_drag_semimajor_axis - with_drag_semimajor_axis << "\n"
-      " After-loop time without drag: " << current_time_nodrag << " and with drag: " << current_time_withdrag << "\n";
+      << "Semimajor axis after evolution wasn't lower when drag was "
+         "introduced. "
+         "This isn't expected behavior. Difference: "
+      << no_drag_semimajor_axis - with_drag_semimajor_axis
+      << "\n"
+         " After-loop time without drag: "
+      << current_time_nodrag << " and with drag: " << current_time_withdrag
+      << "\n";
 }
 
+TEST(EllipticalOrbitTests, ArgofPeriapsisChangeManeuver1) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_3.json");
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = true;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  const double t_thrust_start = 0;
+  const double initial_arg_of_periapsis_deg =
+      test_satellite.get_orbital_parameter("Argument of Periapsis");
+  const double initial_arg_of_periapsis_rad =
+      initial_arg_of_periapsis_deg * (M_PI / 180.0);
+  const double target_arg_of_periapsis_deg = initial_arg_of_periapsis_deg + 10;
+  const double target_arg_of_periapsis_rad =
+      target_arg_of_periapsis_deg * (M_PI / 180.0);
+  const double alpha = M_PI / 2.0;  // continous thrust
+  const double sign_of_delta_omega =
+      1.0;  // because in this case, the final arg of periapsis is larger than
+            // the initial
+  const double thrust_magnitude = 0.1;  // N
+  const double mu_Earth = G * mass_Earth;
+  const double delta_omega_mag =
+      abs(target_arg_of_periapsis_rad -
+          initial_arg_of_periapsis_rad);  // = delta_omega / sgn(delta_omega)
+  const double satellite_a =
+      test_satellite.get_orbital_parameter("Semimajor Axis");
+  const double satellite_eccentricity =
+      test_satellite.get_orbital_parameter("Eccentricity");
+  const double satellite_mass = test_satellite.get_mass();
+  const double delta_V =
+      (2.0 / 3.0) * sqrt(mu_Earth / satellite_a) * satellite_eccentricity *
+      delta_omega_mag /
+      sqrt(1 - satellite_eccentricity * satellite_eccentricity);
+  const double acceleration = thrust_magnitude / satellite_mass;
+  const double maneuver_length = delta_V / acceleration;
+  const double total_sim_time = maneuver_length + 10000;
+  double temp_epsilon = pow(10, -13);
+  test_satellite.add_maneuver("Argument of Periapsis Change", t_thrust_start,
+                              target_arg_of_periapsis_deg, thrust_magnitude);
+  double current_time = test_satellite.get_instantaneous_time();
+  while (current_time < total_sim_time) {
+    std::pair<double, int> new_timestep_and_error_code =
+        test_satellite.evolve_RK45(temp_epsilon, test_timestep, false);
+    double next_timestep = new_timestep_and_error_code.first;
+    test_timestep = next_timestep;
+    int error_code = new_timestep_and_error_code.second;
+    current_time = test_satellite.get_instantaneous_time();
+  }
+  double arg_of_periapsis_final_deg =
+      test_satellite.get_orbital_parameter("Argument of Periapsis");
+  EXPECT_TRUE(abs(arg_of_periapsis_final_deg - target_arg_of_periapsis_deg) <
+              1);
+}
+
+TEST(EllipticalOrbitTests, ArgofPeriapsisChangeManeuver2) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_3.json");
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = true;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  const double t_thrust_start = 0;
+  const double initial_arg_of_periapsis_deg =
+      test_satellite.get_orbital_parameter("Argument of Periapsis");
+  const double initial_arg_of_periapsis_rad =
+      initial_arg_of_periapsis_deg * (M_PI / 180.0);
+  const double target_arg_of_periapsis_deg = initial_arg_of_periapsis_deg - 10;
+  const double target_arg_of_periapsis_rad =
+      target_arg_of_periapsis_deg * (M_PI / 180.0);
+  const double alpha = M_PI / 2.0;  // continous thrust
+  const double sign_of_delta_omega =
+      1.0;  // because in this case, the final arg of periapsis is larger than
+            // the initial
+  const double thrust_magnitude = 0.1;  // N
+  const double mu_Earth = G * mass_Earth;
+  const double delta_omega_mag =
+      abs(target_arg_of_periapsis_rad -
+          initial_arg_of_periapsis_rad);  // = delta_omega / sgn(delta_omega)
+  const double satellite_a =
+      test_satellite.get_orbital_parameter("Semimajor Axis");
+  const double satellite_eccentricity =
+      test_satellite.get_orbital_parameter("Eccentricity");
+  const double satellite_mass = test_satellite.get_mass();
+  const double delta_V =
+      (2.0 / 3.0) * sqrt(mu_Earth / satellite_a) * satellite_eccentricity *
+      delta_omega_mag /
+      sqrt(1 - satellite_eccentricity * satellite_eccentricity);
+  const double acceleration = thrust_magnitude / satellite_mass;
+  const double maneuver_length = delta_V / acceleration;
+  const double total_sim_time = maneuver_length + 10000;
+  double temp_epsilon = pow(10, -13);
+  test_satellite.add_maneuver("Argument of Periapsis Change", t_thrust_start,
+                              target_arg_of_periapsis_deg, thrust_magnitude);
+  double current_time = test_satellite.get_instantaneous_time();
+  while (current_time < total_sim_time) {
+    std::pair<double, int> new_timestep_and_error_code =
+        test_satellite.evolve_RK45(temp_epsilon, test_timestep, false);
+    double next_timestep = new_timestep_and_error_code.first;
+    test_timestep = next_timestep;
+    int error_code = new_timestep_and_error_code.second;
+    current_time = test_satellite.get_instantaneous_time();
+  }
+  double arg_of_periapsis_final_deg =
+      test_satellite.get_orbital_parameter("Argument of Periapsis");
+  EXPECT_TRUE(abs(arg_of_periapsis_final_deg - target_arg_of_periapsis_deg) <
+              1);
+}
 
 // Circular orbit tests
 
@@ -384,9 +516,11 @@ TEST(CircularOrbitTests, TotalEnergyTimestep1) {
   int error_code = new_timestep_and_error_code.second;
   double evolved_energy = test_satellite.get_total_energy();
 
-  EXPECT_TRUE(abs(initial_energy - evolved_energy)/initial_energy < energy_cons_relative_tolerance)
-      << "Total energy not preserved within relative tolerance. Relative difference: "
-      << abs(initial_energy - evolved_energy)/initial_energy << "\n";
+  EXPECT_TRUE(abs(initial_energy - evolved_energy) / initial_energy <
+              energy_cons_relative_tolerance)
+      << "Total energy not preserved within relative tolerance. Relative "
+         "difference: "
+      << abs(initial_energy - evolved_energy) / initial_energy << "\n";
 }
 
 TEST(CircularOrbitTests, EvolvedOrbitalRadius1) {
@@ -556,9 +690,8 @@ TEST(CircularOrbitTests, Thruster_Eccentricity_Change) {
       << resulting_eccentricity << "\n";
 }
 
-
 // Attitude-related tests
-const double pitch_tolerance = 0.25; // degrees
+const double pitch_tolerance = 0.25;  // degrees
 
 TEST(AttitudeTests, PassivePitchTest1) {
   // Without any external or initial torques, the satellite's pitch angle
@@ -572,11 +705,13 @@ TEST(AttitudeTests, PassivePitchTest1) {
   double current_true_anomaly = initial_true_anomaly;
   double next_timestep = 0;
   bool wrapped_around = false;
-  while ((current_true_anomaly < initial_true_anomaly) || (wrapped_around == false)) {
+  while ((current_true_anomaly < initial_true_anomaly) ||
+         (wrapped_around == false)) {
     std::pair<double, int> new_timestep_and_error_code =
         test_satellite.evolve_RK45(epsilon, test_timestep);
     current_true_anomaly = test_satellite.get_orbital_parameter("True Anomaly");
-    if ((!wrapped_around) && (0 <= current_true_anomaly) && (current_true_anomaly <= initial_true_anomaly)){
+    if ((!wrapped_around) && (0 <= current_true_anomaly) &&
+        (current_true_anomaly <= initial_true_anomaly)) {
       wrapped_around = true;
     }
     next_timestep = new_timestep_and_error_code.first;
@@ -584,10 +719,9 @@ TEST(AttitudeTests, PassivePitchTest1) {
     test_timestep = next_timestep;
   }
   double evolved_pitch = test_satellite.get_attitude_val("Pitch");
-  EXPECT_TRUE(abs(evolved_pitch - initial_pitch) <
-  pitch_tolerance)
+  EXPECT_TRUE(abs(evolved_pitch - initial_pitch) < pitch_tolerance)
       << "Pitch didn't progress 2*pi radians (within tolerance) "
-      "over one orbit as expected. Difference: "
+         "over one orbit as expected. Difference: "
       << evolved_pitch - initial_pitch << "\n";
 }
 
@@ -614,20 +748,21 @@ TEST(AttitudeTests, PassivePitchTest2) {
       << "Pitch didn't increase as expected\n";
 }
 
-
 // Misc tests
 TEST(MiscTests, ThrustProfileInitializationTest1) {
   double t_start = 1.0;
   double t_end = 9.0;
-  std::array<double,3> thrust_vec = {1.0,101.2,-0.4};
-  double magnitude = sqrt(pow(thrust_vec.at(0),2) + pow(thrust_vec.at(1),2) + pow(thrust_vec.at(2),2));
-  std::array<double,3> thrust_vec_direction = {0.0,0.0,0.0};
-  for (size_t ind=0;ind<thrust_vec.size();ind++) {
-    thrust_vec_direction.at(ind) = thrust_vec.at(ind)/magnitude;
+  std::array<double, 3> thrust_vec = {1.0, 101.2, -0.4};
+  double magnitude = sqrt(pow(thrust_vec.at(0), 2) + pow(thrust_vec.at(1), 2) +
+                          pow(thrust_vec.at(2), 2));
+  std::array<double, 3> thrust_vec_direction = {0.0, 0.0, 0.0};
+  for (size_t ind = 0; ind < thrust_vec.size(); ind++) {
+    thrust_vec_direction.at(ind) = thrust_vec.at(ind) / magnitude;
   }
 
-  ThrustProfileLVLH thrust_profile_1(t_start,t_end,thrust_vec);
-  ThrustProfileLVLH thrust_profile_2(t_start,t_end,thrust_vec_direction,magnitude);
+  ThrustProfileLVLH thrust_profile_1(t_start, t_end, thrust_vec);
+  ThrustProfileLVLH thrust_profile_2(t_start, t_end, thrust_vec_direction,
+                                     magnitude);
 
   EXPECT_TRUE(thrust_profile_1 == thrust_profile_2)
       << "Thrust profiles initialized differently didn't agree.\n";
@@ -636,15 +771,17 @@ TEST(MiscTests, ThrustProfileInitializationTest1) {
 TEST(MiscTests, TorqueProfileInitializationTest1) {
   double t_start = 1.0;
   double t_end = 9.0;
-  std::array<double,3> torque_vec = {1.0,101.2,-0.4};
-  double magnitude = sqrt(pow(torque_vec.at(0),2) + pow(torque_vec.at(1),2) + pow(torque_vec.at(2),2));
-  std::array<double,3> torque_vec_direction = {0.0,0.0,0.0};
-  for (size_t ind=0;ind<torque_vec.size();ind++) {
-    torque_vec_direction.at(ind) = torque_vec.at(ind)/magnitude;
+  std::array<double, 3> torque_vec = {1.0, 101.2, -0.4};
+  double magnitude = sqrt(pow(torque_vec.at(0), 2) + pow(torque_vec.at(1), 2) +
+                          pow(torque_vec.at(2), 2));
+  std::array<double, 3> torque_vec_direction = {0.0, 0.0, 0.0};
+  for (size_t ind = 0; ind < torque_vec.size(); ind++) {
+    torque_vec_direction.at(ind) = torque_vec.at(ind) / magnitude;
   }
 
-  BodyframeTorqueProfile torque_profile_1(t_start,t_end,torque_vec);
-  BodyframeTorqueProfile torque_profile_2(t_start,t_end,torque_vec_direction,magnitude);
+  BodyframeTorqueProfile torque_profile_1(t_start, t_end, torque_vec);
+  BodyframeTorqueProfile torque_profile_2(t_start, t_end, torque_vec_direction,
+                                          magnitude);
 
   EXPECT_TRUE(torque_profile_1 == torque_profile_2)
       << "Torque profiles initialized differently didn't agree.\n";
@@ -655,13 +792,12 @@ TEST(MiscTests, ZeroInclinationTest) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/zero_inclination_test.json");
-  }
-  catch( const std::invalid_argument& invalid_arg_error) {
+  } catch (const std::invalid_argument& invalid_arg_error) {
     caught = true;
   }
 
-  EXPECT_TRUE(caught)
-      << "Didn't catch the invalid argument error expected for zero inclination\n";
+  EXPECT_TRUE(caught) << "Didn't catch the invalid argument error expected for "
+                         "zero inclination\n";
 }
 
 // Make sure function to get name of Satellite is working as expected
@@ -669,7 +805,6 @@ TEST(MiscTests, SatelliteNameTest) {
   Satellite test_satellite("../tests/circular_orbit_test_1_input.json");
   std::string expected_name = "Circ_Test_1";
   std::string recovered_name = test_satellite.get_name();
-
 
   EXPECT_TRUE(expected_name == recovered_name)
       << "Satellite name fetching didn't work as expected\n";
@@ -681,13 +816,12 @@ TEST(MiscTests, AttitudeIncorrectNameTest) {
   bool caught = false;
   try {
     double val = test_satellite.get_attitude_val("This isn't a real name");
-  }
-  catch( const std::invalid_argument& invalid_arg_error) {
+  } catch (const std::invalid_argument& invalid_arg_error) {
     caught = true;
   }
 
-  EXPECT_TRUE(caught)
-      << "Didn't catch the invalid argument error expected for attitude val fetching\n";
+  EXPECT_TRUE(caught) << "Didn't catch the invalid argument error expected for "
+                         "attitude val fetching\n";
 }
 
 TEST(MiscTests, OrbitElemIncorrectNameTest) {
@@ -695,99 +829,98 @@ TEST(MiscTests, OrbitElemIncorrectNameTest) {
   bool caught = false;
   try {
     double val = test_satellite.get_orbital_parameter("This isn't a real name");
-  }
-  catch( const std::invalid_argument& invalid_arg_error) {
+  } catch (const std::invalid_argument& invalid_arg_error) {
     caught = true;
   }
 
-  EXPECT_TRUE(caught)
-      << "Didn't catch the invalid argument error expected for orbital parameter fetching\n";
+  EXPECT_TRUE(caught) << "Didn't catch the invalid argument error expected for "
+                         "orbital parameter fetching\n";
 }
 
 TEST(MiscTests, NoInclination) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/no_inclination.json");
-  }
-  catch( const std::exception& invalid_arg_error) {
+  } catch (const std::exception& invalid_arg_error) {
     caught = true;
   }
-  EXPECT_TRUE(caught) << "Didn't catch exception when inclination wasn't in input file\n";
+  EXPECT_TRUE(caught)
+      << "Didn't catch exception when inclination wasn't in input file\n";
 }
 
 TEST(MiscTests, NoEccentricity) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/no_eccentricity.json");
-  }
-  catch( const std::exception& invalid_arg_error) {
+  } catch (const std::exception& invalid_arg_error) {
     caught = true;
   }
-  EXPECT_TRUE(caught) << "Didn't catch exception when eccentricity wasn't in input file\n";
+  EXPECT_TRUE(caught)
+      << "Didn't catch exception when eccentricity wasn't in input file\n";
 }
 
 TEST(MiscTests, NoArgofPeriapsis) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/no_arg_of_periapsis.json");
-  }
-  catch( const std::exception& invalid_arg_error) {
+  } catch (const std::exception& invalid_arg_error) {
     caught = true;
   }
-  EXPECT_TRUE(caught) << "Didn't catch exception when argument of periapsis wasn't in input file\n";
+  EXPECT_TRUE(caught) << "Didn't catch exception when argument of periapsis "
+                         "wasn't in input file\n";
 }
 
 TEST(MiscTests, NoRAAN) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/no_RAAN.json");
-  }
-  catch( const std::exception& invalid_arg_error) {
+  } catch (const std::exception& invalid_arg_error) {
     caught = true;
   }
-  EXPECT_TRUE(caught) << "Didn't catch exception when RAAN wasn't in input file\n";
+  EXPECT_TRUE(caught)
+      << "Didn't catch exception when RAAN wasn't in input file\n";
 }
 
 TEST(MiscTests, NoSemimajorAxis) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/no_semimajor_axis.json");
-  }
-  catch( const std::exception& invalid_arg_error) {
+  } catch (const std::exception& invalid_arg_error) {
     caught = true;
   }
-  EXPECT_TRUE(caught) << "Didn't catch exception when semimajor axis wasn't in input file\n";
+  EXPECT_TRUE(caught)
+      << "Didn't catch exception when semimajor axis wasn't in input file\n";
 }
 
 TEST(MiscTests, NoTrueAnomaly) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/no_true_anomaly.json");
-  }
-  catch( const std::exception& invalid_arg_error) {
+  } catch (const std::exception& invalid_arg_error) {
     caught = true;
   }
-  EXPECT_TRUE(caught) << "Didn't catch exception when true anomaly wasn't in input file\n";
+  EXPECT_TRUE(caught)
+      << "Didn't catch exception when true anomaly wasn't in input file\n";
 }
 
 TEST(MiscTests, NoName) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/no_name.json");
-  }
-  catch( const std::exception& invalid_arg_error) {
+  } catch (const std::exception& invalid_arg_error) {
     caught = true;
   }
-  EXPECT_TRUE(caught) << "Didn't catch exception when satellite name wasn't in input file\n";
+  EXPECT_TRUE(caught)
+      << "Didn't catch exception when satellite name wasn't in input file\n";
 }
 
 TEST(MiscTests, NoMass) {
   bool caught = false;
   try {
     Satellite test_satellite("../tests/no_mass.json");
-  }
-  catch( const std::exception& invalid_arg_error) {
+  } catch (const std::exception& invalid_arg_error) {
     caught = true;
   }
-  EXPECT_TRUE(caught) << "Didn't catch exception when satellite mass wasn't in input file\n";
+  EXPECT_TRUE(caught)
+      << "Didn't catch exception when satellite mass wasn't in input file\n";
 }

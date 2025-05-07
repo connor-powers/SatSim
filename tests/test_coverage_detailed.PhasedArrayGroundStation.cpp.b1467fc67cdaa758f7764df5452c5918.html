@@ -26,7 +26,7 @@
     </tr>
     <tr>
       <th scope="row">Date:</th>
-      <td>2025-05-06 17:04:10</td>
+      <td>2025-05-07 02:51:48</td>
     </tr>
   </table>
 </div>
@@ -40,8 +40,8 @@
     </tr>
     <tr>
       <th scope="row">Lines:</th>
-      <td>74</td>
-      <td>75</td>
+      <td>78</td>
+      <td>79</td>
       <td class="coverage-high">98.7%</td>
     </tr>
     <tr>
@@ -70,12 +70,12 @@
       <th>Call count</th>
       <th>Block coverage</th>
     </tr>
-    <tr><td><a href="#l34">PhasedArrayGroundStation::angle_to_satellite_from_normal(Satellite) (line 34)</a></td><td>called 8749080 times</td><td>100.0%</td></tr>
-    <tr><td><a href="#l18">PhasedArrayGroundStation::distance_to_satellite(Satellite) (line 18)</a></td><td>called 4731363 times</td><td>100.0%</td></tr>
-    <tr><td><a href="#l9">PhasedArrayGroundStation::generate_ECEF_position() (line 9)</a></td><td>called 5 times</td><td>100.0%</td></tr>
-    <tr><td><a href="#l13">PhasedArrayGroundStation::get_ECI_position(double) (line 13)</a></td><td>called 13480446 times</td><td>100.0%</td></tr>
-    <tr><td><a href="#l70">PhasedArrayGroundStation::num_sats_connected_at_this_time(double) (line 70)</a></td><td>called 8747784 times</td><td>84.0%</td></tr>
-    <tr><td><a href="#l112">PhasedArrayGroundStation::update_linked_sats_map(unsigned long, double, double) (line 112)</a></td><td>called 714942 times</td><td>77.0%</td></tr>
+    <tr><td><a href="#l39">PhasedArrayGroundStation::angle_to_satellite_from_normal(Satellite) (line 39)</a></td><td>called 8749080 times</td><td>100.0%</td></tr>
+    <tr><td><a href="#l20">PhasedArrayGroundStation::distance_to_satellite(Satellite) (line 20)</a></td><td>called 4731363 times</td><td>100.0%</td></tr>
+    <tr><td><a href="#l11">PhasedArrayGroundStation::generate_ECEF_position() (line 11)</a></td><td>called 5 times</td><td>100.0%</td></tr>
+    <tr><td><a href="#l15">PhasedArrayGroundStation::get_ECI_position(double) (line 15)</a></td><td>called 13480446 times</td><td>100.0%</td></tr>
+    <tr><td><a href="#l79">PhasedArrayGroundStation::num_sats_connected_at_this_time(double) (line 79)</a></td><td>called 8747784 times</td><td>84.0%</td></tr>
+    <tr><td><a href="#l124">PhasedArrayGroundStation::update_linked_sats_map(unsigned long, double, double) (line 124)</a></td><td>called 714942 times</td><td>77.0%</td></tr>
   </table>
 </details>
 
@@ -94,14 +94,14 @@
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span></td>
+      <td class="src "><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;PhasedArrayGroundStation.h&quot;</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l2" href="#l2">2</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span></td>
+      <td class="src "></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l3" href="#l3">3</a></td>
@@ -115,14 +115,14 @@
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;PhasedArrayGroundStation.h&quot;</span></td>
+      <td class="src "><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l5" href="#l5">5</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;utils.h&quot;</span></td>
+      <td class="src "><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l6" href="#l6">6</a></td>
@@ -136,7 +136,7 @@
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="k">using</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">;</span></td>
+      <td class="src "><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;utils.h&quot;</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l8" href="#l8">8</a></td>
@@ -149,123 +149,151 @@
       <td class="lineno"><a id="l9" href="#l9">9</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">5</td>
-      <td class="src coveredLine"><span class="kt">void</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::generate_ECEF_position</span><span class="p">()</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="k">using</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3d</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l10" href="#l10">10</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">5</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">ECEF_position_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">convert_lat_long_to_ECEF</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span><span class="w"> </span><span class="n">longitude</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span></td>
+      <td class="linecount "></td>
+      <td class="src "></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l11" href="#l11">11</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">5</td>
-      <td class="src coveredLine"><span class="p">}</span></td>
+      <td class="src coveredLine"><span class="kt">void</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::generate_ECEF_position</span><span class="p">()</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l12" href="#l12">12</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="linecount coveredLine">5</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">ECEF_position_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">convert_lat_long_to_ECEF</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span><span class="w"> </span><span class="n">longitude</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l13" href="#l13">13</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">13480446</td>
-      <td class="src coveredLine"><span class="n">Vector3d</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::get_ECI_position</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="linecount coveredLine">5</td>
+      <td class="src coveredLine"><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l14" href="#l14">14</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">13480446</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">ECI_position_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">convert_ECEF_to_ECI</span><span class="p">(</span><span class="n">ECEF_position_</span><span class="p">,</span><span class="w"> </span><span class="n">input_time</span><span class="p">);</span></td>
+      <td class="linecount "></td>
+      <td class="src "></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l15" href="#l15">15</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">13480446</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ECI_position_vec</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="n">Vector3d</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::get_ECI_position</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l16" href="#l16">16</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">  </span><span class="p">}</span></td>
+      <td class="linecount coveredLine">13480446</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">ECI_position_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">convert_ECEF_to_ECI</span><span class="p">(</span><span class="n">ECEF_position_</span><span class="p">,</span><span class="w"> </span><span class="n">input_time</span><span class="p">);</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l17" href="#l17">17</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="linecount coveredLine">13480446</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">ECI_position_vec</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l18" href="#l18">18</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">4731363</td>
-      <td class="src coveredLine"><span class="kt">double</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::distance_to_satellite</span><span class="p">(</span><span class="n">Satellite</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l19" href="#l19">19</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Computes Euclidean distance to a satellite</span></td>
+      <td class="src "></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l20" href="#l20">20</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">4731363</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">.</span><span class="n">get_ECI_position</span><span class="p">();</span></td>
+      <td class="src coveredLine"><span class="kt">double</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::distance_to_satellite</span><span class="p">(</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l21" href="#l21">21</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">4731363</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">current_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">.</span><span class="n">get_instantaneous_time</span><span class="p">();</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">    </span><span class="n">Satellite</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l22" href="#l22">22</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">4731363</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_ECI_position</span><span class="p">(</span><span class="n">current_time</span><span class="p">);</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Computes Euclidean distance to a satellite</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l23" href="#l23">23</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="src "><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="w"> </span><span class="o">=</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l24" href="#l24">24</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Convert to Eigen Vector3d</span></td>
+      <td class="linecount coveredLine">4731363</td>
+      <td class="src coveredLine"><span class="w">      </span><span class="n">input_satellite</span><span class="p">.</span><span class="n">get_ECI_position</span><span class="p">();</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l25" href="#l25">25</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">4731363</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">satellite_position_vec</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">current_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">.</span><span class="n">get_instantaneous_time</span><span class="p">();</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l26" href="#l26">26</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">4731363</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_ECI_position</span><span class="p">(</span><span class="n">current_time</span><span class="p">);</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l27" href="#l27">27</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l28" href="#l28">28</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Convert to Eigen Vector3d</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l29" href="#l29">29</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">4731363</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">satellite_position_vec</span><span class="p">;</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l30" href="#l30">30</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -276,171 +304,192 @@
         </details>
       </td>
       <td class="linecount coveredLine">18925452</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">ind</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ind</span><span class="o">&lt;</span><span class="n">satellite_position_ECI</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="n">ind</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l27" href="#l27">27</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">14194089</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="n">satellite_position_vec</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">ind</span><span class="p">);</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l28" href="#l28">28</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">14194089</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="p">}</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l29" href="#l29">29</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Order doesn&#39;t matter here</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l30" href="#l30">30</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">4731363</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">difference_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">satellite_position_vec</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="p">);</span></td>
+      <td class="src coveredLine"><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ind</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="n">ind</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l31" href="#l31">31</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">4731363</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">difference_vec</span><span class="p">.</span><span class="n">norm</span><span class="p">();</span></td>
+      <td class="linecount coveredLine">14194089</td>
+      <td class="src coveredLine"><span class="w">    </span><span class="n">satellite_position_vec</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">ind</span><span class="p">);</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l32" href="#l32">32</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="p">}</span></td>
+      <td class="linecount coveredLine">14194089</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l33" href="#l33">33</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Order doesn&#39;t matter here</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l34" href="#l34">34</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="kt">double</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::angle_to_satellite_from_normal</span><span class="p">(</span><span class="n">Satellite</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">difference_vec</span><span class="w"> </span><span class="o">=</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l35" href="#l35">35</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="linecount coveredLine">4731363</td>
+      <td class="src coveredLine"><span class="w">      </span><span class="p">(</span><span class="n">satellite_position_vec</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="p">);</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l36" href="#l36">36</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Computes angle between vector pointing from ground station to satellite</span></td>
+      <td class="linecount coveredLine">4731363</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">difference_vec</span><span class="p">.</span><span class="n">norm</span><span class="p">();</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l37" href="#l37">37</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// and the vector normal to the ground station&#39;s antenna plane</span></td>
+      <td class="src "><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l38" href="#l38">38</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Note: for now, this antenna plane is assumed to be tangential to the Earth</span></td>
+      <td class="src "></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l39" href="#l39">39</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// at the antenna&#39;s location.</span></td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="kt">double</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::angle_to_satellite_from_normal</span><span class="p">(</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l40" href="#l40">40</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="src "><span class="w">    </span><span class="n">Satellite</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l41" href="#l41">41</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Ref: https://archive.aoe.vt.edu/lutze/AOE4134/12SatelliteLookAngle.pdf</span></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Computes angle between vector pointing from ground station to satellite</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l42" href="#l42">42</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// but I don&#39;t think you need to use that topocentric-horizontal coordinate system</span></td>
+      <td class="src "><span class="w">  </span><span class="c1">// and the vector normal to the ground station&#39;s antenna plane</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l43" href="#l43">43</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// to just get angle between antenna plane normal and station-satellite vector</span></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Note: for now, this antenna plane is assumed to be tangential to the Earth</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l44" href="#l44">44</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">current_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">.</span><span class="n">get_instantaneous_time</span><span class="p">();</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// at the antenna&#39;s location.</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l45" href="#l45">45</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_ECI_position</span><span class="p">(</span><span class="n">current_time</span><span class="p">);</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l46" href="#l46">46</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
       <td class="src "></td>
     </tr>
     <tr class="source-line">
+      <td class="lineno"><a id="l46" href="#l46">46</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Ref: https://archive.aoe.vt.edu/lutze/AOE4134/12SatelliteLookAngle.pdf</span></td>
+    </tr>
+    <tr class="source-line">
       <td class="lineno"><a id="l47" href="#l47">47</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">.</span><span class="n">get_ECI_position</span><span class="p">();</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// but I don&#39;t think you need to use that topocentric-horizontal coordinate</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l48" href="#l48">48</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Convert to Eigen Vector3d</span></td>
+      <td class="src "><span class="w">  </span><span class="c1">// system to just get angle between antenna plane normal and station-satellite</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l49" href="#l49">49</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">satellite_position_vec</span><span class="p">;</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// vector</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l50" href="#l50">50</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">current_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input_satellite</span><span class="p">.</span><span class="n">get_instantaneous_time</span><span class="p">();</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l51" href="#l51">51</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_ECI_position</span><span class="p">(</span><span class="n">current_time</span><span class="p">);</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l52" href="#l52">52</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l53" href="#l53">53</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="w"> </span><span class="o">=</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l54" href="#l54">54</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">      </span><span class="n">input_satellite</span><span class="p">.</span><span class="n">get_ECI_position</span><span class="p">();</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l55" href="#l55">55</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Convert to Eigen Vector3d</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l56" href="#l56">56</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">satellite_position_vec</span><span class="p">;</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l57" href="#l57">57</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -451,199 +500,220 @@
         </details>
       </td>
       <td class="linecount coveredLine">34996320</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">ind</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ind</span><span class="o">&lt;</span><span class="n">satellite_position_ECI</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="n">ind</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l51" href="#l51">51</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">26247240</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="n">satellite_position_vec</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">ind</span><span class="p">);</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l52" href="#l52">52</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">26247240</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="p">}</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l53" href="#l53">53</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount "></td>
-      <td class="src "></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l54" href="#l54">54</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">station_to_satellite_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">satellite_position_vec</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="p">;</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l55" href="#l55">55</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Normalize to avoid needing magnitudes in angle calculation</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l56" href="#l56">56</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// So this is just a unit vector now</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l57" href="#l57">57</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">station_to_satellite_vec</span><span class="p">.</span><span class="n">normalize</span><span class="p">();</span></td>
+      <td class="src coveredLine"><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ind</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="n">ind</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l58" href="#l58">58</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="linecount coveredLine">26247240</td>
+      <td class="src coveredLine"><span class="w">    </span><span class="n">satellite_position_vec</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">satellite_position_ECI</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">ind</span><span class="p">);</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l59" href="#l59">59</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Antenna plane normal is (given current assumptions) in the same</span></td>
+      <td class="linecount coveredLine">26247240</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l60" href="#l60">60</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// direction as the vector from the center of the Earth to the ground station</span></td>
+      <td class="src "></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l61" href="#l61">61</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">antenna_plane_normal_direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="p">;</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">station_to_satellite_vec</span><span class="w"> </span><span class="o">=</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l62" href="#l62">62</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="n">antenna_plane_normal_direction</span><span class="p">.</span><span class="n">normalize</span><span class="p">();</span></td>
+      <td class="src coveredLine"><span class="w">      </span><span class="n">satellite_position_vec</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l63" href="#l63">63</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Normalize to avoid needing magnitudes in angle calculation</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l64" href="#l64">64</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// See, e.g., https://www.wikihow.com/Find-the-Angle-Between-Two-Vectors</span></td>
+      <td class="src "><span class="w">  </span><span class="c1">// So this is just a unit vector now</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l65" href="#l65">65</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">angle_radians</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">acos</span><span class="p">(</span><span class="n">station_to_satellite_vec</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">antenna_plane_normal_direction</span><span class="p">));</span></td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">station_to_satellite_vec</span><span class="p">.</span><span class="n">normalize</span><span class="p">();</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l66" href="#l66">66</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Make sure returned angle is in degrees</span></td>
+      <td class="src "></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l67" href="#l67">67</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">8749080</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">angle_radians</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">180</span><span class="o">/</span><span class="n">M_PI</span><span class="p">));</span></td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Antenna plane normal is (given current assumptions) in the same</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l68" href="#l68">68</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="p">}</span></td>
+      <td class="src "><span class="w">  </span><span class="c1">// direction as the vector from the center of the Earth to the ground station</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l69" href="#l69">69</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">Vector3d</span><span class="w"> </span><span class="n">antenna_plane_normal_direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">groundstation_position_ECI</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l70" href="#l70">70</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">8747784</td>
-      <td class="src coveredLine"><span class="kt">int</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::num_sats_connected_at_this_time</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="n">antenna_plane_normal_direction</span><span class="p">.</span><span class="n">normalize</span><span class="p">();</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l71" href="#l71">71</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Goal: check the number of satellites whose time ranges of being linked with this ground station</span></td>
+      <td class="src "></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l72" href="#l72">72</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// include the current time</span></td>
+      <td class="src "><span class="w">  </span><span class="c1">// See, e.g., https://www.wikihow.com/Find-the-Angle-Between-Two-Vectors</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l73" href="#l73">73</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">angle_radians</span><span class="w"> </span><span class="o">=</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l74" href="#l74">74</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// Method: two-pointer search along each element of linked_sats_list to find </span></td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">      </span><span class="n">acos</span><span class="p">(</span><span class="n">station_to_satellite_vec</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">antenna_plane_normal_direction</span><span class="p">));</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l75" href="#l75">75</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// first and last ranges that overlap the input time</span></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Make sure returned angle is in degrees</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l76" href="#l76">76</a></td>
       <td class="linebranch">
       </td>
-      <td class="linecount coveredLine">8747784</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">connected_sats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span></td>
+      <td class="linecount coveredLine">8749080</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">angle_radians</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">180</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">M_PI</span><span class="p">));</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l77" href="#l77">77</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "></td>
+      <td class="src "><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
       <td class="lineno"><a id="l78" href="#l78">78</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l79" href="#l79">79</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">8747784</td>
+      <td class="src coveredLine"><span class="kt">int</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::num_sats_connected_at_this_time</span><span class="p">(</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l80" href="#l80">80</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l81" href="#l81">81</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Goal: check the number of satellites whose time ranges of being linked with</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l82" href="#l82">82</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// this ground station include the current time</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l83" href="#l83">83</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l84" href="#l84">84</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// Method: two-pointer search along each element of linked_sats_list to find</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l85" href="#l85">85</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// first and last ranges that overlap the input time</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l86" href="#l86">86</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">8747784</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">connected_sats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l87" href="#l87">87</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l88" href="#l88">88</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -654,17 +724,24 @@
         </details>
       </td>
       <td class="linecount coveredLine">32237334</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">key_val_pair</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">linked_sats_map_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src coveredLine"><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">key_val_pair</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">linked_sats_map_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l79" href="#l79">79</a></td>
+      <td class="lineno"><a id="l89" href="#l89">89</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">23489550</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="kt">size_t</span><span class="w"> </span><span class="n">satellite_ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key_val_pair</span><span class="p">.</span><span class="n">first</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">satellite_ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key_val_pair</span><span class="p">.</span><span class="n">first</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l80" href="#l80">80</a></td>
+      <td class="lineno"><a id="l90" href="#l90">90</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">satellite_comms_range_list</span><span class="w"> </span><span class="o">=</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l91" href="#l91">91</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">1/2</summary>
@@ -675,38 +752,38 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">23489550</td>
-      <td class="src partialCoveredLine"><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">satellite_comms_range_list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key_val_pair</span><span class="p">.</span><span class="n">second</span><span class="p">;</span></td>
+      <td class="src partialCoveredLine"><span class="w">        </span><span class="n">key_val_pair</span><span class="p">.</span><span class="n">second</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l81" href="#l81">81</a></td>
+      <td class="lineno"><a id="l92" href="#l92">92</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">        </span><span class="c1">// For a given satellite</span></td>
+      <td class="src "><span class="w">    </span><span class="c1">// For a given satellite</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l82" href="#l82">82</a></td>
+      <td class="lineno"><a id="l93" href="#l93">93</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">        </span><span class="c1">// I just need to identify whether there exists a single range that encompasses the input time</span></td>
+      <td class="src "><span class="w">    </span><span class="c1">// I just need to identify whether there exists a single range that</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l83" href="#l83">83</a></td>
+      <td class="lineno"><a id="l94" href="#l94">94</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">        </span><span class="c1">// I can do this by just finding the last range where the t_start &lt;= input_time and </span></td>
+      <td class="src "><span class="w">    </span><span class="c1">// encompasses the input time I can do this by just finding the last range</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l84" href="#l84">84</a></td>
+      <td class="lineno"><a id="l95" href="#l95">95</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">        </span><span class="c1">// see if t_end &gt;= input_time</span></td>
+      <td class="src "><span class="w">    </span><span class="c1">// where the t_start &lt;= input_time and see if t_end &gt;= input_time</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l85" href="#l85">85</a></td>
+      <td class="lineno"><a id="l96" href="#l96">96</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -717,72 +794,84 @@
         </details>
       </td>
       <td class="linecount coveredLine">23489550</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l86" href="#l86">86</a></td>
+      <td class="lineno"><a id="l97" href="#l97">97</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
-          <summary class="linebranchSummary">6/8</summary>
+          <summary class="linebranchSummary">5/6</summary>
           <div class="linebranchContents">
             <div class="takenBranch">&check; Branch 0 taken 11951604 times.</div>
             <div class="notTakenBranch">&cross; Branch 1 not taken.</div>
             <div class="takenBranch">&check; Branch 2 taken 7669368 times.</div>
             <div class="takenBranch">&check; Branch 3 taken 4282236 times.</div>
-            <div class="takenBranch">&check; Branch 4 taken 7669368 times.</div>
-            <div class="notTakenBranch">&cross; Branch 5 not taken.</div>
-            <div class="takenBranch">&check; Branch 6 taken 7050528 times.</div>
-            <div class="takenBranch">&check; Branch 7 taken 618840 times.</div>
+            <div class="takenBranch">&check; Branch 4 taken 7050528 times.</div>
+            <div class="takenBranch">&check; Branch 5 taken 618840 times.</div>
           </div>
         </details>
       </td>
-      <td class="linecount partialCoveredLine">11951604</td>
-      <td class="src partialCoveredLine"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">first</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">second</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">input_time</span><span class="p">))</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="linecount partialCoveredLine">19620972</td>
+      <td class="src partialCoveredLine"><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">first</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l87" href="#l87">87</a></td>
+      <td class="lineno"><a id="l98" href="#l98">98</a></td>
+      <td class="linebranch">
+        <details class="linebranchDetails">
+          <summary class="linebranchSummary">1/2</summary>
+          <div class="linebranchContents">
+            <div class="takenBranch">&check; Branch 0 taken 7669368 times.</div>
+            <div class="notTakenBranch">&cross; Branch 1 not taken.</div>
+          </div>
+        </details>
+      </td>
+      <td class="linecount partialCoveredLine">7669368</td>
+      <td class="src partialCoveredLine"><span class="w">          </span><span class="p">(</span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">second</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">input_time</span><span class="p">))</span><span class="w"> </span><span class="p">{</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l99" href="#l99">99</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">618840</td>
-      <td class="src coveredLine"><span class="w">                </span><span class="n">connected_sats</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">        </span><span class="n">connected_sats</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l88" href="#l88">88</a></td>
+      <td class="lineno"><a id="l100" href="#l100">100</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">618840</td>
-      <td class="src coveredLine"><span class="w">                </span><span class="k">continue</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">        </span><span class="k">continue</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l89" href="#l89">89</a></td>
+      <td class="lineno"><a id="l101" href="#l101">101</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">            </span><span class="p">}</span></td>
+      <td class="src "><span class="w">      </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l90" href="#l90">90</a></td>
+      <td class="lineno"><a id="l102" href="#l102">102</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">11332764</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="p">}</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l91" href="#l91">91</a></td>
+      <td class="lineno"><a id="l103" href="#l103">103</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">22870710</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">right_ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">right_ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l92" href="#l92">92</a></td>
+      <td class="lineno"><a id="l104" href="#l104">104</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">last_matching_pair_ind</span><span class="p">;</span></td>
+      <td class="src "><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">last_matching_pair_ind</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l93" href="#l93">93</a></td>
+      <td class="lineno"><a id="l105" href="#l105">105</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -793,10 +882,17 @@
         </details>
       </td>
       <td class="linecount coveredLine">36855846</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">right_ind</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">right_ind</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l94" href="#l94">94</a></td>
+      <td class="lineno"><a id="l106" href="#l106">106</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">right_range</span><span class="w"> </span><span class="o">=</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l107" href="#l107">107</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">1/2</summary>
@@ -807,10 +903,10 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">29816406</td>
-      <td class="src partialCoveredLine"><span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">right_range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">right_ind</span><span class="p">);</span></td>
+      <td class="src partialCoveredLine"><span class="w">          </span><span class="n">satellite_comms_range_list</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">right_ind</span><span class="p">);</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l95" href="#l95">95</a></td>
+      <td class="lineno"><a id="l108" href="#l108">108</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -821,24 +917,24 @@
         </details>
       </td>
       <td class="linecount coveredLine">29816406</td>
-      <td class="src coveredLine"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">right_range</span><span class="p">.</span><span class="n">second</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src coveredLine"><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">right_range</span><span class="p">.</span><span class="n">second</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l96" href="#l96">96</a></td>
+      <td class="lineno"><a id="l109" href="#l109">109</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">15013314</td>
-      <td class="src coveredLine"><span class="w">                </span><span class="k">break</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">        </span><span class="k">break</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l97" href="#l97">97</a></td>
+      <td class="lineno"><a id="l110" href="#l110">110</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">            </span><span class="p">}</span></td>
+      <td class="src "><span class="w">      </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l98" href="#l98">98</a></td>
+      <td class="lineno"><a id="l111" href="#l111">111</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -849,31 +945,24 @@
         </details>
       </td>
       <td class="linecount coveredLine">14803092</td>
-      <td class="src coveredLine"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">right_range</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src coveredLine"><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">right_range</span><span class="p">.</span><span class="n">first</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l99" href="#l99">99</a></td>
+      <td class="lineno"><a id="l112" href="#l112">112</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">13985136</td>
-      <td class="src coveredLine"><span class="w">                </span><span class="n">right_ind</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">        </span><span class="n">right_ind</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l100" href="#l100">100</a></td>
+      <td class="lineno"><a id="l113" href="#l113">113</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">13985136</td>
-      <td class="src coveredLine"><span class="w">            </span><span class="p">}</span></td>
+      <td class="src coveredLine"><span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l101" href="#l101">101</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="p">{</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l102" href="#l102">102</a></td>
+      <td class="lineno"><a id="l114" href="#l114">114</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">1/2</summary>
@@ -884,45 +973,45 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">817956</td>
-      <td class="src partialCoveredLine"><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">right_range</span><span class="p">.</span><span class="n">second</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src partialCoveredLine"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">right_range</span><span class="p">.</span><span class="n">second</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">input_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l103" href="#l103">103</a></td>
+      <td class="lineno"><a id="l115" href="#l115">115</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">817956</td>
-      <td class="src coveredLine"><span class="w">                    </span><span class="n">connected_sats</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">          </span><span class="n">connected_sats</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l104" href="#l104">104</a></td>
+      <td class="lineno"><a id="l116" href="#l116">116</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">817956</td>
-      <td class="src coveredLine"><span class="w">                </span><span class="p">}</span></td>
+      <td class="src coveredLine"><span class="w">        </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l105" href="#l105">105</a></td>
+      <td class="lineno"><a id="l117" href="#l117">117</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">817956</td>
-      <td class="src coveredLine"><span class="w">                </span><span class="k">break</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">        </span><span class="k">break</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l106" href="#l106">106</a></td>
+      <td class="lineno"><a id="l118" href="#l118">118</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">            </span><span class="p">}</span></td>
+      <td class="src "><span class="w">      </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l107" href="#l107">107</a></td>
+      <td class="lineno"><a id="l119" href="#l119">119</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">        </span><span class="p">}</span></td>
+      <td class="src "><span class="w">    </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l108" href="#l108">108</a></td>
+      <td class="lineno"><a id="l120" href="#l120">120</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">4/5</summary>
@@ -936,52 +1025,66 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">23489550</td>
-      <td class="src partialCoveredLine"><span class="w">    </span><span class="p">}</span></td>
+      <td class="src partialCoveredLine"><span class="w">  </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l109" href="#l109">109</a></td>
+      <td class="lineno"><a id="l121" href="#l121">121</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">8747784</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">connected_sats</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">connected_sats</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l110" href="#l110">110</a></td>
+      <td class="lineno"><a id="l122" href="#l122">122</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount uncoveredLine">&cross;</td>
       <td class="src uncoveredLine"><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l111" href="#l111">111</a></td>
+      <td class="lineno"><a id="l123" href="#l123">123</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
       <td class="src "></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l112" href="#l112">112</a></td>
+      <td class="lineno"><a id="l124" href="#l124">124</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">714942</td>
-      <td class="src coveredLine"><span class="kt">void</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::update_linked_sats_map</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">satellite_index</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">connection_time</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">previous_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src coveredLine"><span class="kt">void</span><span class="w"> </span><span class="nf">PhasedArrayGroundStation::update_linked_sats_map</span><span class="p">(</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l113" href="#l113">113</a></td>
+      <td class="lineno"><a id="l125" href="#l125">125</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// If you&#39;re just extending an existing range, update the t_end of existing pair,</span></td>
+      <td class="src "><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">satellite_index</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">connection_time</span><span class="p">,</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l114" href="#l114">114</a></td>
+      <td class="lineno"><a id="l126" href="#l126">126</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="c1">// otherwise create a new pair with the current time as the t_start</span></td>
+      <td class="src "><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">previous_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l115" href="#l115">115</a></td>
+      <td class="lineno"><a id="l127" href="#l127">127</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// If you&#39;re just extending an existing range, update the t_end of existing</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l128" href="#l128">128</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">  </span><span class="c1">// pair, otherwise create a new pair with the current time as the t_start</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l129" href="#l129">129</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -992,24 +1095,31 @@
         </details>
       </td>
       <td class="linecount coveredLine">714942</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">linked_sats_map_</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">satellite_index</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src coveredLine"><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">linked_sats_map_</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">satellite_index</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l116" href="#l116">116</a></td>
+      <td class="lineno"><a id="l130" href="#l130">130</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">1296</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">connection_time_range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">connection_time</span><span class="p">,</span><span class="n">connection_time</span><span class="p">};</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">connection_time_range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">connection_time</span><span class="p">,</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l117" href="#l117">117</a></td>
+      <td class="lineno"><a id="l131" href="#l131">131</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">                                                       </span><span class="n">connection_time</span><span class="p">};</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l132" href="#l132">132</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">1296</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">tmp_vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">connection_time_range</span><span class="p">};</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">tmp_vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">connection_time_range</span><span class="p">};</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l118" href="#l118">118</a></td>
+      <td class="lineno"><a id="l133" href="#l133">133</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">1/2</summary>
@@ -1020,45 +1130,45 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">1296</td>
-      <td class="src partialCoveredLine"><span class="w">        </span><span class="n">linked_sats_map_</span><span class="p">.</span><span class="n">emplace</span><span class="p">(</span><span class="n">satellite_index</span><span class="p">,</span><span class="n">tmp_vector</span><span class="p">);</span></td>
+      <td class="src partialCoveredLine"><span class="w">    </span><span class="n">linked_sats_map_</span><span class="p">.</span><span class="n">emplace</span><span class="p">(</span><span class="n">satellite_index</span><span class="p">,</span><span class="w"> </span><span class="n">tmp_vector</span><span class="p">);</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l119" href="#l119">119</a></td>
+      <td class="lineno"><a id="l134" href="#l134">134</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">1296</td>
-      <td class="src coveredLine"><span class="w">    </span><span class="p">}</span></td>
+      <td class="src coveredLine"><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l120" href="#l120">120</a></td>
+      <td class="lineno"><a id="l135" href="#l135">135</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src "><span class="w">    </span><span class="c1">// Look at most recently added range</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l121" href="#l121">121</a></td>
+      <td class="lineno"><a id="l136" href="#l136">136</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">        </span></td>
+      <td class="src "><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="w"> </span><span class="o">=</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l122" href="#l122">122</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount "></td>
-      <td class="src "><span class="w">        </span><span class="c1">// Look at most recently added range</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l123" href="#l123">123</a></td>
+      <td class="lineno"><a id="l137" href="#l137">137</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">713646</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">linked_sats_map_</span><span class="p">[</span><span class="n">satellite_index</span><span class="p">];</span></td>
+      <td class="src coveredLine"><span class="w">        </span><span class="n">linked_sats_map_</span><span class="p">[</span><span class="n">satellite_index</span><span class="p">];</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l124" href="#l124">124</a></td>
+      <td class="lineno"><a id="l138" href="#l138">138</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">most_recent_range</span><span class="w"> </span><span class="o">=</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l139" href="#l139">139</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">1/2</summary>
@@ -1069,10 +1179,17 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">713646</td>
-      <td class="src partialCoveredLine"><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">most_recent_range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span></td>
+      <td class="src partialCoveredLine"><span class="w">        </span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">at</span><span class="p">(</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l125" href="#l125">125</a></td>
+      <td class="lineno"><a id="l140" href="#l140">140</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">713646</td>
+      <td class="src coveredLine"><span class="w">            </span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l141" href="#l141">141</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/2</summary>
@@ -1083,24 +1200,24 @@
         </details>
       </td>
       <td class="linecount coveredLine">713646</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">most_recent_range</span><span class="p">.</span><span class="n">second</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">previous_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">most_recent_range</span><span class="p">.</span><span class="n">second</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">previous_time</span><span class="p">)</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l126" href="#l126">126</a></td>
+      <td class="lineno"><a id="l142" href="#l142">142</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">            </span><span class="c1">// Just extending existing range</span></td>
+      <td class="src "><span class="w">      </span><span class="c1">// Just extending existing range</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l127" href="#l127">127</a></td>
+      <td class="lineno"><a id="l143" href="#l143">143</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">712872</td>
-      <td class="src coveredLine"><span class="w">            </span><span class="n">most_recent_range</span><span class="p">.</span><span class="n">second</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">connection_time</span><span class="p">;</span></td>
+      <td class="src coveredLine"><span class="w">      </span><span class="n">most_recent_range</span><span class="p">.</span><span class="n">second</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">connection_time</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l128" href="#l128">128</a></td>
+      <td class="lineno"><a id="l144" href="#l144">144</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">1/2</summary>
@@ -1111,10 +1228,17 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">712872</td>
-      <td class="src partialCoveredLine"><span class="w">            </span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">most_recent_range</span><span class="p">;</span></td>
+      <td class="src partialCoveredLine"><span class="w">      </span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">at</span><span class="p">(</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l129" href="#l129">129</a></td>
+      <td class="lineno"><a id="l145" href="#l145">145</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">712872</td>
+      <td class="src coveredLine"><span class="w">          </span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">most_recent_range</span><span class="p">;</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l146" href="#l146">146</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/4</summary>
@@ -1127,31 +1251,31 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">712872</td>
-      <td class="src partialCoveredLine"><span class="w">            </span><span class="n">linked_sats_map_</span><span class="p">[</span><span class="n">satellite_index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="p">;</span></td>
+      <td class="src partialCoveredLine"><span class="w">      </span><span class="n">linked_sats_map_</span><span class="p">[</span><span class="n">satellite_index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l130" href="#l130">130</a></td>
+      <td class="lineno"><a id="l147" href="#l147">147</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">712872</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="p">}</span></td>
+      <td class="src coveredLine"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l131" href="#l131">131</a></td>
+      <td class="lineno"><a id="l148" href="#l148">148</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span></td>
+      <td class="src "><span class="w">      </span><span class="c1">// New connection range</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l132" href="#l132">132</a></td>
+      <td class="lineno"><a id="l149" href="#l149">149</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>
-      <td class="src "><span class="w">            </span><span class="c1">// New connection range</span></td>
+      <td class="src "><span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="w"> </span><span class="o">=</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l133" href="#l133">133</a></td>
+      <td class="lineno"><a id="l150" href="#l150">150</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/4</summary>
@@ -1164,17 +1288,24 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">774</td>
-      <td class="src partialCoveredLine"><span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">linked_sats_map_</span><span class="p">[</span><span class="n">satellite_index</span><span class="p">];</span></td>
+      <td class="src partialCoveredLine"><span class="w">          </span><span class="n">linked_sats_map_</span><span class="p">[</span><span class="n">satellite_index</span><span class="p">];</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l134" href="#l134">134</a></td>
+      <td class="lineno"><a id="l151" href="#l151">151</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">774</td>
-      <td class="src coveredLine"><span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">new_connection_time_range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">connection_time</span><span class="p">,</span><span class="n">connection_time</span><span class="p">};</span></td>
+      <td class="src coveredLine"><span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">new_connection_time_range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">connection_time</span><span class="p">,</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l135" href="#l135">135</a></td>
+      <td class="lineno"><a id="l152" href="#l152">152</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount "></td>
+      <td class="src "><span class="w">                                                             </span><span class="n">connection_time</span><span class="p">};</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l153" href="#l153">153</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">1/2</summary>
@@ -1185,10 +1316,10 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">774</td>
-      <td class="src partialCoveredLine"><span class="w">            </span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">new_connection_time_range</span><span class="p">);</span></td>
+      <td class="src partialCoveredLine"><span class="w">      </span><span class="n">existing_connection_time_ranges</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">new_connection_time_range</span><span class="p">);</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l136" href="#l136">136</a></td>
+      <td class="lineno"><a id="l154" href="#l154">154</a></td>
       <td class="linebranch">
         <details class="linebranchDetails">
           <summary class="linebranchSummary">2/4</summary>
@@ -1201,31 +1332,31 @@
         </details>
       </td>
       <td class="linecount partialCoveredLine">774</td>
-      <td class="src partialCoveredLine"><span class="w">            </span><span class="n">linked_sats_map_</span><span class="p">[</span><span class="n">satellite_index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="p">;</span></td>
+      <td class="src partialCoveredLine"><span class="w">      </span><span class="n">linked_sats_map_</span><span class="p">[</span><span class="n">satellite_index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">existing_connection_time_ranges</span><span class="p">;</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l137" href="#l137">137</a></td>
+      <td class="lineno"><a id="l155" href="#l155">155</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">774</td>
-      <td class="src coveredLine"><span class="w">        </span><span class="p">}</span></td>
-    </tr>
-    <tr class="source-line">
-      <td class="lineno"><a id="l138" href="#l138">138</a></td>
-      <td class="linebranch">
-      </td>
-      <td class="linecount coveredLine">713646</td>
       <td class="src coveredLine"><span class="w">    </span><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l139" href="#l139">139</a></td>
+      <td class="lineno"><a id="l156" href="#l156">156</a></td>
+      <td class="linebranch">
+      </td>
+      <td class="linecount coveredLine">713646</td>
+      <td class="src coveredLine"><span class="w">  </span><span class="p">}</span></td>
+    </tr>
+    <tr class="source-line">
+      <td class="lineno"><a id="l157" href="#l157">157</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount coveredLine">714942</td>
       <td class="src coveredLine"><span class="p">}</span></td>
     </tr>
     <tr class="source-line">
-      <td class="lineno"><a id="l140" href="#l140">140</a></td>
+      <td class="lineno"><a id="l158" href="#l158">158</a></td>
       <td class="linebranch">
       </td>
       <td class="linecount "></td>

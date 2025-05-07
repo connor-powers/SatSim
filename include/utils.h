@@ -6,8 +6,8 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-#include "Satellite.h"
 #include "PhasedArrayGroundStation.h"
+#include "Satellite.h"
 
 using Eigen::Matrix3d;
 using Eigen::MatrixXd;
@@ -15,7 +15,6 @@ using Eigen::Vector3d;
 using Eigen::Vector4d;
 
 using json = nlohmann::json;
-
 
 struct SimParameters {
   double initial_timestep_guess = 1;
@@ -88,9 +87,11 @@ std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
 // template <int T>
 // std::array<double, T> RK4_step(
 //     const std::array<double, T> y_n, const double input_step_size,
-//     std::function<std::array<double, T>(const std::array<double, T> input_y_vec,
+//     std::function<std::array<double, T>(const std::array<double, T>
+//     input_y_vec,
 //                                         const double input_spacecraft_mass,
-//                                         const std::vector<std::array<double, 3>>
+//                                         const std::vector<std::array<double,
+//                                         3>>
 //                                             input_vec_of_force_vectors_in_ECI)>
 //         input_derivative_function,
 //     const double input_spacecraft_mass,
@@ -101,7 +102,8 @@ std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
 //     const std::vector<std::array<double, 3>>
 //         input_vec_of_force_vectors_in_ECI_at_t_and_step = {}) {
 //   // ref:
-//   // https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods#The_Runge%E2%80%93Kutta_method
+//   //
+//   https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods#The_Runge%E2%80%93Kutta_method
 //   std::array<double, T> y_nplus1 = y_n;
 
 //   // first, k=1;
@@ -148,11 +150,9 @@ std::array<double, 6> RK4_deriv_function_orbit_position_and_velocity(
 //   return y_nplus1;
 // }
 
-void sim_and_draw_orbit_gnuplot(
-    std::vector<Satellite> input_satellite_vector, 
-    const SimParameters& input_sim_parameters,
-    const std::string output_file_name = "output"
-);
+void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
+                                const SimParameters& input_sim_parameters,
+                                const std::string output_file_name = "output");
 
 template <int T>
 std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
@@ -166,6 +166,8 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
     double input_t_n, double input_epsilon, double input_inclination,
     double input_arg_of_periapsis, double input_true_anomaly,
     bool perturbation) {
+  // std::cout << "In RK45_step, received perturbation bool: " << perturbation
+  // << "\n";
   // Version for satellite orbital motion time evolution
   // Implementing RK4(5) method for its adaptive step size
   // Refs:https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
@@ -205,8 +207,8 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
     std::array<double, T> k_vec_at_this_s;
     for (size_t s_ind = 0; s_ind < k_ind; s_ind++) {
       for (size_t y_val_ind = 0; y_val_ind < y_n.size(); y_val_ind++) {
-        y_n_evaluated_value.at(y_val_ind) += RK_matrix(k_ind, s_ind) *
-                                             k_vec_vec.at(s_ind).at(y_val_ind);
+        y_n_evaluated_value.at(y_val_ind) +=
+            RK_matrix(k_ind, s_ind) * k_vec_vec.at(s_ind).at(y_val_ind);
       }
     }
     std::array<double, 6> derivative_function_output =
@@ -290,14 +292,14 @@ std::array<double, 3> convert_cylindrical_to_cartesian(
     const double input_r_comp, const double input_theta_comp,
     const double input_z_comp, const double input_theta);
 void sim_and_plot_orbital_elem_gnuplot(
-    std::vector<Satellite> input_satellite_vector, 
+    std::vector<Satellite> input_satellite_vector,
     const SimParameters& input_sim_parameters,
     const std::string input_orbital_element_name,
     const std::string file_name = "output");
 void sim_and_plot_attitude_evolution_gnuplot(
     std::vector<Satellite> input_satellite_vector,
     const SimParameters& input_sim_parameters,
-    const std::string input_plotted_val_name, 
+    const std::string input_plotted_val_name,
     const std::string file_name = "output");
 
 Matrix3d rollyawpitch_bodyframe_to_LVLH(
@@ -499,22 +501,25 @@ std::array<double, 3> convert_array_from_LVLH_to_bodyframe(
     const std::array<double, 3> input_LVLH_frame_array, const double input_roll,
     const double input_yaw, const double input_pitch);
 
+Vector3d convert_lat_long_to_ECEF(const double latitude, const double longitude,
+                                  const double height);
+Vector3d convert_ECEF_to_ECI(const Vector3d input_ECEF_position,
+                             const double input_time);
 
-Vector3d  convert_lat_long_to_ECEF(const double latitude, const double longitude, const double height);
-Vector3d  convert_ECEF_to_ECI(const Vector3d input_ECEF_position, const double input_time);
+void sim_and_plot_gs_connectivity_distance_gnuplot(
+    PhasedArrayGroundStation input_ground_station,
+    std::vector<Satellite> input_satellite_vector,
+    const SimParameters& input_sim_parameters,
+    const std::string file_name = "output");
 
-void sim_and_plot_gs_connectivity_distance_gnuplot(PhasedArrayGroundStation input_ground_station,
-  std::vector<Satellite> input_satellite_vector, 
-  const SimParameters& input_sim_parameters,
-  const std::string file_name = "output");
+void sim_and_plot_gs_connectivity_gnuplot(
+    PhasedArrayGroundStation input_ground_station,
+    std::vector<Satellite> input_satellite_vector,
+    const SimParameters& input_sim_parameters,
+    const std::string file_name = "output");
 
-void sim_and_plot_gs_connectivity_gnuplot(PhasedArrayGroundStation input_ground_station,
-  std::vector<Satellite> input_satellite_vector, 
-  const SimParameters& input_sim_parameters,
-  const std::string file_name = "output");
-
-int add_lowthrust_orbit_transfer(Satellite& input_satellite_object, const double final_orbit_semimajor_axis_km, 
-  const double thrust_magnitude, const double transfer_initiation_time = 0);
-
-double calibrate_mean_val(Satellite satellite_object, const SimParameters& input_sim_parameters, const std::string input_parameter_name);
+int add_lowthrust_orbit_transfer(Satellite& input_satellite_object,
+                                 const double final_orbit_semimajor_axis_km,
+                                 const double thrust_magnitude,
+                                 const double transfer_initiation_time = 0);
 #endif

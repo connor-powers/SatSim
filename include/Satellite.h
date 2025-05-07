@@ -19,13 +19,16 @@ using json = nlohmann::json;
 
 class ThrustProfileLVLH {
   // Note: for now, thrust forces are assumed to act through center of mass of
-  // satellite.
+  // the satellite.
  public:
   double t_start_ = {0};
   double t_end_ = {0};
   bool arg_of_periapsis_change_thrust_profile = false;
+  // =======================================================================
+  // Only used for argument of periapsis change thrust profiles
   double sign_of_delta_omega = {1};
-  double thrust_magnitude_ = {0}; // Only used for argument of periapsis change thrust profiles
+  double thrust_magnitude_ = {0};  
+  // =======================================================================
   std::array<double, 3> LVLH_force_vec_ = {0, 0, 0};
   ThrustProfileLVLH(const double t_start, const double t_end,
                     const std::array<double, 3> LVLH_force_vec) {
@@ -45,24 +48,33 @@ class ThrustProfileLVLH {
     }
   }
   ThrustProfileLVLH(const double t_start, const double final_arg_of_periapsis,
-                  const  double thrust_magnitude, const double initial_arg_of_periapsis,
-                  const double satellite_eccentricity, const double satellite_a,
-                  const double satellite_mass) {
+                    const double thrust_magnitude,
+                    const double initial_arg_of_periapsis,
+                    const double satellite_eccentricity,
+                    const double satellite_a, const double satellite_mass) {
     // Thrust profile for continuous-thrust argument of periapsis change
     // Main ref: https://apps.dtic.mil/sti/tr/pdf/ADA384536.pdf
-    // 
-    // Used Eq. 67 in https://link.springer.com/article/10.1007/s10569-021-10033-9#Sec15 to determine burn angles
+    // Used Eq. 67 in
+    // https://link.springer.com/article/10.1007/s10569-021-10033-9#Sec15 to
+    // determine burn angles Arguments of periapsis are input in radians
     arg_of_periapsis_change_thrust_profile = true;
     t_start_ = t_start;
-    const double alpha = M_PI/2.0; // continous thrust
-    (final_arg_of_periapsis > initial_arg_of_periapsis) ? sign_of_delta_omega = 1.0 : sign_of_delta_omega = -1.0;
+    const double alpha = M_PI / 2.0;  // continous thrust
+    (final_arg_of_periapsis > initial_arg_of_periapsis)
+        ? sign_of_delta_omega = 1.0
+        : sign_of_delta_omega = -1.0;
     thrust_magnitude_ = thrust_magnitude;
-    const double mu_Earth = G*mass_Earth;
-    const double delta_omega_mag = abs(final_arg_of_periapsis - initial_arg_of_periapsis); // = delta_omega / sgn(delta_omega)
-    const double delta_V = (2.0/3.0)*sqrt(mu_Earth/satellite_a)*satellite_eccentricity*delta_omega_mag/sqrt(1-satellite_eccentricity*satellite_eccentricity);
-    const double acceleration = thrust_magnitude/satellite_mass;
-    t_end_ = t_start + delta_V/acceleration;
-    std::cout << "Transfer time: " << t_end_ << "\n";
+    const double mu_Earth = G * mass_Earth;
+    const double delta_omega_mag =
+        abs(final_arg_of_periapsis -
+            initial_arg_of_periapsis);  // = delta_omega / sgn(delta_omega)
+    const double delta_V =
+        (2.0 / 3.0) * sqrt(mu_Earth / satellite_a) * satellite_eccentricity *
+        delta_omega_mag /
+        sqrt(1 - satellite_eccentricity * satellite_eccentricity);
+    const double acceleration = thrust_magnitude / satellite_mass;
+    t_end_ = t_start + delta_V / acceleration;
+    std::cout << "Maneuver duration: " << t_end_ << "\n";
   }
   bool operator==(const ThrustProfileLVLH& input_profile) {
     return ((t_start_ == input_profile.t_start_) &&
@@ -106,23 +118,24 @@ class BodyframeTorqueProfile {
 class Satellite {
  private:
   double inclination_ = {0};
-  double raan_ = {
-      0};  // Assuming RAAN can be used interchangeably with longitude of
-           // ascending node for the Earth-orbiting satellites simulated here
+  double raan_ = {0};  
+  // Assuming RAAN can be used interchangeably with longitude of
+  // ascending node for the Earth-orbiting satellites simulated here
   double arg_of_periapsis_ = {0};
   double eccentricity_ = {0};
   double a_ = {0};
   double true_anomaly_ = {0};
   double orbital_period_ = {0};
-  double m_ = {1};  // default value to prevent infinities in acceleration
-                    // calculations from a=F/m
+  double m_ = {1};  
+  // default value to prevent infinities in acceleration
+  // calculations from a=F/m
   // double I_={1}; //moment of inertia, taken to be same for all 3 principal
   // axes, set to default value for same reasons as mass
   double t_ = {0};
 
   double orbital_rate_ = {0};
-  double orbital_angular_acceleration_ = {0};  // Time derivative of orbital
-                                               // rate
+  // Time derivative of orbital rate
+  double orbital_angular_acceleration_ = {0};  
 
   // Now body-frame attributes
   // Assuming diagonal J matrix
@@ -141,8 +154,8 @@ class Satellite {
 
   // body-frame angular velocities relative to the LVLH frame, represented in
   // the body frame
-  std::array<double, 3> body_angular_velocity_vec_wrt_LVLH_in_body_frame_ = {
-      0, 0, 0};
+  std::array<double, 3> body_angular_velocity_vec_wrt_LVLH_in_body_frame_ 
+    = {0, 0, 0};
 
   // quaternion representing attitude of satellite body frame with respect to
   // the LVLH frame
@@ -163,7 +176,8 @@ class Satellite {
   std::vector<std::array<double, 3>> list_of_ECI_forces_at_this_time_ = {};
   std::vector<std::array<double, 3>> list_of_body_frame_torques_at_this_time_ =
       {};
-
+  std::vector<std::pair<std::string, std::array<double, 3>>>
+      maneuvers_awaiting_initiation_ = {};
   double drag_surface_area = {0};  // Surface area of satellite used for
   // atmospheric drag calculations
 
@@ -354,8 +368,9 @@ class Satellite {
   void add_LVLH_thrust_profile(
       const std::array<double, 3> input_LVLH_thrust_vector,
       const double input_thrust_start_time, const double input_thrust_end_time);
-  void add_LVLH_thrust_profile(const double input_thrust_start_time, const double final_arg_of_periapsis,
-                                const double input_thrust_magnitude);
+  void add_LVLH_thrust_profile(const double input_thrust_start_time,
+                               const double final_arg_of_periapsis,
+                               const double input_thrust_magnitude);
   void add_bodyframe_torque_profile(
       const std::array<double, 3> input_bodyframe_direction_unit_vec,
       const double input_bodyframe_torque_magnitude,
@@ -381,6 +396,11 @@ class Satellite {
   double get_attitude_val(const std::string input_attitude_val_name);
   double calculate_orbital_period();
   int add_arg_of_periapsis_change_thrust();
+  void check_for_maneuvers_to_initialize();
+  void add_maneuver(const std::string maneuver_type,
+                    const double maneuver_start_time,
+                    const double final_parameter_val,
+                    const double thrust_magnitude);
 };
 
 #endif
