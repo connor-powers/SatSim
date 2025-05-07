@@ -146,25 +146,17 @@ int main() {
   // oscillations at the final orbit be close to the target value
 
   Satellite arg_periapsis_change_sat("../example_satellite_input_files/arg_of_periapsis_test_input.json");
-  Satellite arg_periapsis_change_calibration_sat("../example_satellite_input_files/arg_of_periapsis_calibration_input.json");
-  sim_parameters.epsilon = pow(10,-12);
-  sim_parameters.total_sim_time = 250000; 
+  sim_parameters.epsilon = pow(10,-14);
+  sim_parameters.total_sim_time = 400000; 
   sim_parameters.perturbation_bool = false;
   sim_parameters.drag_bool = false;
-  double set_initial_arg_of_periapsis = arg_periapsis_change_sat.get_orbital_parameter("Argument of Periapsis");
-  double mean_val_final = calibrate_mean_val(arg_periapsis_change_calibration_sat,sim_parameters,"Argument of Periapsis");
-  t_thrust_start = 25000;
-  double mean_val_initial = calibrate_mean_val(arg_periapsis_change_sat,sim_parameters,"Argument of Periapsis");
-  // NOTE: Make sure the below value matches the argument of periapsis of your calibration satellite.
-  double final_arg_of_periapsis_deg = 20;
-  if (final_arg_of_periapsis_deg != arg_periapsis_change_calibration_sat.get_orbital_parameter("Argument of Periapsis")) {
-    std::cout << "Warning: Entered final argument of periapsis differs from value in calibration satellite object. "
-    "This will skew the applied offset from the nominal value. Make sure these two argument of periapsis values are equal.\n";
-  }
-  double offset = (final_arg_of_periapsis_deg - mean_val_final) + (set_initial_arg_of_periapsis - mean_val_initial);
-  double final_arg_of_periapsis = final_arg_of_periapsis_deg * (M_PI/180.0); // rad
+
+  t_thrust_start = 50000;
+  double final_arg_of_periapsis_deg = 25;
+
   thrust_magnitude = 0.1; // N
-  arg_periapsis_change_sat.add_LVLH_thrust_profile(t_thrust_start,final_arg_of_periapsis+(offset*M_PI/180.0),thrust_magnitude);
+  // std::cout << "orbital period: " << arg_periapsis_change_sat.calculate_orbital_period() << "\n";
+  arg_periapsis_change_sat.add_maneuver("Argument of Periapsis Change",t_thrust_start,final_arg_of_periapsis_deg,thrust_magnitude);
   file_name = "Arg of periapsis transfer";
   std::vector<Satellite> arg_of_periapsis_transfer_vec = {arg_periapsis_change_sat};
   sim_and_plot_orbital_elem_gnuplot(arg_of_periapsis_transfer_vec, sim_parameters, "Argument of Periapsis", file_name);

@@ -166,6 +166,7 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
     double input_t_n, double input_epsilon, double input_inclination,
     double input_arg_of_periapsis, double input_true_anomaly,
     bool perturbation) {
+      // std::cout << "In RK45_step, received perturbation bool: " << perturbation << "\n";
   // Version for satellite orbital motion time evolution
   // Implementing RK4(5) method for its adaptive step size
   // Refs:https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
@@ -515,6 +516,4 @@ void sim_and_plot_gs_connectivity_gnuplot(PhasedArrayGroundStation input_ground_
 
 int add_lowthrust_orbit_transfer(Satellite& input_satellite_object, const double final_orbit_semimajor_axis_km, 
   const double thrust_magnitude, const double transfer_initiation_time = 0);
-
-double calibrate_mean_val(Satellite satellite_object, const SimParameters& input_sim_parameters, const std::string input_parameter_name);
 #endif

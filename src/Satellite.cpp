@@ -395,6 +395,7 @@ std::pair<double, int> Satellite::evolve_RK45(
     const double input_epsilon, const double input_step_size,
     const bool perturbation, const bool atmospheric_drag,
     const std::pair<double, double> drag_elements) {
+      // std::cout << "In EvolveRK45, received perturbation bool: " << perturbation << "\n";
   // perturbation is a flag which, when set to true, currently accounts for J2
   // perturbation.
 
@@ -412,7 +413,10 @@ std::pair<double, int> Satellite::evolve_RK45(
   // F_10 is the first element, A_p is the second element
   double input_F_10 = drag_elements.first;
   double input_A_p = drag_elements.second;
-
+  
+  // Initialize arg of periapsis change thrust profile from current orbital parameters,
+  // if there is one that hasn't already been initialized
+  check_for_maneuvers_to_initialize();
   // Add any thrusts from an argument of periapsis change maneuver, if applicable
   int arg_of_periapsis_code = add_arg_of_periapsis_change_thrust();
 
@@ -700,3 +704,26 @@ int Satellite::add_arg_of_periapsis_change_thrust() {
   }
   return 0;
 }
+void Satellite::check_for_maneuvers_to_initialize() {
+  for (size_t maneuver_index = 0; maneuver_index < maneuvers_awaiting_initiation_.size(); maneuver_index++) {
+    std::pair<std::string,std::array<double,3>> maneuver_info = maneuvers_awaiting_initiation_.at(maneuver_index);
+    const double maneuver_start_time = maneuver_info.second.at(0);
+    if ((maneuver_start_time <= t_) && (maneuver_info.first == "Argument of Periapsis Change")) {
+      // Need to initialize this maneuver
+      const double target_arg_of_periapsis_deg = maneuver_info.second.at(1);
+      const double target_arg_of_periapsis_rad = target_arg_of_periapsis_deg * (M_PI/180.0);
+      const double thrust_magnitude = maneuver_info.second.at(2);
+      ThrustProfileLVLH thrust_profile(maneuver_start_time,target_arg_of_periapsis_rad,thrust_magnitude,
+        arg_of_periapsis_, eccentricity_, a_, m_);
+      thrust_profile_list_.push_back(thrust_profile);
+      maneuvers_awaiting_initiation_.erase(maneuvers_awaiting_initiation_.begin() + maneuver_index);
+    }
+  }
+}
+
+void Satellite::add_maneuver(const std::string maneuver_type, const double maneuver_start_time,
+  const double final_parameter_val, const double thrust_magnitude) {
+    std::array<double,3> maneuver_vals = {maneuver_start_time,final_parameter_val,thrust_magnitude};
+    std::pair<std::string,std::array<double,3>> maneuver_info = {maneuver_type,maneuver_vals};
+    maneuvers_awaiting_initiation_.push_back(maneuver_info);
+  }

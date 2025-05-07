@@ -340,6 +340,85 @@ TEST(EllipticalOrbitTests, DragTest2) {
       " After-loop time without drag: " << current_time_nodrag << " and with drag: " << current_time_withdrag << "\n";
 }
 
+TEST(EllipticalOrbitTests, ArgofPeriapsisChangeManeuver1) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_3.json");
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = true;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  const double t_thrust_start = 0;
+  const double initial_arg_of_periapsis_deg = test_satellite.get_orbital_parameter("Argument of Periapsis");
+  const double initial_arg_of_periapsis_rad = initial_arg_of_periapsis_deg*(M_PI/180.0);
+  const double target_arg_of_periapsis_deg = initial_arg_of_periapsis_deg + 10;
+  const double target_arg_of_periapsis_rad = target_arg_of_periapsis_deg*(M_PI/180.0);
+  const double alpha = M_PI/2.0; // continous thrust
+  const double sign_of_delta_omega = 1.0; // because in this case, the final arg of periapsis is larger than the initial
+  const double thrust_magnitude = 0.1; // N
+  const double mu_Earth = G*mass_Earth;
+  const double delta_omega_mag = abs(target_arg_of_periapsis_rad - initial_arg_of_periapsis_rad); // = delta_omega / sgn(delta_omega)
+  const double satellite_a = test_satellite.get_orbital_parameter("Semimajor Axis");  
+  const double satellite_eccentricity = test_satellite.get_orbital_parameter("Eccentricity");
+  const double satellite_mass = test_satellite.get_mass();
+  const double delta_V = (2.0/3.0)*sqrt(mu_Earth/satellite_a)*satellite_eccentricity*delta_omega_mag/sqrt(1-satellite_eccentricity*satellite_eccentricity);
+  const double acceleration = thrust_magnitude/satellite_mass;
+  const double maneuver_length = delta_V/acceleration;
+  const double total_sim_time = maneuver_length + 10000;
+  double temp_epsilon = pow(10,-14);
+  test_satellite.add_maneuver("Argument of Periapsis Change",t_thrust_start,target_arg_of_periapsis_deg,thrust_magnitude);
+  double current_time = test_satellite.get_instantaneous_time();
+  while (current_time < total_sim_time) {
+    std::pair<double, int> new_timestep_and_error_code =
+    test_satellite.evolve_RK45(temp_epsilon, test_timestep, false);
+        double next_timestep = new_timestep_and_error_code.first;
+        test_timestep = next_timestep;
+        int error_code = new_timestep_and_error_code.second;
+        current_time = test_satellite.get_instantaneous_time();
+    }
+    double arg_of_periapsis_final_deg = test_satellite.get_orbital_parameter("Argument of Periapsis");
+    EXPECT_TRUE(abs(arg_of_periapsis_final_deg - target_arg_of_periapsis_deg) < 1);
+}
+
+TEST(EllipticalOrbitTests, ArgofPeriapsisChangeManeuver2) {
+  Satellite test_satellite("../tests/elliptical_orbit_test_3.json");
+  double test_timestep = 0.1;  // s
+  bool perturbation_bool = true;
+  std::pair<double, int> new_timestep_and_error_code =
+      test_satellite.evolve_RK45(epsilon, test_timestep, perturbation_bool);
+  double next_timestep = new_timestep_and_error_code.first;
+  int error_code = new_timestep_and_error_code.second;
+  const double t_thrust_start = 0;
+  const double initial_arg_of_periapsis_deg = test_satellite.get_orbital_parameter("Argument of Periapsis");
+  const double initial_arg_of_periapsis_rad = initial_arg_of_periapsis_deg*(M_PI/180.0);
+  const double target_arg_of_periapsis_deg = initial_arg_of_periapsis_deg - 10;
+  const double target_arg_of_periapsis_rad = target_arg_of_periapsis_deg*(M_PI/180.0);
+  const double alpha = M_PI/2.0; // continous thrust
+  const double sign_of_delta_omega = 1.0; // because in this case, the final arg of periapsis is larger than the initial
+  const double thrust_magnitude = 0.1; // N
+  const double mu_Earth = G*mass_Earth;
+  const double delta_omega_mag = abs(target_arg_of_periapsis_rad - initial_arg_of_periapsis_rad); // = delta_omega / sgn(delta_omega)
+  const double satellite_a = test_satellite.get_orbital_parameter("Semimajor Axis");  
+  const double satellite_eccentricity = test_satellite.get_orbital_parameter("Eccentricity");
+  const double satellite_mass = test_satellite.get_mass();
+  const double delta_V = (2.0/3.0)*sqrt(mu_Earth/satellite_a)*satellite_eccentricity*delta_omega_mag/sqrt(1-satellite_eccentricity*satellite_eccentricity);
+  const double acceleration = thrust_magnitude/satellite_mass;
+  const double maneuver_length = delta_V/acceleration;
+  const double total_sim_time = maneuver_length + 10000;
+  double temp_epsilon = pow(10,-14);
+  test_satellite.add_maneuver("Argument of Periapsis Change",t_thrust_start,target_arg_of_periapsis_deg,thrust_magnitude);
+  double current_time = test_satellite.get_instantaneous_time();
+  while (current_time < total_sim_time) {
+    std::pair<double, int> new_timestep_and_error_code =
+    test_satellite.evolve_RK45(temp_epsilon, test_timestep, false);
+        double next_timestep = new_timestep_and_error_code.first;
+        test_timestep = next_timestep;
+        int error_code = new_timestep_and_error_code.second;
+        current_time = test_satellite.get_instantaneous_time();
+    }
+    double arg_of_periapsis_final_deg = test_satellite.get_orbital_parameter("Argument of Periapsis");
+    EXPECT_TRUE(abs(arg_of_periapsis_final_deg - target_arg_of_periapsis_deg) < 1);
+}
 
 // Circular orbit tests
 

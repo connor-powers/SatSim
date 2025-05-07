@@ -52,6 +52,7 @@ class ThrustProfileLVLH {
     // Main ref: https://apps.dtic.mil/sti/tr/pdf/ADA384536.pdf
     // 
     // Used Eq. 67 in https://link.springer.com/article/10.1007/s10569-021-10033-9#Sec15 to determine burn angles
+    // Arguments of periapsis are input in radians
     arg_of_periapsis_change_thrust_profile = true;
     t_start_ = t_start;
     const double alpha = M_PI/2.0; // continous thrust
@@ -62,7 +63,7 @@ class ThrustProfileLVLH {
     const double delta_V = (2.0/3.0)*sqrt(mu_Earth/satellite_a)*satellite_eccentricity*delta_omega_mag/sqrt(1-satellite_eccentricity*satellite_eccentricity);
     const double acceleration = thrust_magnitude/satellite_mass;
     t_end_ = t_start + delta_V/acceleration;
-    std::cout << "Transfer time: " << t_end_ << "\n";
+    std::cout << "Maneuver duration: " << t_end_ << "\n";
   }
   bool operator==(const ThrustProfileLVLH& input_profile) {
     return ((t_start_ == input_profile.t_start_) &&
@@ -163,7 +164,7 @@ class Satellite {
   std::vector<std::array<double, 3>> list_of_ECI_forces_at_this_time_ = {};
   std::vector<std::array<double, 3>> list_of_body_frame_torques_at_this_time_ =
       {};
-
+  std::vector<std::pair<std::string,std::array<double,3>>> maneuvers_awaiting_initiation_ = {};
   double drag_surface_area = {0};  // Surface area of satellite used for
   // atmospheric drag calculations
 
@@ -381,6 +382,9 @@ class Satellite {
   double get_attitude_val(const std::string input_attitude_val_name);
   double calculate_orbital_period();
   int add_arg_of_periapsis_change_thrust();
+  void check_for_maneuvers_to_initialize();
+  void add_maneuver(const std::string maneuver_type, const double maneuver_start_time,
+                    const double final_parameter_val, const double thrust_magnitude);
 };
 
 #endif

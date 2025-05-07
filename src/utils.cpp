@@ -353,6 +353,7 @@ std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
     const double input_F_10, const double input_A_p, const double input_A_s,
     const double input_satellite_mass, const bool perturbation,
     const bool atmospheric_drag) {
+  // std::cout << "In RK45 deriv function orbit position and velocity, received perturbation bool: " << perturbation << "\n";
   std::array<double, 6> derivative_of_input_y = {};
   std::array<double, 3> position_array = {};
   std::array<double, 3> velocity_array = {};
@@ -1612,48 +1613,4 @@ int add_lowthrust_orbit_transfer(Satellite& input_satellite_object, const double
       transfer_initiation_time, transfer_initiation_time + time_to_burn);
   }
   return error_code;
-}
-
-double calibrate_mean_val(Satellite satellite_object, const SimParameters& input_sim_parameters, const std::string input_parameter_name) {
-  // Objective: help calibrate simulations in context of inherent oscillations of parameters
-  // Here, the mean value of oscillations will be assumed to be constant (oscillations don't drift up or down over time)
-
-  // Let the simulation run without external applied forces, return mean value of parameter
-  // Not passing in satellite object by ref so that its internal clock doesn't get altered from its initial value before the actual
-  // simulations start
-  
-  double val =
-  satellite_object.get_orbital_parameter(input_parameter_name);
-  double mean_val = val;
-  size_t num_datapoints = 1;
-  double current_satellite_time =
-    satellite_object.get_instantaneous_time();
-
-  double evolved_val = {0};
-
-  double timestep_to_use = input_sim_parameters.initial_timestep_guess;
-  current_satellite_time = satellite_object.get_instantaneous_time();
-  while (current_satellite_time < input_sim_parameters.total_sim_time) {
-  std::pair<double, double> drag_elements = {input_sim_parameters.F_10, input_sim_parameters.A_p};
-  std::pair<double, int> new_timestep_and_error_code =
-  satellite_object.evolve_RK45(input_sim_parameters.epsilon, timestep_to_use,
-        input_sim_parameters.perturbation_bool, 
-        input_sim_parameters.drag_bool, drag_elements);
-  double new_timestep = new_timestep_and_error_code.first;
-  int error_code = new_timestep_and_error_code.second;
-
-  if (error_code != 0) {
-    std::cout << "Error code " << error_code << " detected, halting simulation and returning 0\n";
-    return 0.0;
-  }
-  timestep_to_use = new_timestep;
-  evolved_val =
-  satellite_object.get_orbital_parameter(input_parameter_name);
-  mean_val += evolved_val;
-  num_datapoints+=1;
-
-  current_satellite_time = satellite_object.get_instantaneous_time();
-  }
-  mean_val /= num_datapoints;
-  return mean_val;
 }
