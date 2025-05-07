@@ -19,14 +19,16 @@ using json = nlohmann::json;
 
 class ThrustProfileLVLH {
   // Note: for now, thrust forces are assumed to act through center of mass of
-  // satellite.
+  // the satellite.
  public:
   double t_start_ = {0};
   double t_end_ = {0};
   bool arg_of_periapsis_change_thrust_profile = false;
+  // =======================================================================
+  // Only used for argument of periapsis change thrust profiles
   double sign_of_delta_omega = {1};
-  double thrust_magnitude_ = {
-      0};  // Only used for argument of periapsis change thrust profiles
+  double thrust_magnitude_ = {0};  
+  // =======================================================================
   std::array<double, 3> LVLH_force_vec_ = {0, 0, 0};
   ThrustProfileLVLH(const double t_start, const double t_end,
                     const std::array<double, 3> LVLH_force_vec) {
@@ -52,7 +54,6 @@ class ThrustProfileLVLH {
                     const double satellite_a, const double satellite_mass) {
     // Thrust profile for continuous-thrust argument of periapsis change
     // Main ref: https://apps.dtic.mil/sti/tr/pdf/ADA384536.pdf
-    //
     // Used Eq. 67 in
     // https://link.springer.com/article/10.1007/s10569-021-10033-9#Sec15 to
     // determine burn angles Arguments of periapsis are input in radians
@@ -117,23 +118,24 @@ class BodyframeTorqueProfile {
 class Satellite {
  private:
   double inclination_ = {0};
-  double raan_ = {
-      0};  // Assuming RAAN can be used interchangeably with longitude of
-           // ascending node for the Earth-orbiting satellites simulated here
+  double raan_ = {0};  
+  // Assuming RAAN can be used interchangeably with longitude of
+  // ascending node for the Earth-orbiting satellites simulated here
   double arg_of_periapsis_ = {0};
   double eccentricity_ = {0};
   double a_ = {0};
   double true_anomaly_ = {0};
   double orbital_period_ = {0};
-  double m_ = {1};  // default value to prevent infinities in acceleration
-                    // calculations from a=F/m
+  double m_ = {1};  
+  // default value to prevent infinities in acceleration
+  // calculations from a=F/m
   // double I_={1}; //moment of inertia, taken to be same for all 3 principal
   // axes, set to default value for same reasons as mass
   double t_ = {0};
 
   double orbital_rate_ = {0};
-  double orbital_angular_acceleration_ = {0};  // Time derivative of orbital
-                                               // rate
+  // Time derivative of orbital rate
+  double orbital_angular_acceleration_ = {0};  
 
   // Now body-frame attributes
   // Assuming diagonal J matrix
@@ -152,8 +154,8 @@ class Satellite {
 
   // body-frame angular velocities relative to the LVLH frame, represented in
   // the body frame
-  std::array<double, 3> body_angular_velocity_vec_wrt_LVLH_in_body_frame_ = {
-      0, 0, 0};
+  std::array<double, 3> body_angular_velocity_vec_wrt_LVLH_in_body_frame_ 
+    = {0, 0, 0};
 
   // quaternion representing attitude of satellite body frame with respect to
   // the LVLH frame
