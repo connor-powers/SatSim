@@ -37,8 +37,14 @@ int main() {
   sim_parameters.initial_timestep_guess = 2;
   sim_parameters.total_sim_time = 25000;
   sim_parameters.epsilon = pow(10, -12);
+  sim_parameters.x_increment = pow(10,7);
+  sim_parameters.y_increment = pow(10,7);
+  sim_parameters.z_increment = 5*pow(10,6);
   sim_and_draw_orbit_gnuplot(satellite_vector_1, sim_parameters);
-
+  // Reset increments
+  sim_parameters.x_increment = 0;
+  sim_parameters.y_increment = 0;
+  sim_parameters.z_increment = 0;
   // Now some demonstrations of plotting orbital parameters
   Satellite test_sat_4("../example_satellite_input_files/input_4.json");
   Satellite test_sat_5("../example_satellite_input_files/input_5.json");
