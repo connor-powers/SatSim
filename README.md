@@ -26,6 +26,15 @@
   
 - Simple customizable phased array ground stations
 
+- Automatically-generated thrust profiles for select orbital maneuvers:
+
+   - Continuous (low) thrust orbit raising/lowering between circular orbits
+   
+   - Continuous (low) thrust maneuvers to change argument of perigee
+      
+      - Note: Thrust profiles of argument of periapsis change maneuvers are calculated assuming a "continuous" maneuver takes place (i.e., a burn arc angle $\alpha = \pi/2$ radians in https://apps.dtic.mil/sti/tr/pdf/ADA384536.pdf). Therefore it is not recommended to use this feature outside of parameter ranges where this assumption does not hold.
+
+
 ## TO DO
 - Automate code coverage badge updating via Github Actions
 - Change thrust profiles to be input in the satellite body-frame
