@@ -1,5 +1,5 @@
 # 6 DOF simulation of customizable satellites in Earth's orbit.
-![CodeLineCoverage](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fconnor-powers%2FSatSim%2Frefs%2Fheads%2Fmain%2Ftests%2Ftest_coverage_summary.json&query=%24.line_percent&suffix=%25&label=Line%20Coverage&color=g)
+![Code Line Coverage](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fconnor-powers%2FSatSim%2Frefs%2Fheads%2Fmain%2Ftests%2Ftest_coverage_summary.json&query=line_percent&suffix=%25&color=green)
 
 
 ## Current Features:
