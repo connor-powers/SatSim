@@ -419,16 +419,16 @@ void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
     // fprintf(gnuplot_pipe,"set view 70,1,1,1\n");
     fprintf(gnuplot_pipe, "set view equal xyz\n");
     if (input_sim_parameters.x_increment != 0) {
-      fprintf(gnuplot_pipe, "set xtics %e offset 0,-1\n",
+      fprintf(gnuplot_pipe, "set xtics %e offset 0,-1.5\n",
               input_sim_parameters.x_increment);
     } else {
-      fprintf(gnuplot_pipe, "set xtics offset 0,-1\n");
+      fprintf(gnuplot_pipe, "set xtics offset 0,-1.5\n");
     }
     if (input_sim_parameters.y_increment != 0) {
-      fprintf(gnuplot_pipe, "set ytics %e offset -1,0\n",
+      fprintf(gnuplot_pipe, "set ytics %e offset -1.5,0\n",
               input_sim_parameters.y_increment);
     } else {
-      fprintf(gnuplot_pipe, "set ytics offset -1,0\n");
+      fprintf(gnuplot_pipe, "set ytics offset -1.5,0\n");
     }
     if (input_sim_parameters.z_increment != 0) {
       fprintf(gnuplot_pipe, "set ztics %e\n", input_sim_parameters.z_increment);
