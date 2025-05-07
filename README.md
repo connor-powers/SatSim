@@ -1,7 +1,8 @@
 # 6 DOF simulation of customizable satellites in Earth's orbit.
 ![Line Coverage Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fconnor-powers%2FSatSim%2Frefs%2Fheads%2Fmain%2Ftests%2Ftest_coverage_summary.json&query=line_percent&suffix=%25&label=Line%20Coverage&color=green)
 
-![Example 3D Plot](./media/example_3D_plot.png)
+<img src="./media/example_3D_plot.png" width="65%" />
+
 ## Current Features:
 
 - RK4(5) method for time evolution
