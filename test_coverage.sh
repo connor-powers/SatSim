@@ -6,6 +6,6 @@ cmake --build .
 ./Satellite_tests
 ./utils_tests
 ./gs_tests
-gcovr -r .. --filter ../src/ --filter ../include/ --json-summary ../tests/test_coverage_summary.json --html-details ../tests/test_coverage_detailed.html
+gcovr -r .. --filter ../src/ --filter ../include/ --json-summary ../tests/test_coverage_summary.json --html-details ../tests/test_coverage_detailed.html --gcov-ignore-parse-errors=suspicious_hits.warn
 cd ..
 rm test_plot.png
