@@ -68,8 +68,9 @@ Note: see the "example_project" folder for source files of an example project.
 3. Configure the CMakeLists.txt of the project to use SatSim (once it's built and installed) and its dependencies (see the CMakeLists.txt in example_project for an example)
 4. Create an empty build directory for the project: `mkdir build`
 5. Navigate to the new build directory: `cd build`
-6. Run `cmake --build .` from the new build directory to build the executable
-7. Run `./run`in that build directory
+6. Run `cmake ..`
+7. Run `cmake --build .` from the new build directory to build the executable
+8. Run `./run`in that build directory
 
 ## TO DO
 - Automate code coverage badge updating via Github Actions
