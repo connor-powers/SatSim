@@ -69,8 +69,8 @@ Note: see the "example_project" folder for source files of an example project.
 4. Create an empty build directory for the project: `mkdir build`
 5. Navigate to the new build directory: `cd build`
 6. Run `cmake ..`
-7. Run `cmake --build .` from the new build directory to build the executable
-8. Run `./run`in that build directory
+7. Run `cmake --build .` to build the executable
+8. Run `./run` to run the executable
 
 ## TO DO
 - Automate code coverage badge updating via Github Actions
