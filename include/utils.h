@@ -235,12 +235,12 @@ std::pair<std::array<double, T>, std::pair<double, double>> RK45_step(
 
   std::array<double, T> TE_vec;
   for (size_t s_ind = 0; s_ind < s; s_ind++) {
-    for (size_t y_ind = 0; y_ind < std::size(TE_vec); y_ind++) {
+    for (size_t y_ind = 0; y_ind < TE_vec.size(); y_ind++) {
       TE_vec.at(y_ind) += CT_vec.at(s_ind) * k_vec_vec.at(s_ind).at(y_ind);
     }
   }
 
-  for (size_t y_ind = 0; y_ind < std::size(TE_vec); y_ind++) {
+  for (size_t y_ind = 0; y_ind < TE_vec.size(); y_ind++) {
     TE_vec.at(y_ind) = abs(TE_vec.at(y_ind));
   }
   // I'm going to use the max TE found across the whole position+velocity vec as

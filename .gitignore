@@ -7,3 +7,5 @@ src/files_to_format.txt
 include/files_to_format.txt
 tests/files_to_format.txt
 files_to_format.txt
+_deps/
+CMakeFiles/
