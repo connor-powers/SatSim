@@ -33,7 +33,7 @@
 
    - Continuous (low) thrust orbit raising/lowering between circular orbits
    
-   - Continuous (low) thrust maneuvers to change argument of perigee
+   - Continuous (low) thrust maneuvers to change argument of periapsis
       
       - Note: Thrust profiles of argument of periapsis change maneuvers are calculated assuming a "continuous" maneuver takes place (i.e., a burn arc angle $\alpha = \pi/2$ radians in https://apps.dtic.mil/sti/tr/pdf/ADA384536.pdf). Therefore it is not recommended to use this feature outside of parameter ranges where this assumption does not hold. Maneuvers that take place over a fraction of an orbit are not recommended.
 
