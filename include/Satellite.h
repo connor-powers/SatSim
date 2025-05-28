@@ -328,16 +328,7 @@ class Satellite {
     return sqrt(pow(ECI_position_.at(0), 2) + pow(ECI_position_.at(1), 2) +
                 pow(ECI_position_.at(2), 2));
   }
-  double get_total_energy() {
-    double orbital_radius = get_radius();
-    double gravitational_potential_energy =
-        -G * mass_Earth * m_ / orbital_radius;
-
-    double orbital_speed = get_speed();
-    double kinetic_energy = (1.0 / 2.0) * m_ * (orbital_speed * orbital_speed);
-
-    return (gravitational_potential_energy + kinetic_energy);
-  }
+  double get_total_energy();
   double get_mass() { return m_; }
   double get_instantaneous_time() { return t_; }
   std::string get_name() { return name_; }

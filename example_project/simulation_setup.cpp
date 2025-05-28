@@ -1,14 +1,15 @@
-#include <iostream>
-
 #include "PhasedArrayGroundStation.h"
 #include "Satellite.h"
 #include "utils.h"
+
+#include <iostream>
 
 int main() {
   // This file demonstrates a few different ways you can run and
   // visualize data from satellite simulations.
   // First let's initialize the struct containing parameters for simulation and
   // plotting
+
   SimParameters sim_parameters("../sim_parameters_example.json");
   // Initialize satellite object from an input JSON file
   Satellite test_sat_1("../example_satellite_input_files/input.json");
@@ -22,8 +23,8 @@ int main() {
                                      t_thrust_start, t_thrust_end);
 
   std::array<double, 3> LVLH_thrust_vec_2 = {0.51, 20, -5};
-  double t_thrust_2_start = 5500;
-  double t_thrust_2_end = 6500;
+  double t_thrust_2_start = 3800;
+  double t_thrust_2_end = 4500;
   test_sat_1.add_LVLH_thrust_profile(LVLH_thrust_vec_2, t_thrust_2_start,
                                      t_thrust_2_end);
 
@@ -33,7 +34,6 @@ int main() {
 
   std::vector<Satellite> satellite_vector_1 = {test_sat_1, test_sat_2,
                                                test_sat_3};
-
   sim_parameters.initial_timestep_guess = 2;
   sim_parameters.total_sim_time = 25000;
   sim_parameters.epsilon = pow(10, -12);
@@ -69,6 +69,21 @@ int main() {
   sim_and_plot_attitude_evolution_gnuplot(satellite_vector_3, sim_parameters,
                                           "Pitch", file_name);
 
+  // Equivalent workflow saving data
+  std::string pitch_datafile_prefix = "Sim1-";
+  sim_and_write_to_file(satellite_vector_3, sim_parameters, pitch_datafile_prefix);
+  std::string plotted_parameter = "Pitch";
+  std::string output_filename_2D = "Pitch_from_file";
+  std::vector<std::string> datafile_name_vector = {};
+  for (Satellite sat_object : satellite_vector_3) {
+        std::string sat_name = sat_object.get_name();
+        std::string datafile_name = pitch_datafile_prefix + sat_name;
+        datafile_name_vector.push_back(datafile_name);
+    }
+  plot_2D_from_datafile(datafile_name_vector,
+                            plotted_parameter,
+                            output_filename_2D);
+
   // Now let's demonstrate effect of atmospheric drag approximation
   Satellite test_sat_8("../example_satellite_input_files/input_8.json");
   Satellite test_sat_9("../example_satellite_input_files/input_9.json");
@@ -78,11 +93,11 @@ int main() {
   double F_10 = 100;  // Solar radio ten centimeter flux
   double A_p = 120;   // Geomagnetic A_p index
 
-  // Collect drag parameters into a tuple with F_10 first and A_p second
-  std::pair<double, double> drag_elements = {F_10, A_p};
   sim_parameters.total_sim_time = 10000;
   sim_parameters.epsilon = pow(10, -14);
   sim_parameters.drag_bool = true;
+  sim_parameters.F_10 = F_10;
+  sim_parameters.A_p = A_p;
   file_name = "Eccentricity Plot";
   sim_and_plot_orbital_elem_gnuplot(satellite_vector_4, sim_parameters,
                                     "Eccentricity", file_name);
@@ -157,13 +172,6 @@ int main() {
   sim_and_draw_orbit_gnuplot(orbit_transfer_demo_vec, sim_parameters);
 
   // Now let's demonstrate changing the argument of periapsis
-  // Calibration strategy: there are some inherent oscillations in, e.g., arg of
-  // periapsis, even in absence of external forces or perturbations This
-  // oscillation magnitude can be different in initial and final orbits, so
-  // current strategy is to find the mean val of these oscillations at initial
-  // and final orbits, use those to get an offset, which can be applied to the
-  // final argument of periapsis to try to make the oscillations at the final
-  // orbit be close to the target value
 
   Satellite arg_periapsis_change_sat(
       "../example_satellite_input_files/arg_of_periapsis_test_input.json");
@@ -176,8 +184,7 @@ int main() {
   double final_arg_of_periapsis_deg = 25;
 
   thrust_magnitude = 0.1;  // N
-  // std::cout << "orbital period: " <<
-  // arg_periapsis_change_sat.calculate_orbital_period() << "\n";
+
   arg_periapsis_change_sat.add_maneuver(
       "Argument of Periapsis Change", t_thrust_start,
       final_arg_of_periapsis_deg, thrust_magnitude);
@@ -188,5 +195,28 @@ int main() {
                                     sim_parameters, "Argument of Periapsis",
                                     file_name);
 
+  // Now let's demonstrate the workflow if you choose to save simulation data to a data file then plot from the data file(s)
+  sim_parameters.epsilon = pow(10,-12);
+  sim_parameters.total_sim_time = 25000;
+  sim_parameters.x_increment = pow(10,7);
+  sim_parameters.y_increment = pow(10,7);
+  sim_parameters.z_increment = 5*pow(10,6);
+  sim_parameters.drag_bool = false;
+  std::string datafile_prefix = "Sim2-";
+  sim_and_write_to_file(satellite_vector_1, sim_parameters, datafile_prefix);
+  datafile_name_vector = {};
+  for (Satellite sat_object : satellite_vector_1) {
+        std::string sat_name = sat_object.get_name();
+        std::string datafile_name = datafile_prefix + sat_name;
+        datafile_name_vector.push_back(datafile_name);
+    }
+  std::string output_file_name = "sample_output_3D_plot";
+  std::string terminal_name = "qt";
+  plot_3D_from_datafile(datafile_name_vector,
+                                output_file_name,
+                                terminal_name,
+                                sim_parameters.x_increment,
+                                sim_parameters.y_increment,
+                                sim_parameters.z_increment);
   return 0;
 }

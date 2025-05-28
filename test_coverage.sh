@@ -1,3 +1,4 @@
+mkdir -p data
 rm -rf build
 mkdir build
 cd build/
@@ -9,3 +10,4 @@ cmake --build .
 gcovr -r .. --filter ../src/ --filter ../include/ --json-summary ../tests/test_coverage_summary.json --html-details ../tests/test_coverage_detailed.html
 cd ..
 rm test_plot.png
+rm -rf data
