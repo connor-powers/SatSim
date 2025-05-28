@@ -4,6 +4,9 @@
 #include <Eigen/Geometry>
 #include <cmath>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <stdexcept>
 
 #include "PhasedArrayGroundStation.h"
 #include "Satellite.h"
@@ -385,6 +388,462 @@ std::array<double, 6> RK45_deriv_function_orbit_position_and_velocity(
   return derivative_of_input_y;
 }
 
+/// @brief Runs the requested simulation and writes output data to a text file
+/// @param input_satellite_vector: The vector of satellite objects to be simulated
+/// @param input_sim_parameters: A SimParameters struct containing simulation parameters
+/// @param output_file_name_prefix: The prefix of the text file containing simulation data. Individual satellite data files will start with this prefix, followed by the satellite name.
+int sim_and_write_to_file(std::vector<Satellite> input_satellite_vector,
+                                const SimParameters& input_sim_parameters,
+                                const std::string output_file_name_prefix,
+                                const double size_limit) {
+  // Estimate of bytes of output file (NOTE: size on disk may be different): 372.67*n - 189.97 with n the number of timesteps at which there exists data
+  // This would change if, e.g., the number of values stored at each timestep changed, or the precision at which these values are written are changed
+  double size_estimate_slope = 372.67;
+  double size_estimate_y_intercept = -189.97;
+  double size_estimate = size_estimate_y_intercept; // bytes (this isn't physical at n = 0, but need to account for possibility that no data is written)
+  // One satellite at a time
+  for (Satellite current_satellite : input_satellite_vector) {
+    std::string satellite_name = current_satellite.get_name();
+    std::string file_name = "../data/" + output_file_name_prefix + satellite_name;
+    std::ofstream output_file(file_name.c_str());
+    // Get initial values of all stored parameters
+    double current_satellite_time =
+        current_satellite.get_instantaneous_time();
+    // ECI Position
+    std::array<double,3> current_satellite_position_ECI = current_satellite.get_ECI_position();
+    double current_satellite_position_ECI_x = current_satellite_position_ECI.at(0);
+    double current_satellite_position_ECI_y = current_satellite_position_ECI.at(1);
+    double current_satellite_position_ECI_z = current_satellite_position_ECI.at(2);
+    // ECI Velocity
+    std::array<double,3> current_satellite_velocity_ECI = current_satellite.get_ECI_velocity();
+    double current_satellite_velocity_ECI_x = current_satellite_velocity_ECI.at(0);
+    double current_satellite_velocity_ECI_y = current_satellite_velocity_ECI.at(1);
+    double current_satellite_velocity_ECI_z = current_satellite_velocity_ECI.at(2);
+    // Attitude-related values
+    double current_satellite_roll = current_satellite.get_attitude_val("Roll");
+    double current_satellite_pitch = current_satellite.get_attitude_val("Pitch");
+    double current_satellite_yaw = current_satellite.get_attitude_val("Yaw");
+    double current_satellite_omega_x = current_satellite.get_attitude_val("omega_x");
+    double current_satellite_omega_y = current_satellite.get_attitude_val("omega_y");
+    double current_satellite_omega_z = current_satellite.get_attitude_val("omega_z");
+    double current_satellite_q_0 = current_satellite.get_attitude_val("q_0");
+    double current_satellite_q_1 = current_satellite.get_attitude_val("q_1");
+    double current_satellite_q_2 = current_satellite.get_attitude_val("q_2");
+    double current_satellite_q_3 = current_satellite.get_attitude_val("q_3");
+    // Orbit-related parameters
+    double current_satellite_a = current_satellite.get_orbital_parameter("Semimajor Axis");
+    double current_satellite_eccentricity = current_satellite.get_orbital_parameter("Eccentricity");
+    double current_satellite_inclination = current_satellite.get_orbital_parameter("Inclination");
+    double current_satellite_raan = current_satellite.get_orbital_parameter("RAAN");
+    double current_satellite_arg_of_periapsis = current_satellite.get_orbital_parameter("Argument of Periapsis");
+    double current_satellite_true_anomaly = current_satellite.get_orbital_parameter("True Anomaly");
+    double current_satellite_orbital_rate = current_satellite.get_orbital_parameter("Orbital Rate");
+    double current_satellite_orbital_ang_acc = current_satellite.get_orbital_parameter("Orbital Angular Acceleration");
+    double current_satellite_total_energy = current_satellite.get_orbital_parameter("Total Energy");
+
+    int num_digits = 15;
+
+    // Write initial datapoints
+    output_file << std::setprecision(num_digits) 
+    << current_satellite_time << " "
+    << current_satellite_position_ECI_x << " "
+    << current_satellite_position_ECI_y << " "
+    << current_satellite_position_ECI_z << " "
+    << current_satellite_velocity_ECI_x << " "
+    << current_satellite_velocity_ECI_y << " "
+    << current_satellite_velocity_ECI_z << " "
+    << current_satellite_roll << " "
+    << current_satellite_pitch << " "
+    << current_satellite_yaw << " "
+    << current_satellite_omega_x << " "
+    << current_satellite_omega_y << " "
+    << current_satellite_omega_z << " "
+    << current_satellite_q_0 << " "
+    << current_satellite_q_1 << " "
+    << current_satellite_q_2 << " "
+    << current_satellite_q_3 << " "
+    << current_satellite_a << " "
+    << current_satellite_eccentricity << " "
+    << current_satellite_inclination << " "
+    << current_satellite_raan << " "
+    << current_satellite_arg_of_periapsis << " "
+    << current_satellite_true_anomaly << " "
+    << current_satellite_orbital_rate << " "
+    << current_satellite_orbital_ang_acc << " "
+    << current_satellite_total_energy << "\n";
+    size_estimate += size_estimate_slope;
+    if (size_estimate >= size_limit) {
+      std::cout << "Hit estimated number of bytes above input limit, exiting early\n";
+      output_file.close();
+      return 2;
+    }
+
+    double timestep_to_use = input_sim_parameters.initial_timestep_guess;
+    while (current_satellite_time < input_sim_parameters.total_sim_time) {
+
+      std::pair<double, double> drag_elements = {input_sim_parameters.F_10,
+                                                  input_sim_parameters.A_p};
+      std::pair<double, int> new_timestep_and_error_code =
+          current_satellite.evolve_RK45(
+              input_sim_parameters.epsilon, timestep_to_use,
+              input_sim_parameters.perturbation_bool,
+              input_sim_parameters.drag_bool, drag_elements);
+      double new_timestep = new_timestep_and_error_code.first;
+      int error_code = new_timestep_and_error_code.second;
+
+      if (error_code != 0) {
+        std::cout << "Error code " << error_code
+                  << " detected, halting simulation\n";
+        output_file << "Error code " << error_code
+                  << " detected, halting simulation\n";
+        output_file.close();
+        return 1;
+      }
+      timestep_to_use = new_timestep;
+      current_satellite_time = current_satellite.get_instantaneous_time();
+      // Get updated parameters
+      // ECI Position
+        current_satellite_position_ECI = current_satellite.get_ECI_position();
+        current_satellite_position_ECI_x = current_satellite_position_ECI.at(0);
+        current_satellite_position_ECI_y = current_satellite_position_ECI.at(1);
+        current_satellite_position_ECI_z = current_satellite_position_ECI.at(2);
+        // ECI Velocity
+        current_satellite_velocity_ECI = current_satellite.get_ECI_velocity();
+        current_satellite_velocity_ECI_x = current_satellite_velocity_ECI.at(0);
+        current_satellite_velocity_ECI_y = current_satellite_velocity_ECI.at(1);
+        current_satellite_velocity_ECI_z = current_satellite_velocity_ECI.at(2);
+        // Attitude-related values
+        current_satellite_roll = current_satellite.get_attitude_val("Roll");
+        current_satellite_pitch = current_satellite.get_attitude_val("Pitch");
+        current_satellite_yaw = current_satellite.get_attitude_val("Yaw");
+        current_satellite_omega_x = current_satellite.get_attitude_val("omega_x");
+        current_satellite_omega_y = current_satellite.get_attitude_val("omega_y");
+        current_satellite_omega_z = current_satellite.get_attitude_val("omega_z");
+        current_satellite_q_0 = current_satellite.get_attitude_val("q_0");
+        current_satellite_q_1 = current_satellite.get_attitude_val("q_1");
+        current_satellite_q_2 = current_satellite.get_attitude_val("q_2");
+        current_satellite_q_3 = current_satellite.get_attitude_val("q_3");
+        // Orbit-related parameters
+        current_satellite_a = current_satellite.get_orbital_parameter("Semimajor Axis");
+        current_satellite_eccentricity = current_satellite.get_orbital_parameter("Eccentricity");
+        current_satellite_inclination = current_satellite.get_orbital_parameter("Inclination");
+        current_satellite_raan = current_satellite.get_orbital_parameter("RAAN");
+        current_satellite_arg_of_periapsis = current_satellite.get_orbital_parameter("Argument of Periapsis");
+        current_satellite_true_anomaly = current_satellite.get_orbital_parameter("True Anomaly");
+        current_satellite_orbital_rate = current_satellite.get_orbital_parameter("Orbital Rate");
+        current_satellite_orbital_ang_acc = current_satellite.get_orbital_parameter("Orbital Angular Acceleration");
+        current_satellite_total_energy = current_satellite.get_orbital_parameter("Total Energy");
+
+        // Write updated parameters to file
+        output_file << std::setprecision(num_digits) 
+        << current_satellite_time << " "
+        << current_satellite_position_ECI_x << " "
+        << current_satellite_position_ECI_y << " "
+        << current_satellite_position_ECI_z << " "
+        << current_satellite_velocity_ECI_x << " "
+        << current_satellite_velocity_ECI_y << " "
+        << current_satellite_velocity_ECI_z << " "
+        << current_satellite_roll << " "
+        << current_satellite_pitch << " "
+        << current_satellite_yaw << " "
+        << current_satellite_omega_x << " "
+        << current_satellite_omega_y << " "
+        << current_satellite_omega_z << " "
+        << current_satellite_q_0 << " "
+        << current_satellite_q_1 << " "
+        << current_satellite_q_2 << " "
+        << current_satellite_q_3 << " "
+        << current_satellite_a << " "
+        << current_satellite_eccentricity << " "
+        << current_satellite_inclination << " "
+        << current_satellite_raan << " "
+        << current_satellite_arg_of_periapsis << " "
+        << current_satellite_true_anomaly << " "
+        << current_satellite_orbital_rate << " "
+        << current_satellite_orbital_ang_acc << " "
+        << current_satellite_total_energy << "\n";
+        size_estimate += size_estimate_slope;
+        if (size_estimate >= size_limit) {
+          std::cout << "Hit estimated number of bytes above input limit, exiting early\n";
+          output_file.close();
+          return 2;
+        }
+    }
+    output_file.close();
+  }
+  return 0;
+}
+
+
+/// @brief Uses Gnuplot to plot a specified parameter from a specified simulation data file.
+/// @param data_file_name: Name of the data file to use
+/// @param parameter_to_plot: Parameter you would like to plot. See comments above implementation for details.
+
+/*
+Possible values of "parameter_to_plot":
+"3D Position" - makes an interactive 3D plot of the satellite's ECI position [m]. This is the only 3D plot currently supported.alignas
+The following are available as 2D plots (the specified parameter will be plotted with respect to simulation time)
+"X Velocity" - X component of ECI velocity [m/s]
+"Y Velocity" - Y component of ECI velocity [m/s]
+"Z Velocity" - Z component of ECI velocity [m/s]
+"Roll" - Satellite's roll angle with respect to LVLH frame, represented in the satellite body frame [deg]
+"Pitch" - Satellite's pitch angle with respect to LVLH frame, represented in the satellite body frame [deg]
+"Yaw" - Satellite's yaw angle with respect to LVLH frame, represented in the satellite body frame [deg]
+"omega_x" - x component of satellite's body-frame angular velocity with respect to the LVLH frame [deg/s]
+"omega_y" - y component of satellite's body-frame angular velocity with respect to the LVLH frame [deg/s]
+"omega_z" - z component of satellite's body-frame angular velocity with respect to the LVLH frame [deg/s]
+"q_0" - First (scalar) component of quaternion representing satellite's attitude with respect to the LVLH frame
+"q_1" - Second component of quaternion representing satellite's attitude with respect to the LVLH frame
+"q_2" - Third component of quaternion representing satellite's attitude with respect to the LVLH frame
+"q_3" - Fourth component of quaternion representing satellite's attitude with respect to the LVLH frame
+"Semimajor Axis" - Semimajor axis of satellite's orbit [m]
+"Eccentricity" - Eccentricity of satellite's orbit
+"Inclination" - Inclination of satellite's orbit [deg]
+"RAAN" - Right ascension of the ascending node of satellite's orbit [deg]
+        (assumed to be equivalent to the longitude of the ascending node for Earth-orbiting satellites simulated here)
+"Argument of Periapsis" - Argument of periapsis of the satellite's orbit [deg]
+"True Anomaly" - True anomaly of the satellite's orbit [deg]
+"Orbital Rate" - Rate of change of the true anomaly
+"Orbital Angular Acceleration" - Second time derivative of the true anomaly
+"Total Energy" - Satellite's total energy 
+                (here taken to be gravitational potential energy + translational kinetic energy + rotational kinetic energy)
+*/
+void plot_3D_from_datafile(std::vector<std::string> input_datafile_name_vector,
+                                const std::string output_file_name,
+                                const std::string terminal_name,
+                                const double x_increment,
+                                const double y_increment,
+                                const double z_increment) {
+  if (input_datafile_name_vector.size() < 1) {
+    throw std::invalid_argument("Empty datafile name vector");
+  }
+  // first, open "pipe" to gnuplot
+  std::string gnuplot_arg_string = "gnuplot";
+  if (terminal_name == "qt") {
+    gnuplot_arg_string += " -persist";
+  }
+  FILE* gnuplot_pipe = popen(gnuplot_arg_string.c_str(), "w");
+
+  // if it exists
+  if (gnuplot_pipe) {
+    fprintf(gnuplot_pipe, "set terminal '%s' size 900,700 font ',14'\n",
+            terminal_name.c_str());
+    if (terminal_name == "png") {
+      fprintf(gnuplot_pipe, "set output '../%s.png'\n",
+              output_file_name.c_str());
+    }
+    // formatting
+    fprintf(gnuplot_pipe, "set xlabel 'x [m]' offset 0,-2\n");
+    fprintf(gnuplot_pipe, "set ylabel 'y [m]' offset -2,0\n");
+    fprintf(gnuplot_pipe, "set zlabel 'z [m]'\n");
+    // fprintf(gnuplot_pipe,"set view 70,1,1,1\n");
+    fprintf(gnuplot_pipe, "set view equal xyz\n");
+    if (x_increment != 0) {
+      fprintf(gnuplot_pipe, "set xtics %e offset 0,-1.5\n",
+              x_increment);
+    } else {
+      fprintf(gnuplot_pipe, "set xtics offset 0,-1.5\n");
+    }
+    if (y_increment != 0) {
+      fprintf(gnuplot_pipe, "set ytics %e offset -1.5,0\n",
+              y_increment);
+    } else {
+      fprintf(gnuplot_pipe, "set ytics offset -1.5,0\n");
+    }
+    if (z_increment != 0) {
+      fprintf(gnuplot_pipe, "set ztics %e\n", z_increment);
+    }
+    fprintf(gnuplot_pipe, "unset colorbox\n");
+    fprintf(gnuplot_pipe, "set style fill transparent solid 1.0\n");
+
+    fprintf(gnuplot_pipe, "set key offset 0,-10\n");
+    fprintf(gnuplot_pipe, "set hidden3d front\n");
+
+    // plotting
+    // first let's set the stage for plotting the Earth
+    fprintf(gnuplot_pipe, "R_Earth=%.17g\n", radius_Earth);
+    fprintf(gnuplot_pipe, "set isosamples 50,50\n");
+    fprintf(gnuplot_pipe, "set parametric\n");
+    fprintf(gnuplot_pipe, "set urange [-pi/2:pi/2]\n");
+    fprintf(gnuplot_pipe, "set vrange [0:2*pi]\n");
+
+    // first satellite
+    std::string current_file_name = input_datafile_name_vector.at(0);
+    if (input_datafile_name_vector.size() == 1) {
+      fprintf(gnuplot_pipe, "splot '../data/%s' using 2:3:4 with lines lw 1 title '%s' \\\n",
+              current_file_name.c_str(),
+              current_file_name.c_str());
+    }
+
+    else {
+      fprintf(gnuplot_pipe, "splot '../data/%s' using 2:3:4 with lines lw 1 title '%s'\\\n",
+              current_file_name.c_str(),
+              current_file_name.c_str());
+    }
+
+    for (size_t datafile_index = 1;
+         datafile_index < input_datafile_name_vector.size(); datafile_index++) {
+      current_file_name = input_datafile_name_vector.at(datafile_index);
+      if (datafile_index < input_datafile_name_vector.size() - 1) {
+        fprintf(gnuplot_pipe, ",'../data/%s' using 2:3:4 with lines lw 1 title '%s' \\\n",
+                current_file_name.c_str(),
+                current_file_name.c_str());
+      }
+      else {
+        fprintf(gnuplot_pipe, ",'../data/%s' using 2:3:4 with lines lw 1 title '%s' \\\n",
+                current_file_name.c_str(),
+                current_file_name.c_str());
+        }
+    }
+    fprintf(gnuplot_pipe,
+            ",R_Earth*cos(u)*cos(v),R_Earth*cos(u)*sin(v),R_Earth*sin(u) "
+            "notitle with pm3d fillcolor rgbcolor 'navy'\n");
+
+    if (terminal_name == "qt") {
+      fprintf(gnuplot_pipe, "pause mouse keypress\n");
+    }
+    fprintf(gnuplot_pipe, "exit \n");
+    pclose(gnuplot_pipe);
+    std::cout << "Done\n";
+
+  } else {
+    std::cout << "gnuplot not found";
+  }
+
+  return;
+}
+
+
+
+// Now the 2D version for plotting parameters over time
+void plot_2D_from_datafile(std::vector<std::string> input_datafile_name_vector,
+                            const std::string plotted_parameter,
+                            const std::string output_file_name) {
+  if (input_datafile_name_vector.size() < 1) {
+    throw std::invalid_argument("Empty datafile name vector");
+  }
+
+  std::unordered_map<std::string,std::string> name_to_units_map;
+  name_to_units_map["X Velocity"] = "[m/s]";
+  name_to_units_map["Y Velocity"] = "[m/s]";
+  name_to_units_map["Z Velocity"] = "[m/s]";
+  name_to_units_map["Semimajor Axis"] = "[m]";
+  name_to_units_map["Eccentricity"] = "";
+  name_to_units_map["Inclination"] = "[deg]";
+  name_to_units_map["Argument of Periapsis"] = "[deg]";
+  name_to_units_map["RAAN"] = "[deg]";
+  name_to_units_map["True Anomaly"] = "[deg]";
+  name_to_units_map["Roll"] = "[deg]";
+  name_to_units_map["Pitch"] = "[deg]";
+  name_to_units_map["Yaw"] = "[deg]";
+  name_to_units_map["omega_x"] = "[deg/s]";
+  name_to_units_map["omega_y"] = "[deg/s]";
+  name_to_units_map["omega_z"] = "[deg/s]";
+  name_to_units_map["q_0"] = "";
+  name_to_units_map["q_1"] = "";
+  name_to_units_map["q_2"] = "";
+  name_to_units_map["q_3"] = "";
+  name_to_units_map["Total Energy"] = "[J]";
+  name_to_units_map["Orbital Rate"] = "[rad/s]";
+  name_to_units_map["Orbital Angular Acceleration"] = "[rad/s^2]";
+
+  std::unordered_map<std::string,int> name_to_col_map;
+  name_to_col_map["X Velocity"] = 5;
+  name_to_col_map["Y Velocity"] = 6;
+  name_to_col_map["Z Velocity"] = 7;
+  name_to_col_map["Roll"] = 8;
+  name_to_col_map["Pitch"] = 9;
+  name_to_col_map["Yaw"] = 10;
+  name_to_col_map["omega_x"] = 11;
+  name_to_col_map["omega_y"] = 12;
+  name_to_col_map["omega_z"] = 13;
+  name_to_col_map["q_0"] = 14;
+  name_to_col_map["q_1"] = 15;
+  name_to_col_map["q_2"] = 16;
+  name_to_col_map["q_3"] = 17;
+  name_to_col_map["Semimajor Axis"] = 18;
+  name_to_col_map["Eccentricity"] = 19;
+  name_to_col_map["Inclination"] = 20;
+  name_to_col_map["RAAN"] = 21;
+  name_to_col_map["Argument of Periapsis"] = 22;
+  name_to_col_map["True Anomaly"] = 23;
+  name_to_col_map["Orbital Rate"] = 24;
+  name_to_col_map["Orbital Angular Acceleration"] = 25;
+  name_to_col_map["Total Energy"] = 26;
+
+  // first, open "pipe" to gnuplot
+  FILE* gnuplot_pipe = popen("gnuplot", "w");
+  // if it exists
+  if (gnuplot_pipe) {
+    fprintf(gnuplot_pipe,
+            "set terminal png size 800,500 font ',14' linewidth 2\n");
+    // formatting
+    fprintf(gnuplot_pipe, "set output '../%s.png'\n", output_file_name.c_str());
+    fprintf(gnuplot_pipe, "set offsets graph 0, 0, 0.05, 0.05\n");
+    fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
+    if (name_to_units_map.count(plotted_parameter) == 0) {
+      throw std::invalid_argument("Unrecognized parameter to plot");
+    }
+    std::string plotted_element_units = name_to_units_map[plotted_parameter];
+    int plotted_element_column = name_to_col_map[plotted_parameter];
+    fprintf(gnuplot_pipe, "set ylabel '%s %s'\n",
+              plotted_parameter.c_str(),
+              plotted_element_units.c_str());
+    fprintf(gnuplot_pipe, "set key right bottom\n");
+
+    // plotting
+
+    // first satellite
+    std::string current_datafile_name = input_datafile_name_vector.at(0);
+    if (input_datafile_name_vector.size() == 1) {
+      fprintf(gnuplot_pipe,
+                "plot '../data/%s' using 1:%d with lines lw 1 title '%s' \n",
+                current_datafile_name.c_str(),
+                plotted_element_column, 
+                current_datafile_name.c_str());
+    }
+
+    else {
+      fprintf(gnuplot_pipe,
+                "plot '../data/%s' using 1:%d with lines lw 1 title '%s'\\\n",
+                current_datafile_name.c_str(),
+                plotted_element_column, 
+                current_datafile_name.c_str());
+
+    }
+
+    for (size_t datafile_index = 1;
+         datafile_index < input_datafile_name_vector.size(); datafile_index++) {
+      current_datafile_name = input_datafile_name_vector.at(datafile_index);
+      if (datafile_index < input_datafile_name_vector.size() - 1) {
+          fprintf(gnuplot_pipe,
+                    ",'../data/%s' using 1:%d with lines lw 1 title '%s'\\\n",
+                    current_datafile_name.c_str(),
+                    plotted_element_column, 
+                    current_datafile_name.c_str());
+      }
+
+      else {
+          fprintf(gnuplot_pipe,
+                    ",'../data/%s' using 1:%d with lines lw 1 title '%s'\n",
+                    current_datafile_name.c_str(),
+                    plotted_element_column, 
+                    current_datafile_name.c_str());
+      }
+    }
+
+    fprintf(gnuplot_pipe, "exit \n");
+    pclose(gnuplot_pipe);
+    std::cout << "Done\n";
+
+  } else {
+    std::cout << "gnuplot not found";
+  }
+
+  return;
+}
+
+
 // Objective: simulate the input satellites over the specified total sim time,
 // and visualize the resulting orbits in an interactive 3D plot using gnuplot
 void sim_and_draw_orbit_gnuplot(std::vector<Satellite> input_satellite_vector,
@@ -581,6 +1040,7 @@ void sim_and_plot_orbital_elem_gnuplot(
             "set terminal png size 800,500 font ',14' linewidth 2\n");
     // formatting
     fprintf(gnuplot_pipe, "set output '../%s.png'\n", file_name.c_str());
+    fprintf(gnuplot_pipe, "set offsets graph 0, 0, 0.05, 0.05\n");
     fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
     if (input_orbital_element_name == "Semimajor Axis") {
       fprintf(gnuplot_pipe, "set ylabel '%s [m]'\n",
@@ -707,7 +1167,6 @@ void sim_and_plot_orbital_elem_gnuplot(
       }
       fprintf(gnuplot_pipe, "e\n");
     }
-    fprintf(gnuplot_pipe, "pause mouse keypress\n");
 
     fprintf(gnuplot_pipe, "exit \n");
     pclose(gnuplot_pipe);
@@ -763,6 +1222,7 @@ void sim_and_plot_attitude_evolution_gnuplot(
             "set terminal png size 800,500 font ',14' linewidth 2\n");
     // formatting
     fprintf(gnuplot_pipe, "set output '../%s.png'\n", file_name.c_str());
+    fprintf(gnuplot_pipe, "set offsets graph 0, 0, 0.05, 0.05\n");
     fprintf(gnuplot_pipe, "set xlabel 'Time [s]'\n");
     if ((input_plotted_val_name == "omega_x") ||
         (input_plotted_val_name == "omega_y") ||
@@ -886,7 +1346,6 @@ void sim_and_plot_attitude_evolution_gnuplot(
       }
       fprintf(gnuplot_pipe, "e\n");
     }
-    fprintf(gnuplot_pipe, "pause mouse keypress\n");
 
     fprintf(gnuplot_pipe, "exit \n");
     pclose(gnuplot_pipe);

@@ -765,3 +765,23 @@ void Satellite::add_maneuver(const std::string maneuver_type,
                                                                  maneuver_vals};
   maneuvers_awaiting_initiation_.push_back(maneuver_info);
 }
+
+double Satellite::get_total_energy() {
+  // First, gravitational potential energy
+  double orbital_radius = get_radius();
+  double gravitational_potential_energy =
+      -G * mass_Earth * m_ / orbital_radius;
+
+  // Next, translational kinetic energy
+  double orbital_speed = get_speed();
+  double translational_kinetic_energy = (1.0 / 2.0) * m_ * (orbital_speed * orbital_speed);
+
+  // Next, rotational kinetic energy
+  double rotational_kinetic_energy = 0;
+  std::array<double,3> body_angular_velocity_vec_wrt_LVLH_in_body_frame = body_angular_velocity_vec_wrt_LVLH_in_body_frame_;
+  rotational_kinetic_energy += (0.5 * J_11_ * body_angular_velocity_vec_wrt_LVLH_in_body_frame.at(0)*body_angular_velocity_vec_wrt_LVLH_in_body_frame.at(0));
+  rotational_kinetic_energy += (0.5 * J_22_ * body_angular_velocity_vec_wrt_LVLH_in_body_frame.at(1)*body_angular_velocity_vec_wrt_LVLH_in_body_frame.at(1));
+  rotational_kinetic_energy += (0.5 * J_33_ * body_angular_velocity_vec_wrt_LVLH_in_body_frame.at(2)*body_angular_velocity_vec_wrt_LVLH_in_body_frame.at(2));
+
+  return (gravitational_potential_energy + translational_kinetic_energy + rotational_kinetic_energy);
+}

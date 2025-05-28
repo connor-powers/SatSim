@@ -522,4 +522,20 @@ int add_lowthrust_orbit_transfer(Satellite& input_satellite_object,
                                  const double final_orbit_semimajor_axis_km,
                                  const double thrust_magnitude,
                                  const double transfer_initiation_time = 0);
+
+int sim_and_write_to_file(std::vector<Satellite> input_satellite_vector,
+                                const SimParameters& input_sim_parameters,
+                                const std::string output_file_name_prefix,
+                                const double size_limit = INFINITY);
+
+void plot_3D_from_datafile(std::vector<std::string> input_datafile_name_vector,
+                                const std::string output_file_name = "3D plot",
+                                const std::string terminal_name = "qt",
+                                const double x_increment = 0,
+                                const double y_increment = 0,
+                                const double z_increment = 0);
+
+void plot_2D_from_datafile(std::vector<std::string> input_datafile_name_vector,
+                            const std::string plotted_parameter,
+                            const std::string output_file_name = "2D plot");
 #endif

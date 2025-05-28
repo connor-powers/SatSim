@@ -82,6 +82,7 @@
         "semaphore": "cpp",
         "typeindex": "cpp",
         "dense": "cpp",
-        "mprealsupport": "cpp"
+        "mprealsupport": "cpp",
+        "hash_map": "cpp"
     }
 }

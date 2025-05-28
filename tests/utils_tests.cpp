@@ -548,3 +548,124 @@ TEST(UtilsTests, LowThrustTransferTest2) {
   EXPECT_TRUE(error_code == 1)
       << "Non-circular orbit should have been thrown here\n";
 }
+
+TEST(UtilsTests, DataSavingTest1) {
+  SimParameters sim_parameters("../tests/sim_parameters_baseline.json");
+  Satellite test_sat("../tests/elliptical_orbit_test_1.json");
+  std::string datafile_prefix = "utils_test";
+  std::vector<Satellite> test_vec =  {test_sat};
+  int file_writing_error_code = sim_and_write_to_file(test_vec, sim_parameters, datafile_prefix);
+  EXPECT_TRUE(file_writing_error_code == 0);
+}
+
+TEST(UtilsTests, DataSavingTest2) {
+  SimParameters sim_parameters("../tests/sim_parameters_baseline.json");
+  Satellite test_sat("../tests/elliptical_orbit_test_1.json");
+  Satellite test_sat2("../tests/circular_orbit_test_2_input.json");
+  Satellite test_sat3("../tests/input_2.json");
+  std::string datafile_prefix = "utils_test";
+  std::vector<Satellite> test_vec =  {test_sat,test_sat2,test_sat3};
+  int file_writing_error_code = sim_and_write_to_file(test_vec, sim_parameters, datafile_prefix);
+  EXPECT_TRUE(file_writing_error_code == 0);
+}
+
+TEST(UtilsTests, DataSavingOverflowTest) {
+  SimParameters sim_parameters("../tests/sim_parameters_baseline.json");
+  Satellite test_sat("../tests/elliptical_orbit_test_1.json");
+  Satellite test_sat2("../tests/circular_orbit_test_2_input.json");
+  Satellite test_sat3("../tests/input_2.json");
+  std::string datafile_prefix = "utils_test";
+  std::vector<Satellite> test_vec =  {test_sat,test_sat2,test_sat3};
+  sim_parameters.total_sim_time = 1000000;
+  double size_limit = 50000;
+  int file_writing_error_code = sim_and_write_to_file(test_vec, sim_parameters, datafile_prefix, size_limit);
+  EXPECT_TRUE(file_writing_error_code == 2);
+}
+
+TEST(UtilsTests, PlottingFromDataFile2D_Test1) {
+  SimParameters sim_parameters("../tests/sim_parameters_baseline.json");
+  Satellite test_sat("../tests/elliptical_orbit_test_1.json");
+  std::string datafile_prefix = "Test-";
+  std::vector<Satellite> test_vec =  {test_sat};
+  int file_writing_error_code = sim_and_write_to_file(test_vec, sim_parameters, datafile_prefix);
+  EXPECT_TRUE(file_writing_error_code == 0);
+  std::string plotted_parameter = "Semimajor Axis";
+  std::string output_filename_2D = "2D_plot_example";
+  std::vector<std::string> datafile_name_vector = {};
+  for (Satellite sat_object : test_vec) {
+        std::string sat_name = sat_object.get_name();
+        std::string datafile_name = datafile_prefix + sat_name;
+        datafile_name_vector.push_back(datafile_name);
+    }
+  plot_2D_from_datafile(datafile_name_vector,
+                            plotted_parameter,
+                            output_filename_2D);
+}
+
+TEST(UtilsTests, PlottingFromDataFile2D_Test2) {
+  SimParameters sim_parameters("../tests/sim_parameters_baseline.json");
+  Satellite test_sat("../tests/elliptical_orbit_test_1.json");
+  Satellite test_sat2("../tests/circular_orbit_test_2_input.json");
+  Satellite test_sat3("../tests/input_2.json");
+  std::string datafile_prefix = "Test-";
+  std::vector<Satellite> test_vec =  {test_sat,test_sat2,test_sat3};
+  int file_writing_error_code = sim_and_write_to_file(test_vec, sim_parameters, datafile_prefix);
+  EXPECT_TRUE(file_writing_error_code == 0);
+  std::string plotted_parameter = "Semimajor Axis";
+  std::string output_filename_2D = "2D_plot_example";
+  std::vector<std::string> datafile_name_vector = {};
+  for (Satellite sat_object : test_vec) {
+        std::string sat_name = sat_object.get_name();
+        std::string datafile_name = datafile_prefix + sat_name;
+        datafile_name_vector.push_back(datafile_name);
+    }
+  plot_2D_from_datafile(datafile_name_vector,
+                            plotted_parameter,
+                            output_filename_2D);
+}
+
+TEST(UtilsTests, PlottingFromDataFile3D_Test1) {
+  SimParameters sim_parameters("../tests/sim_parameters_baseline.json");
+  Satellite test_sat("../tests/elliptical_orbit_test_1.json");
+  std::string datafile_prefix = "Test-";
+  std::vector<Satellite> test_vec =  {test_sat};
+  int file_writing_error_code = sim_and_write_to_file(test_vec, sim_parameters, datafile_prefix);
+  EXPECT_TRUE(file_writing_error_code == 0);
+  std::string plotted_parameter = "Semimajor Axis";
+  std::string output_filename_2D = "2D_plot_example";
+  std::vector<std::string> datafile_name_vector = {};
+  for (Satellite sat_object : test_vec) {
+        std::string sat_name = sat_object.get_name();
+        std::string datafile_name = datafile_prefix + sat_name;
+        datafile_name_vector.push_back(datafile_name);
+    }
+  std::string output_file_name = "test_plot";
+  std::string terminal_name = "png";
+  plot_3D_from_datafile(datafile_name_vector,
+                                output_file_name,
+                                terminal_name);
+}
+
+TEST(UtilsTests, PlottingFromDataFile3D_Test2) {
+  SimParameters sim_parameters("../tests/sim_parameters_baseline.json");
+  Satellite test_sat("../tests/elliptical_orbit_test_1.json");
+  Satellite test_sat2("../tests/circular_orbit_test_2_input.json");
+  Satellite test_sat3("../tests/input_2.json");
+  std::string datafile_prefix = "Test-";
+  std::vector<Satellite> test_vec =  {test_sat, test_sat2, test_sat3};
+  int file_writing_error_code = sim_and_write_to_file(test_vec, sim_parameters, datafile_prefix);
+  EXPECT_TRUE(file_writing_error_code == 0);
+  std::string plotted_parameter = "Semimajor Axis";
+  std::string output_filename_2D = "2D_plot_example";
+  std::vector<std::string> datafile_name_vector = {};
+  for (Satellite sat_object : test_vec) {
+        std::string sat_name = sat_object.get_name();
+        std::string datafile_name = datafile_prefix + sat_name;
+        datafile_name_vector.push_back(datafile_name);
+    }
+  std::string output_file_name = "test_plot";
+  std::string terminal_name = "png";
+  plot_3D_from_datafile(datafile_name_vector,
+                                output_file_name,
+                                terminal_name);
+}
