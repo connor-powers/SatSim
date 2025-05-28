@@ -789,7 +789,7 @@ void plot_2D_from_datafile(std::vector<std::string> input_datafile_name_vector,
     fprintf(gnuplot_pipe, "set ylabel '%s %s'\n",
               plotted_parameter.c_str(),
               plotted_element_units.c_str());
-    fprintf(gnuplot_pipe, "set key outside\n");
+    fprintf(gnuplot_pipe, "set key top right\n");
 
     // plotting
 
@@ -1055,7 +1055,7 @@ void sim_and_plot_orbital_elem_gnuplot(
     fprintf(gnuplot_pipe, "set title '%s simulated up to time %.2f s'\n",
             input_orbital_element_name.c_str(),
             input_sim_parameters.total_sim_time);
-    fprintf(gnuplot_pipe, "set key outside\n");
+    fprintf(gnuplot_pipe, "set key top right\n");
 
     // plotting
 
@@ -1241,7 +1241,7 @@ void sim_and_plot_attitude_evolution_gnuplot(
     fprintf(gnuplot_pipe, "set title '%s simulated up to time %.2f s'\n",
             input_plotted_val_name.c_str(),
             input_sim_parameters.total_sim_time);
-    fprintf(gnuplot_pipe, "set key outside\n");
+    fprintf(gnuplot_pipe, "set key top right\n");
 
     // plotting
 
