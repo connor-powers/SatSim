@@ -39,7 +39,7 @@
 
 - Saving simulation data to data files and generating 2D and 3D plots from data files
 
-   - Note: Some plotting-related features (e.g., total simulation time in titles, specified plotting colors) are not yet supported when plotting from data files. Legend names also currently reflect data file names instead of satellite names. I hope to improve plotting from data files in the future.
+   - Note: Some plotting-related features (e.g., total simulation time in titles, specified plotting colors) are not yet supported when plotting from data files. Legend names also currently reflect data file names instead of satellite names. I intend to further improve plotting from data files.
 
 ## SatSim Build + Install Instructions
 Note: this tool requires gnuplot to be installed.
