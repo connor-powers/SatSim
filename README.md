@@ -35,7 +35,11 @@
    
    - Continuous (low) thrust maneuvers to change argument of periapsis
       
-      - Note: Thrust profiles of argument of periapsis change maneuvers are calculated assuming a "continuous" maneuver takes place (i.e., a burn arc angle $\alpha = \pi/2$ radians in https://apps.dtic.mil/sti/tr/pdf/ADA384536.pdf). Therefore it is not recommended to use this feature outside of parameter ranges where this assumption does not hold. Maneuvers that take place over a fraction of an orbit are not recommended.
+      - Note: Thrust profiles of argument of periapsis change maneuvers are calculated assuming a "continuous" maneuver takes place (i.e., a burn arc angle $\alpha = \pi/2$ radians in https://apps.dtic.mil/sti/tr/pdf/ADA384536.pdf) with negligible natural drift rate of the argument of periapsis compared to the rate of change due to the maneuver burn. Therefore it is not recommended to use this feature outside of parameter ranges where these assumptions does not hold. Maneuvers that take place over a fraction of an orbit are not recommended.
+
+- Saving simulation data to data files and generating 2D and 3D plots from data files
+
+   - Note: Some plotting-related features (e.g., total simulation time in titles, specified plotting colors) are not yet supported when plotting from data files. Legend names also currently reflect data file names instead of satellite names. I hope to improve plotting from data files in the future.
 
 ## SatSim Build + Install Instructions
 Note: this tool requires gnuplot to be installed.
@@ -84,6 +88,8 @@ Simulation of zero-inclination orbits isn't currently supported, as the magnitud
 Calculation of instantaneous orbital angular acceleration does not currently include any contribution from the time derivative of the magnitude of the orbital angular momentum vector.
 
 Loss of propellant mass during burns is not yet accounted for.
+
+If saving to data files, make a "data" directory in your project folder.
 
 Visualization/plotting is done via Gnuplot. The copyright and permission notice of Gnuplot is shown below:
 
